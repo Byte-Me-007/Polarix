@@ -5,7 +5,7 @@ import { ConnectionStatus } from './ConnectionStatus';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 
 export const Navbar = () => {
-  const { activeStation } = useStationTelemetry();
+  const { activeStation, config } = useStationTelemetry();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -21,10 +21,8 @@ export const Navbar = () => {
     second: '2-digit'
   });
 
-  // Format Station Local Time (Maitri UTC+0 / Bharati UTC+5 or Indian Standard Expedition reference UTC+5)
-  // Maitri is at 11°E (~UTC+1 approx local solar), standard expedition time often references UTC or UTC+5.
-  // We can calculate Station Solar/Standard Local Time:
-  const localOffsetHours = activeStation === 'MAITRI' ? 1 : 5; // Maitri Queen Maud Land (UTC+1) / Bharati East Antarctica (UTC+5)
+  // Format Station Local Time
+  const localOffsetHours = config?.timeZoneOffsetHours ?? (activeStation === 'MAITRI' ? 1 : 5);
   const stationDate = new Date(currentTime.getTime() + localOffsetHours * 3600000);
   const stationLocalString = stationDate.toLocaleTimeString('en-GB', {
     timeZone: 'UTC',

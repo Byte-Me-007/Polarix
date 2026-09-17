@@ -1,85 +1,87 @@
-// Antarctic Research Stations Configuration and Baseline Telemetry Data
+// Demo data — replace with backend API/WebSocket telemetry during integration.
+
+/**
+ * Configuration-driven Antarctic Research Stations (MAITRI & BHARATI)
+ * Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations (SIH 2026)
+ */
 
 export const STATIONS = {
   MAITRI: {
-    id: "MTR",
-    name: "MAITRI",
-    fullName: "Maitri Antarctic Research Station",
+    stationId: "MAITRI",
+    shortCode: "MTR",
+    displayName: "Maitri Research Station",
     code: "MTR-IND",
     tagline: "Remote Station Monitoring & Decision Support",
-    coordinates: "70°45′58″ S, 11°43′56″ E",
     region: "Schirmacher Oasis, Queen Maud Land",
+    coordinates: "70°45′58″ S, 11°43′56″ E",
+    altitude: "117 m a.s.l.",
     elevation: "117 m a.s.l.",
     established: "1989",
     expedition: "45th Indian Scientific Expedition to Antarctica",
     personnelOnsite: 24,
     status: "OPERATIONAL",
-    connection: "ONLINE"
-  },
-  BHARATI: {
-    id: "BHR",
-    name: "BHARATI",
-    fullName: "Bharati Antarctic Research Station",
-    code: "BHR-IND",
-    tagline: "Remote Station Monitoring & Decision Support",
-    coordinates: "69°24′29″ S, 76°11′14″ E",
-    region: "Larsemann Hills, East Antarctica",
-    elevation: "35 m a.s.l.",
-    established: "2012",
-    expedition: "45th Indian Scientific Expedition to Antarctica",
-    personnelOnsite: 19,
-    status: "OPERATIONAL",
-    connection: "ONLINE"
-  }
-};
+    connection: "ONLINE",
+    timeZoneOffsetHours: 1, // UTC+1 local solar time
 
-export const BASE_TELEMETRY = {
-  MAITRI: {
-    healthScore: 94,
-    healthStatus: "HEALTHY",
-    healthCategories: [
-      { name: "Environment", score: 92, status: "NOMINAL", icon: "CloudSnow" },
-      { name: "Energy", score: 96, status: "OPTIMAL", icon: "Zap" },
-      { name: "Structure", score: 98, status: "STABLE", icon: "Shield" },
-      { name: "Connectivity", score: 95, status: "ONLINE", icon: "Radio" },
-      { name: "Critical Alerts", score: 89, status: "LOW_RISK", icon: "AlertTriangle" }
-    ],
-    power: {
-      currentPower: "76.4 kW",
-      loadPercentage: 64,
-      solarGeneration: "18.5 kW",
-      windGeneration: "34.2 kW",
-      dieselGeneration: "23.7 kW",
-      batteryPercentage: 91,
-      totalGeneration: "76.4 kW"
+    // Readiness configuration
+    readiness: {
+      score: 94,
+      status: "HEALTHY",
+      categories: [
+        { name: "ENVIRONMENT", score: 96, status: "NOMINAL", icon: "CloudSnow" },
+        { name: "ENERGY", score: 91, status: "OPTIMAL", icon: "Zap" },
+        { name: "STRUCTURE", score: 97, status: "STABLE", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 94, status: "ONLINE", icon: "Radio" },
+        { name: "ALERT LOAD", score: 89, status: "LOW_RISK", icon: "AlertTriangle" }
+      ]
     },
+
+    // Power Subsystem configuration
+    power: {
+      currentPower: "84.3 kW",
+      loadPercentage: 68,
+      solarGeneration: "42.8 kW",
+      windGeneration: "18.4 kW",
+      dieselGeneration: "23.1 kW",
+      totalGeneration: "84.3 kW",
+      peakLoad: "89.2 kW",
+      sparklinePoints: "0,28 15,24 30,26 45,18 60,14 75,19 90,12 105,16 120,8 135,11 150,6"
+    },
+
+    // Battery Subsystem configuration
     battery: {
-      percentage: 91,
+      percentage: 78,
       state: "CHARGING",
       voltage: "418.2 V",
-      current: "+44.1 A",
+      current: "+38.4 A",
       remainingHours: "38.5 hrs",
       cycles: 1420,
       health: "98.2%"
     },
+
+    // Fuel Reserve configuration
     fuel: {
-      currentLevel: 82,
-      totalLiters: 68400,
+      currentLevel: 64,
+      totalLiters: 53400,
       capacityLiters: 83400,
       dailyBurnRate: 480,
-      remainingDays: 142,
+      remainingDays: 18.4,
       reserveStatus: "SECURE"
     },
-    connectivity: {
+
+    // Satellite & Communications configuration
+    satellite: {
       status: "ONLINE",
       satellite: "GSAT-14 / Inmarsat-C",
       signalQuality: 96,
-      latency: "318 ms",
+      latency: "42 ms",
       uplinkBandwidth: "12.4 Mbps",
       downlinkBandwidth: "28.6 Mbps",
       packetLoss: "0.02%"
     },
-    environment: {
+
+    // Environmental Telemetry baseline
+    environmentalTelemetry: {
       temperature: -18.4,
       temperatureUnit: "°C",
       feelsLike: -28.1,
@@ -93,74 +95,172 @@ export const BASE_TELEMETRY = {
       solarRadiation: 420,
       solarRadiationUnit: "W/m²",
       visibility: "24 km"
-    }
-  },
-  BHARATI: {
-    healthScore: 97,
-    healthStatus: "OPTIMAL",
-    healthCategories: [
-      { name: "Environment", score: 95, status: "NOMINAL", icon: "CloudSnow" },
-      { name: "Energy", score: 98, status: "OPTIMAL", icon: "Zap" },
-      { name: "Structure", score: 99, status: "STABLE", icon: "Shield" },
-      { name: "Connectivity", score: 96, status: "ONLINE", icon: "Radio" },
-      { name: "Critical Alerts", score: 97, status: "OPTIMAL", icon: "AlertTriangle" }
-    ],
-    power: {
-      currentPower: "88.2 kW",
-      loadPercentage: 58,
-      solarGeneration: "22.8 kW",
-      windGeneration: "41.6 kW",
-      dieselGeneration: "23.8 kW",
-      batteryPercentage: 94,
-      totalGeneration: "88.2 kW"
     },
+
+    // Placeholder configuration for future 3D Digital Twin (Three.js)
+    digitalTwin: {
+      model: "/models/maitri_station.gltf",
+      zones: [
+        { id: "Z-01", name: "Main Living Module", status: "NOMINAL", temp: 21.2 },
+        { id: "Z-02", name: "Science Laboratories", status: "NOMINAL", temp: 19.8 },
+        { id: "Z-03", name: "Generator & Power Substation", status: "WARNING", temp: 24.5 },
+        { id: "Z-04", name: "Storage & Life Support", status: "NOMINAL", temp: 16.0 }
+      ],
+      sensors: []
+    },
+
+    // Placeholder configuration for IoT sensor array topology
+    sensors: [
+      { id: "SN-MTR-01", name: "Anemometer Mast Alpha", type: "WIND_SPEED", unit: "km/h", x: 12.4, y: 8.5, z: 0.0, status: "ACTIVE" },
+      { id: "SN-MTR-02", name: "External RTD Thermal Probe 1", type: "TEMPERATURE", unit: "°C", x: 5.2, y: 3.1, z: 1.2, status: "ACTIVE" },
+      { id: "SN-MTR-03", name: "DG-2 Vibration Accelerometer", type: "VIBRATION", unit: "mm/s", x: -8.0, y: 14.2, z: -0.5, status: "WARNING" },
+      { id: "SN-MTR-04", name: "Solar Array Pyranometer", type: "IRRADIANCE", unit: "W/m²", x: 18.0, y: -4.5, z: 2.0, status: "ACTIVE" }
+    ]
+  },
+
+  BHARATI: {
+    stationId: "BHARATI",
+    shortCode: "BHR",
+    displayName: "Bharati Research Station",
+    code: "BHR-IND",
+    tagline: "Remote Station Monitoring & Decision Support",
+    region: "Larsemann Hills, East Antarctica",
+    coordinates: "69°24′29″ S, 76°11′14″ E",
+    altitude: "35 m a.s.l.",
+    elevation: "35 m a.s.l.",
+    established: "2012",
+    expedition: "45th Indian Scientific Expedition to Antarctica",
+    personnelOnsite: 19,
+    status: "OPERATIONAL",
+    connection: "ONLINE",
+    timeZoneOffsetHours: 5, // UTC+5 local expedition time
+
+    // Readiness configuration
+    readiness: {
+      score: 97,
+      status: "OPTIMAL",
+      categories: [
+        { name: "ENVIRONMENT", score: 98, status: "NOMINAL", icon: "CloudSnow" },
+        { name: "ENERGY", score: 96, status: "OPTIMAL", icon: "Zap" },
+        { name: "STRUCTURE", score: 99, status: "STABLE", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 97, status: "ONLINE", icon: "Radio" },
+        { name: "ALERT LOAD", score: 95, status: "OPTIMAL", icon: "AlertTriangle" }
+      ]
+    },
+
+    // Power Subsystem configuration
+    power: {
+      currentPower: "92.6 kW",
+      loadPercentage: 54,
+      solarGeneration: "54.2 kW",
+      windGeneration: "22.8 kW",
+      dieselGeneration: "15.6 kW",
+      totalGeneration: "92.6 kW",
+      peakLoad: "96.4 kW",
+      sparklinePoints: "0,20 15,18 30,22 45,14 60,10 75,16 90,8 105,12 120,5 135,9 150,4"
+    },
+
+    // Battery Subsystem configuration
     battery: {
-      percentage: 94,
+      percentage: 89,
       state: "FLOAT",
-      voltage: "421.0 V",
-      current: "+12.4 A",
-      remainingHours: "44.2 hrs",
+      voltage: "421.4 V",
+      current: "+14.2 A",
+      remainingHours: "52.0 hrs",
       cycles: 884,
       health: "99.4%"
     },
+
+    // Fuel Reserve configuration
     fuel: {
-      currentLevel: 88,
-      totalLiters: 92400,
+      currentLevel: 84,
+      totalLiters: 88200,
       capacityLiters: 105000,
       dailyBurnRate: 510,
-      remainingDays: 181,
+      remainingDays: 164.0,
       reserveStatus: "SECURE"
     },
-    connectivity: {
+
+    // Satellite & Communications configuration
+    satellite: {
       status: "ONLINE",
       satellite: "GSAT-30 / Starlink Gateway",
       signalQuality: 98,
-      latency: "245 ms",
+      latency: "28 ms",
       uplinkBandwidth: "18.2 Mbps",
       downlinkBandwidth: "45.0 Mbps",
       packetLoss: "0.01%"
     },
-    environment: {
-      temperature: -14.2,
+
+    // Environmental Telemetry baseline
+    environmentalTelemetry: {
+      temperature: -12.6,
       temperatureUnit: "°C",
-      feelsLike: -22.5,
-      pressure: 994.0,
+      feelsLike: -21.4,
+      pressure: 994.5,
       pressureUnit: "hPa",
-      windSpeed: 28.0,
+      windSpeed: 26.4,
       windSpeedUnit: "km/h",
       windDirection: "ENE (065°)",
-      humidity: 62,
+      humidity: 64,
       humidityUnit: "%",
-      solarRadiation: 510,
+      solarRadiation: 530,
       solarRadiationUnit: "W/m²",
-      visibility: "32 km"
-    }
+      visibility: "35 km"
+    },
+
+    // Placeholder configuration for future 3D Digital Twin (Three.js)
+    digitalTwin: {
+      model: "/models/bharati_station.gltf",
+      zones: [
+        { id: "Z-B01", name: "Integrated Habitats Module", status: "NOMINAL", temp: 22.0 },
+        { id: "Z-B02", name: "Remote Sensing Laboratory", status: "NOMINAL", temp: 20.5 },
+        { id: "Z-B03", name: "Clean Microgrid Plant", status: "NOMINAL", temp: 21.0 }
+      ],
+      sensors: []
+    },
+
+    // Placeholder configuration for IoT sensor array topology
+    sensors: [
+      { id: "SN-BHR-01", name: "Larsemann Anemometer Mast", type: "WIND_SPEED", unit: "km/h", x: 10.0, y: 12.0, z: 0.0, status: "ACTIVE" },
+      { id: "SN-BHR-02", name: "Optical Surface Temperature Sensor", type: "TEMPERATURE", unit: "°C", x: 4.0, y: 2.0, z: 1.0, status: "ACTIVE" },
+      { id: "SN-BHR-03", name: "Satellite Radome Feed Monitor", type: "RF_LEVEL", unit: "dBm", x: 0.0, y: 0.0, z: 6.5, status: "ACTIVE" }
+    ]
+  }
+};
+
+// Aliases for compatibility
+export const BASE_TELEMETRY = {
+  MAITRI: {
+    healthScore: STATIONS.MAITRI.readiness.score,
+    healthStatus: STATIONS.MAITRI.readiness.status,
+    healthCategories: STATIONS.MAITRI.readiness.categories,
+    power: STATIONS.MAITRI.power,
+    battery: STATIONS.MAITRI.battery,
+    fuel: STATIONS.MAITRI.fuel,
+    connectivity: STATIONS.MAITRI.satellite,
+    satellite: STATIONS.MAITRI.satellite,
+    environment: STATIONS.MAITRI.environmentalTelemetry,
+    environmentalTelemetry: STATIONS.MAITRI.environmentalTelemetry
+  },
+  BHARATI: {
+    healthScore: STATIONS.BHARATI.readiness.score,
+    healthStatus: STATIONS.BHARATI.readiness.status,
+    healthCategories: STATIONS.BHARATI.readiness.categories,
+    power: STATIONS.BHARATI.power,
+    battery: STATIONS.BHARATI.battery,
+    fuel: STATIONS.BHARATI.fuel,
+    connectivity: STATIONS.BHARATI.satellite,
+    satellite: STATIONS.BHARATI.satellite,
+    environment: STATIONS.BHARATI.environmentalTelemetry,
+    environmentalTelemetry: STATIONS.BHARATI.environmentalTelemetry
   }
 };
 
 export const INITIAL_ALERTS = [
+  // MAITRI Alerts
   {
-    id: "ALT-01",
+    id: "ALT-MTR-01",
     station: "MAITRI",
     severity: "CRITICAL",
     title: "Generator vibration anomaly",
@@ -170,17 +270,17 @@ export const INITIAL_ALERTS = [
     acknowledged: false
   },
   {
-    id: "ALT-02",
+    id: "ALT-MTR-02",
     station: "MAITRI",
     severity: "WARNING",
     title: "High wind speed alert",
-    message: "Anemometer Mast 1 recorded sustained gusts reaching 68 km/h. Wind turbine pitch dampening auto-engaged.",
+    message: "Anemometer Mast Alpha recorded sustained gusts reaching 68 km/h. Wind turbine pitch dampening auto-engaged.",
     subsystem: "ENVIRONMENT",
     timestamp: "38m ago",
     acknowledged: false
   },
   {
-    id: "ALT-03",
+    id: "ALT-MTR-03",
     station: "MAITRI",
     severity: "WARNING",
     title: "Battery discharge rate elevated",
@@ -190,13 +290,35 @@ export const INITIAL_ALERTS = [
     acknowledged: true
   },
   {
-    id: "ALT-04",
+    id: "ALT-MTR-04",
     station: "MAITRI",
     severity: "INFO",
     title: "Scheduled GSAT telemetry sync completed",
     message: "64 telemetry packets transmitted to NCPOR Goa mission operations ground terminal.",
     subsystem: "CONNECTIVITY",
     timestamp: "2h 05m ago",
+    acknowledged: true
+  },
+
+  // BHARATI Alerts
+  {
+    id: "ALT-BHR-01",
+    station: "BHARATI",
+    severity: "INFO",
+    title: "Fuel transfer pump cycle completed",
+    message: "Automated fuel replenishment from Bulk Tank B to Day Tank completed nominally (1,200 L).",
+    subsystem: "LOGISTICS",
+    timestamp: "45m ago",
+    acknowledged: true
+  },
+  {
+    id: "ALT-BHR-02",
+    station: "BHARATI",
+    severity: "INFO",
+    title: "Larsemann optical radome calibrated",
+    message: "Starlink gateway RF signal-to-noise ratio tested at 24 dB. Uplink channel cleared.",
+    subsystem: "CONNECTIVITY",
+    timestamp: "2h 10m ago",
     acknowledged: true
   }
 ];
@@ -215,8 +337,8 @@ export const generate24HourTelemetry = (baseTemp = -18.4, baseWind = 42.5) => {
   });
 
   const winds = hours.map((_, i) => {
-    const gust = (Math.cos(i) * 12);
-    return Math.max(10, Number((baseWind + gust).toFixed(1)));
+    const gust = (Math.cos(i) * 8);
+    return Math.max(5, Number((baseWind + gust).toFixed(1)));
   });
 
   const pressures = hours.map((_, i) => {
@@ -236,39 +358,7 @@ export const DEMO_SCENARIOS = {
     label: "NORMAL",
     badge: "STANDARD OPERATIONS",
     description: "Nominal operational telemetry across all Antarctic station life-support subsystems.",
-    patch: {
-      healthScore: 94,
-      healthStatus: "HEALTHY",
-      environment: {
-        temperature: -18.4,
-        windSpeed: 42.5,
-        pressure: 986.2,
-        humidity: 58
-      },
-      power: {
-        currentPower: "76.4 kW",
-        solarGeneration: "18.5 kW",
-        windGeneration: "34.2 kW",
-        batteryPercentage: 91
-      },
-      battery: {
-        percentage: 91,
-        state: "CHARGING",
-        remainingHours: "38.5 hrs"
-      },
-      connectivity: {
-        status: "ONLINE",
-        signalQuality: 96,
-        latency: "318 ms"
-      },
-      healthCategories: [
-        { name: "Environment", score: 92, status: "NOMINAL", icon: "CloudSnow" },
-        { name: "Energy", score: 96, status: "OPTIMAL", icon: "Zap" },
-        { name: "Structure", score: 98, status: "STABLE", icon: "Shield" },
-        { name: "Connectivity", score: 95, status: "ONLINE", icon: "Radio" },
-        { name: "Critical Alerts", score: 89, status: "LOW_RISK", icon: "AlertTriangle" }
-      ]
-    },
+    patch: {},
     addedAlerts: []
   },
   STORM: {
@@ -279,6 +369,12 @@ export const DEMO_SCENARIOS = {
       healthScore: 74,
       healthStatus: "DEGRADED",
       environment: {
+        temperature: -34.8,
+        windSpeed: 118.4,
+        pressure: 958.0,
+        humidity: 88
+      },
+      environmentalTelemetry: {
         temperature: -34.8,
         windSpeed: 118.4,
         pressure: 958.0,
@@ -296,17 +392,17 @@ export const DEMO_SCENARIOS = {
         remainingHours: "19.2 hrs"
       },
       healthCategories: [
-        { name: "Environment", score: 58, status: "CRITICAL", icon: "CloudSnow" },
-        { name: "Energy", score: 82, status: "WARNING", icon: "Zap" },
-        { name: "Structure", score: 84, status: "WARNING", icon: "Shield" },
-        { name: "Connectivity", score: 78, status: "DEGRADED", icon: "Radio" },
-        { name: "Critical Alerts", score: 62, status: "HIGH_RISK", icon: "AlertTriangle" }
+        { name: "ENVIRONMENT", score: 58, status: "CRITICAL", icon: "CloudSnow" },
+        { name: "ENERGY", score: 82, status: "WARNING", icon: "Zap" },
+        { name: "STRUCTURE", score: 84, status: "WARNING", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 78, status: "DEGRADED", icon: "Radio" },
+        { name: "ALERT LOAD", score: 62, status: "HIGH_RISK", icon: "AlertTriangle" }
       ]
     },
     addedAlerts: [
       {
         id: "ALT-SCN-01",
-        station: "MAITRI",
+        station: "ALL",
         severity: "CRITICAL",
         title: "Severe Blizzard Warning — 118 km/h gusts",
         message: "External shelter lockdown protocol active. Optical visibility < 50m. Solar array auto-stowed.",
@@ -324,25 +420,25 @@ export const DEMO_SCENARIOS = {
       healthScore: 82,
       healthStatus: "MONITORING",
       environment: {
-        temperature: -18.4,
-        windSpeed: 42.5,
-        pressure: 986.2,
-        humidity: 0 // degraded
+        humidity: 0
+      },
+      environmentalTelemetry: {
+        humidity: 0
       },
       healthCategories: [
-        { name: "Environment", score: 70, status: "WARNING", icon: "CloudSnow" },
-        { name: "Energy", score: 96, status: "OPTIMAL", icon: "Zap" },
-        { name: "Structure", score: 98, status: "STABLE", icon: "Shield" },
-        { name: "Connectivity", score: 92, status: "ONLINE", icon: "Radio" },
-        { name: "Critical Alerts", score: 76, status: "WARNING", icon: "AlertTriangle" }
+        { name: "ENVIRONMENT", score: 70, status: "WARNING", icon: "CloudSnow" },
+        { name: "ENERGY", score: 96, status: "OPTIMAL", icon: "Zap" },
+        { name: "STRUCTURE", score: 98, status: "STABLE", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 92, status: "ONLINE", icon: "Radio" },
+        { name: "ALERT LOAD", score: 76, status: "WARNING", icon: "AlertTriangle" }
       ]
     },
     addedAlerts: [
       {
         id: "ALT-SCN-02",
-        station: "MAITRI",
+        station: "ALL",
         severity: "WARNING",
-        title: "East Mast Telemetry Array Offline",
+        title: "Telemetry Array Bus Offline",
         message: "RS-485 bus heartbeat lost on Humidity Sensor Node #4. Fallback estimation active.",
         subsystem: "SENSORS",
         timestamp: "Just now",
@@ -370,17 +466,17 @@ export const DEMO_SCENARIOS = {
         remainingHours: "7.4 hrs"
       },
       healthCategories: [
-        { name: "Environment", score: 88, status: "NOMINAL", icon: "CloudSnow" },
-        { name: "Energy", score: 38, status: "CRITICAL", icon: "Zap" },
-        { name: "Structure", score: 94, status: "STABLE", icon: "Shield" },
-        { name: "Connectivity", score: 80, status: "WARNING", icon: "Radio" },
-        { name: "Critical Alerts", score: 32, status: "EMERGENCY", icon: "AlertTriangle" }
+        { name: "ENVIRONMENT", score: 88, status: "NOMINAL", icon: "CloudSnow" },
+        { name: "ENERGY", score: 38, status: "CRITICAL", icon: "Zap" },
+        { name: "STRUCTURE", score: 94, status: "STABLE", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 80, status: "WARNING", icon: "Radio" },
+        { name: "ALERT LOAD", score: 32, status: "EMERGENCY", icon: "AlertTriangle" }
       ]
     },
     addedAlerts: [
       {
         id: "ALT-SCN-03",
-        station: "MAITRI",
+        station: "ALL",
         severity: "CRITICAL",
         title: "Microgrid Generator Trip & Battery Drain",
         message: "Auxiliary power active. Non-essential scientific heating disabled to conserve battery bank.",
@@ -393,29 +489,36 @@ export const DEMO_SCENARIOS = {
   SATELLITE_OUTAGE: {
     label: "SATELLITE OUTAGE",
     badge: "COMMS BLACKOUT",
-    description: "Primary Ku-Band satellite tracking dish misalignment due to geomagnetic solar storm.",
+    description: "Primary satellite tracking dish misalignment due to geomagnetic solar storm.",
     patch: {
       healthScore: 68,
       healthStatus: "DEGRADED",
+      satellite: {
+        status: "OFFLINE",
+        satellite: "DISCONNECTED",
+        signalQuality: 0,
+        latency: "FAIL",
+        packetLoss: "100%"
+      },
       connectivity: {
         status: "OFFLINE",
-        satellite: "GSAT-14 (DISCONNECTED)",
+        satellite: "DISCONNECTED",
         signalQuality: 0,
         latency: "FAIL",
         packetLoss: "100%"
       },
       healthCategories: [
-        { name: "Environment", score: 92, status: "NOMINAL", icon: "CloudSnow" },
-        { name: "Energy", score: 96, status: "OPTIMAL", icon: "Zap" },
-        { name: "Structure", score: 98, status: "STABLE", icon: "Shield" },
-        { name: "Connectivity", score: 22, status: "OFFLINE", icon: "Radio" },
-        { name: "Critical Alerts", score: 60, status: "WARNING", icon: "AlertTriangle" }
+        { name: "ENVIRONMENT", score: 92, status: "NOMINAL", icon: "CloudSnow" },
+        { name: "ENERGY", score: 96, status: "OPTIMAL", icon: "Zap" },
+        { name: "STRUCTURE", score: 98, status: "STABLE", icon: "Shield" },
+        { name: "CONNECTIVITY", score: 22, status: "OFFLINE", icon: "Radio" },
+        { name: "ALERT LOAD", score: 60, status: "WARNING", icon: "AlertTriangle" }
       ]
     },
     addedAlerts: [
       {
         id: "ALT-SCN-04",
-        station: "MAITRI",
+        station: "ALL",
         severity: "CRITICAL",
         title: "Satellite Uplink Lost — Comms Blackout",
         message: "Telemetry buffering to local solid-state logger. Auto-switching to emergency HF radio packet burst.",
@@ -429,48 +532,14 @@ export const DEMO_SCENARIOS = {
     label: "RECOVERY",
     badge: "RESTORING NOMINAL",
     description: "System recovery routines executed. Subsystems re-engaging to nominal baseline.",
-    patch: {
-      healthScore: 94,
-      healthStatus: "HEALTHY",
-      environment: {
-        temperature: -18.4,
-        windSpeed: 42.5,
-        pressure: 986.2,
-        humidity: 58
-      },
-      power: {
-        currentPower: "76.4 kW",
-        solarGeneration: "18.5 kW",
-        windGeneration: "34.2 kW",
-        dieselGeneration: "23.7 kW",
-        batteryPercentage: 91
-      },
-      battery: {
-        percentage: 91,
-        state: "CHARGING",
-        remainingHours: "38.5 hrs"
-      },
-      connectivity: {
-        status: "ONLINE",
-        satellite: "GSAT-14 / Inmarsat-C",
-        signalQuality: 96,
-        latency: "318 ms"
-      },
-      healthCategories: [
-        { name: "Environment", score: 92, status: "NOMINAL", icon: "CloudSnow" },
-        { name: "Energy", score: 96, status: "OPTIMAL", icon: "Zap" },
-        { name: "Structure", score: 98, status: "STABLE", icon: "Shield" },
-        { name: "Connectivity", score: 95, status: "ONLINE", icon: "Radio" },
-        { name: "Critical Alerts", score: 89, status: "LOW_RISK", icon: "AlertTriangle" }
-      ]
-    },
+    patch: {},
     addedAlerts: [
       {
         id: "ALT-SCN-REC",
-        station: "MAITRI",
+        station: "ALL",
         severity: "INFO",
         title: "Diagnostic Self-Test Completed",
-        message: "Microgrid and satellite uplink restored to nominal operating parameters.",
+        message: "Microgrid and satellite uplink verified nominal on active station bus.",
         subsystem: "SYSTEM",
         timestamp: "Just now",
         acknowledged: true

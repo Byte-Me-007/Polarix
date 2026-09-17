@@ -3,7 +3,8 @@ import { useStationTelemetry } from '../hooks/useStationTelemetry';
 
 export const MetricCard = () => {
   const { telemetry, alerts } = useStationTelemetry();
-  const { power, battery, fuel, connectivity } = telemetry;
+  const { power, battery, fuel, connectivity, satellite } = telemetry;
+  const conn = satellite || connectivity || {};
 
   // Compute counts
   const criticalCount = alerts.filter(a => a.severity === 'CRITICAL').length;
@@ -12,10 +13,11 @@ export const MetricCard = () => {
   const criticalStr = String(criticalCount).padStart(2, '0');
   const warningStr = String(warningCount).padStart(2, '0');
 
-  // Sparkline points for 24h power trend
-  const sparklinePoints = "0,28 15,24 30,26 45,18 60,14 75,19 90,12 105,16 120,8 135,11 150,6";
+  // Fallback sparkline points
+  const defaultSparkline = "0,28 15,24 30,26 45,18 60,14 75,19 90,12 105,16 120,8 135,11 150,6";
+  const activeSparkline = power?.sparklinePoints || defaultSparkline;
 
-  const isOnline = connectivity?.status === 'ONLINE';
+  const isOnline = conn?.status === 'ONLINE';
 
   return (
     <div className="systems-grid-layout" aria-label="Station Key Systems">
@@ -36,7 +38,7 @@ export const MetricCard = () => {
           <div style={{ margin: '0.75rem 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', fontFamily: 'var(--font-mono)', color: 'var(--polaris-text-muted)', marginBottom: '0.2rem' }}>
               <span>24H LOAD PROFILE</span>
-              <span>PEAK: 89.2 kW</span>
+              <span>PEAK: {power?.peakLoad || '89.2 kW'}</span>
             </div>
             <svg width="100%" height="32" viewBox="0 0 150 32" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
               <polyline
@@ -45,7 +47,7 @@ export const MetricCard = () => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={sparklinePoints}
+                points={activeSparkline}
               />
             </svg>
           </div>
@@ -145,13 +147,13 @@ export const MetricCard = () => {
           </div>
 
           <div className="metric-medium-readout" style={{ fontSize: '1.45rem' }}>
-            {connectivity?.latency || '42 ms'}
+            {conn?.latency || '42 ms'}
           </div>
         </div>
 
         <div className="metric-sub-descriptor">
           <span style={{ color: 'var(--polaris-text-muted)' }}>UPLINK</span>
-          <span style={{ fontWeight: 600 }}>{connectivity?.satellite?.split('/')[0] || 'GSAT-14'}</span>
+          <span style={{ fontWeight: 600 }}>{conn?.satellite?.split('/')[0] || 'GSAT-14'}</span>
         </div>
       </div>
 

@@ -9,7 +9,9 @@ import { DemoMode } from '../components/DemoMode';
 
 export const Dashboard = () => {
   const { config, telemetry } = useStationTelemetry();
-  const operationalStatus = telemetry.healthStatus === 'HEALTHY' ? 'OPERATIONAL' : telemetry.healthStatus;
+  const operationalStatus = telemetry.healthStatus === 'HEALTHY' || telemetry.healthStatus === 'OPTIMAL'
+    ? 'OPERATIONAL' 
+    : telemetry.healthStatus;
 
   const getOperationalClass = (status) => {
     if (status === 'HEALTHY' || status === 'OPERATIONAL' || status === 'OPTIMAL') return '';
@@ -17,27 +19,36 @@ export const Dashboard = () => {
     return 'degraded';
   };
 
+  const stationDisplayName = config.displayName 
+    ? config.displayName.toUpperCase() 
+    : `${config.stationId || 'MAITRI'} RESEARCH STATION`;
+
+  const stationCode = config.shortCode || config.id || 'MTR';
+  const stationAltitude = config.altitude || config.elevation || '117 m a.s.l.';
+  const expeditionText = config.expedition || '45th Indian Scientific Expedition to Antarctica';
+  const personnelCount = config.personnelOnsite || 24;
+
   return (
     <main className="main-viewport">
-      {/* 6. STATION IDENTITY HEADER (Large, Confident, Editorial, Open) */}
+      {/* 6. STATION IDENTITY HEADER (Configuration-Driven, Large, Editorial) */}
       <section className="station-editorial-header" aria-label="Station Identity">
         <div className="station-title-block">
-          <h1>{config.name} RESEARCH STATION</h1>
+          <h1>{stationDisplayName}</h1>
           <div className="station-meta-strip">
-            <span className="meta-pill">{config.id} / ANTARCTICA</span>
+            <span className="meta-pill">{stationCode} / ANTARCTICA</span>
             <span className="meta-coords">{config.coordinates}</span>
             <span>•</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--polaris-text-muted)' }}>
-              {config.elevation}
+              {stationAltitude}
             </span>
             <span>•</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--polaris-text-secondary)' }}>
-              EXPEDITION 45 // {config.personnelOnsite} ONSITE
+              {expeditionText} // {personnelCount} ONSITE
             </span>
           </div>
         </div>
 
-        {/* Small restrained operational indicator */}
+        {/* Operational Indicator */}
         <div className={`header-operational-badge ${getOperationalClass(operationalStatus)}`}>
           <span className="status-dot-sm" style={{ background: 'currentColor' }} />
           <span>{operationalStatus}</span>

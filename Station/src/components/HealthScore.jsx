@@ -11,7 +11,7 @@ export const HealthScore = () => {
   const criticalCount = alerts.filter(a => a.severity === 'CRITICAL').length;
   const alertLoadText = criticalCount > 0 ? 'ELEVATED' : 'LOW';
 
-  // SVG Radial Gauge parameters (circumference for semi-open or full ring)
+  // SVG Radial Gauge parameters
   const radius = 38;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
@@ -24,12 +24,17 @@ export const HealthScore = () => {
 
   const theme = getReadinessTheme(score);
 
-  // Category values mapping
+  // Category values mapping with case-insensitive search
+  const getCategoryScore = (catName, defaultVal) => {
+    const found = categories.find(c => c.name?.toUpperCase() === catName.toUpperCase());
+    return found ? found.score : defaultVal;
+  };
+
   const breakdownItems = [
-    { name: 'ENVIRONMENT', val: categories.find(c => c.name === 'Environment')?.score ?? 96, isNum: true },
-    { name: 'ENERGY', val: categories.find(c => c.name === 'Energy')?.score ?? 91, isNum: true },
-    { name: 'STRUCTURE', val: categories.find(c => c.name === 'Structure')?.score ?? 97, isNum: true },
-    { name: 'CONNECTIVITY', val: categories.find(c => c.name === 'Connectivity')?.score ?? 94, isNum: true },
+    { name: 'ENVIRONMENT', val: getCategoryScore('ENVIRONMENT', 96), isNum: true },
+    { name: 'ENERGY', val: getCategoryScore('ENERGY', 91), isNum: true },
+    { name: 'STRUCTURE', val: getCategoryScore('STRUCTURE', 97), isNum: true },
+    { name: 'CONNECTIVITY', val: getCategoryScore('CONNECTIVITY', 94), isNum: true },
     { 
       name: 'ALERT LOAD', 
       val: alertLoadText, 
@@ -113,7 +118,7 @@ export const HealthScore = () => {
                     className="breakdown-bar-fill"
                     style={{ 
                       width: `${item.val}%`, 
-                      background: item.val >= 90 ? 'var(--polaris-text-secondary)' : 'var(--polaris-copper)' 
+                      background: item.val >= 95 ? 'var(--polaris-text-secondary)' : 'var(--polaris-copper)' 
                     }} 
                   />
                 </div>

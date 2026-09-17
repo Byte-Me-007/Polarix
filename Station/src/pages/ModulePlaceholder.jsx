@@ -73,7 +73,7 @@ export const ModulePlaceholder = () => {
             <div>
               <span className="polaris-module-badge">{currentMod.code}</span>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--polaris-text-primary)', marginTop: '0.25rem' }}>
-                {config.name} STATION ALARMS & DIAGNOSTICS
+                {config.displayName ? config.displayName.toUpperCase() : `${config.stationId || config.name || 'MAITRI'} STATION ALARMS & DIAGNOSTICS`}
               </h2>
               <p style={{ fontSize: '0.8125rem', color: 'var(--polaris-text-secondary)', marginTop: '0.25rem' }}>
                 Active anomaly notifications and life-support subsystem warnings

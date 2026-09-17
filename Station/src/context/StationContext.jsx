@@ -25,11 +25,11 @@ export const StationProvider = ({ children }) => {
     const base = BASE_TELEMETRY[activeStation] || BASE_TELEMETRY.MAITRI;
     const scenario = DEMO_SCENARIOS[activeScenario];
 
-    if (!scenario || !scenario.patch) {
+    if (!scenario || !scenario.patch || Object.keys(scenario.patch).length === 0) {
       return base;
     }
 
-    // Merge scenario overrides cleanly
+    // Merge scenario overrides cleanly over the active station's base telemetry
     return {
       ...base,
       ...scenario.patch,
@@ -47,11 +47,19 @@ export const StationProvider = ({ children }) => {
       },
       connectivity: {
         ...base.connectivity,
-        ...(scenario.patch.connectivity || {})
+        ...(scenario.patch.connectivity || scenario.patch.satellite || {})
+      },
+      satellite: {
+        ...base.satellite,
+        ...(scenario.patch.satellite || scenario.patch.connectivity || {})
       },
       environment: {
         ...base.environment,
-        ...(scenario.patch.environment || {})
+        ...(scenario.patch.environment || scenario.patch.environmentalTelemetry || {})
+      },
+      environmentalTelemetry: {
+        ...base.environmentalTelemetry,
+        ...(scenario.patch.environmentalTelemetry || scenario.patch.environment || {})
       },
       healthCategories: scenario.patch.healthCategories || base.healthCategories,
       healthScore: scenario.patch.healthScore !== undefined ? scenario.patch.healthScore : base.healthScore,
@@ -59,7 +67,7 @@ export const StationProvider = ({ children }) => {
     };
   }, [activeStation, activeScenario]);
 
-  // Combined alerts: initial + scenario-specific
+  // Combined alerts: station-specific alerts + scenario additions
   const activeAlertsList = useMemo(() => {
     const scenario = DEMO_SCENARIOS[activeScenario];
     const scenarioAlerts = scenario?.addedAlerts || [];
@@ -79,10 +87,18 @@ export const StationProvider = ({ children }) => {
     );
   };
 
+  const handleStationChange = (newStation) => {
+    if (STATIONS[newStation]) {
+      setActiveStation(newStation);
+      setLastUpdated(new Date());
+    }
+  };
+
   const value = {
     activeStation,
-    setActiveStation,
+    setActiveStation: handleStationChange,
     stationConfig,
+    config: stationConfig,
     telemetry,
     alerts: activeAlertsList,
     acknowledgeAlert,

@@ -5,7 +5,7 @@ import { generate24HourTelemetry } from '../data/stationData';
 
 export const EnvironmentSummary = () => {
   const { telemetry, activeStation } = useStationTelemetry();
-  const env = telemetry.environment || {};
+  const env = telemetry.environmentalTelemetry || telemetry.environment || {};
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const [activeMetricFocus, setActiveMetricFocus] = useState('ALL');
@@ -19,9 +19,12 @@ export const EnvironmentSummary = () => {
       });
     }
 
+    const baseTemp = env.temperature !== undefined ? env.temperature : -18.4;
+    const baseWind = env.windSpeed !== undefined ? env.windSpeed : 42.5;
+
     const { hours, temps, winds, pressures, humidities } = generate24HourTelemetry(
-      env.temperature || -18.4,
-      env.windSpeed || 42.5
+      baseTemp,
+      baseWind
     );
 
     // Build series based on focus selection (NO BLUE!)
