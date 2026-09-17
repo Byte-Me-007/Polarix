@@ -1,0 +1,183 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "zscore-bharati-v1",
+  "model_type": "ROLLING_ZSCORE_BASELINE",
+  "parameters": {
+    "window": 30,
+    "min_periods": 5,
+    "threshold": 3.0,
+    "threshold_status": "INITIAL_BASELINE_3.0_SIGMA"
+  },
+  "dataset": {
+    "path": "ml/data/bharati_synthetic_telemetry.csv",
+    "total_records": 10000,
+    "sensors": [
+      "BRT_HUM_001",
+      "BRT_POWER_001",
+      "BRT_PRESS_001",
+      "BRT_TEMP_001",
+      "BRT_VIB_001"
+    ],
+    "splits": {
+      "train": {
+        "ratio": "70%",
+        "records": 7000,
+        "anomalies": 0
+      },
+      "validation": {
+        "ratio": "15%",
+        "records": 1500,
+        "anomalies": 321
+      },
+      "test": {
+        "ratio": "15%",
+        "records": 1500,
+        "anomalies": 317
+      }
+    }
+  },
+  "validation_metrics": {
+    "true_positives": 43,
+    "true_negatives": 1159,
+    "false_positives": 20,
+    "false_negatives": 278,
+    "total_samples": 1500,
+    "accuracy": 0.8013,
+    "precision": 0.6825,
+    "recall": 0.134,
+    "f1_score": 0.224,
+    "false_positive_rate": 0.017,
+    "confusion_matrix": {
+      "TN": 1159,
+      "FP": 20,
+      "FN": 278,
+      "TP": 43
+    }
+  },
+  "validation_anomaly_type_recall": {
+    "SPIKE": {
+      "total": 22,
+      "detected": 10,
+      "recall": 0.4545,
+      "percentage_str": "10/22 (45.45%)"
+    },
+    "DRIFT": {
+      "total": 150,
+      "detected": 4,
+      "recall": 0.0267,
+      "percentage_str": "4/150 (2.67%)"
+    },
+    "STUCK_VALUE": {
+      "total": 120,
+      "detected": 0,
+      "recall": 0.0,
+      "percentage_str": "0/120 (0.00%)"
+    },
+    "DROPOUT": {
+      "total": 29,
+      "detected": 29,
+      "recall": 1.0,
+      "percentage_str": "29/29 (100.00%)"
+    }
+  },
+  "test_metrics": {
+    "true_positives": 43,
+    "true_negatives": 1166,
+    "false_positives": 17,
+    "false_negatives": 274,
+    "total_samples": 1500,
+    "accuracy": 0.806,
+    "precision": 0.7167,
+    "recall": 0.1356,
+    "f1_score": 0.2281,
+    "false_positive_rate": 0.0144,
+    "confusion_matrix": {
+      "TN": 1166,
+      "FP": 17,
+      "FN": 274,
+      "TP": 43
+    }
+  },
+  "test_anomaly_type_recall": {
+    "SPIKE": {
+      "total": 19,
+      "detected": 10,
+      "recall": 0.5263,
+      "percentage_str": "10/19 (52.63%)"
+    },
+    "DRIFT": {
+      "total": 150,
+      "detected": 5,
+      "recall": 0.0333,
+      "percentage_str": "5/150 (3.33%)"
+    },
+    "STUCK_VALUE": {
+      "total": 120,
+      "detected": 0,
+      "recall": 0.0,
+      "percentage_str": "0/120 (0.00%)"
+    },
+    "DROPOUT": {
+      "total": 28,
+      "detected": 28,
+      "recall": 1.0,
+      "percentage_str": "28/28 (100.00%)"
+    }
+  },
+  "full_dataset_metrics": {
+    "true_positives": 86,
+    "true_negatives": 9307,
+    "false_positives": 55,
+    "false_negatives": 552,
+    "total_samples": 10000,
+    "accuracy": 0.9393,
+    "precision": 0.6099,
+    "recall": 0.1348,
+    "f1_score": 0.2208,
+    "false_positive_rate": 0.0059,
+    "confusion_matrix": {
+      "TN": 9307,
+      "FP": 55,
+      "FN": 552,
+      "TP": 86
+    }
+  },
+  "full_anomaly_type_recall": {
+    "SPIKE": {
+      "total": 41,
+      "detected": 20,
+      "recall": 0.4878,
+      "percentage_str": "20/41 (48.78%)"
+    },
+    "DRIFT": {
+      "total": 300,
+      "detected": 9,
+      "recall": 0.03,
+      "percentage_str": "9/300 (3.00%)"
+    },
+    "STUCK_VALUE": {
+      "total": 240,
+      "detected": 0,
+      "recall": 0.0,
+      "percentage_str": "0/240 (0.00%)"
+    },
+    "DROPOUT": {
+      "total": 57,
+      "detected": 57,
+      "recall": 1.0,
+      "percentage_str": "57/57 (100.00%)"
+    }
+  },
+  "missing_data_summary": {
+    "total_dropouts": 57,
+    "predicted_missing_data": 57,
+    "dropout_detection_rate": "100% (handled via missing-data ingestion rule)"
+  },
+  "known_limitations": {
+    "synthetic_data_only": "All evaluation is performed strictly on synthetic Bharati telemetry. No real Antarctic telemetry was used.",
+    "no_field_claims": "Metrics demonstrate mathematical characteristics on synthetic workloads and do not constitute field deployment validation or production SLAs.",
+    "drift_and_stuck_limitations": "Z-score trailing rolling mean adapts to gradual drift (resulting in low drift recall) and fails to detect mid-range flatlines without dedicated variance rules.",
+    "baseline_threshold": "Threshold 3.0 sigma is an uncalibrated statistical baseline; a future validation step will perform formal threshold calibration."
+  }
+}
