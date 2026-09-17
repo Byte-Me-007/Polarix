@@ -94,6 +94,7 @@ export const DigitalTwinScene = ({
         <SpatialHeatmap 
           sensors={sensors} 
           zones={zones} 
+          selectedSensor={selectedSensor}
         />
       )}
 

@@ -303,8 +303,8 @@ export const SensorDetailsPanel = ({ sensor, onClose }) => {
             <div className="anomaly-col">
               <span className="anomaly-sub">ANOMALY SCORE</span>
               <span className="anomaly-score-val mono-val">
-                {typeof sensor.anomalyScore === 'number'
-                  ? sensor.anomalyScore.toFixed(2)
+                {typeof (sensor.anomaly_score ?? sensor.anomalyScore) === 'number'
+                  ? (sensor.anomaly_score ?? sensor.anomalyScore).toFixed(2)
                   : '—'}
               </span>
             </div>
@@ -312,10 +312,10 @@ export const SensorDetailsPanel = ({ sensor, onClose }) => {
               <span className="anomaly-sub">ANOMALY STATUS</span>
               <span
                 className={`anomaly-badge ${
-                  sensor.anomalyStatus ? 'has-anomaly' : 'no-anomaly'
+                  (sensor.anomaly_status ?? sensor.anomalyStatus) ? 'has-anomaly' : 'no-anomaly'
                 }`}
               >
-                {sensor.anomalyStatus || 'NOT AVAILABLE'}
+                {(sensor.anomaly_status ?? sensor.anomalyStatus) || 'NOT AVAILABLE'}
               </span>
             </div>
           </div>

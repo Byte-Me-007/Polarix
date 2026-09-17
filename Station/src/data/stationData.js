@@ -405,12 +405,23 @@ export const DEMO_SCENARIOS = {
     badge: "STANDARD OPERATIONS",
     description: "Nominal operational telemetry across all Antarctic station life-support subsystems.",
     patch: {},
+    sensorOverrides: {
+      ALL_NORMAL: true
+    },
     addedAlerts: []
   },
   STORM: {
     label: "STORM",
     badge: "BLIZZARD CODE RED",
     description: "Catastrophic Antarctic blizzard detected. 118 km/h wind gusts, rapid barometric drop.",
+    sensorOverrides: {
+      byType: {
+        WIND_SPEED:  { value: 118.4, status: "CRITICAL", anomaly_score: 0.92, anomaly_status: "CRITICAL", quality: "ALERT" },
+        PRESSURE:    { value: 958.0, status: "WARNING",  anomaly_score: 0.68, anomaly_status: "WARNING",  quality: "GOOD" },
+        TEMPERATURE: { value: -34.8, status: "WARNING",  anomaly_score: 0.58, anomaly_status: "WARNING",  quality: "GOOD" },
+        STRAIN:      { value: 640.0, status: "WARNING",  anomaly_score: 0.65, anomaly_status: "WARNING",  quality: "GOOD" }
+      }
+    },
     patch: {
       healthScore: 74,
       healthStatus: "DEGRADED",
@@ -462,6 +473,11 @@ export const DEMO_SCENARIOS = {
     label: "SENSOR FAILURE",
     badge: "TELEMETRY FAULT",
     description: "Multiplexer communication dropout on East Mast Met Sensor Cluster.",
+    sensorOverrides: {
+      byType: {
+        HUMIDITY: { value: 0.0, status: "OFFLINE", quality: "FAIL", anomaly_score: null, anomaly_status: "DROPOUT" }
+      }
+    },
     patch: {
       healthScore: 82,
       healthStatus: "MONITORING",
@@ -496,6 +512,13 @@ export const DEMO_SCENARIOS = {
     label: "POWER CRISIS",
     badge: "ENERGY EMERGENCY",
     description: "DG #1 and DG #2 trip; battery bank sustaining critical life support under severe load.",
+    sensorOverrides: {
+      byType: {
+        VIBRATION: { value: 5.8,   status: "CRITICAL", anomaly_score: 0.95, anomaly_status: "CRITICAL", quality: "ALERT" },
+        VOLTAGE:   { value: 374.0, status: "CRITICAL", anomaly_score: 0.88, anomaly_status: "CRITICAL", quality: "ALERT" },
+        POWER:     { status: "WARNING", anomaly_score: 0.62, anomaly_status: "WARNING", quality: "DEGRADED" }
+      }
+    },
     patch: {
       healthScore: 48,
       healthStatus: "CRITICAL",
@@ -536,6 +559,13 @@ export const DEMO_SCENARIOS = {
     label: "SATELLITE OUTAGE",
     badge: "COMMS BLACKOUT",
     description: "Primary satellite tracking dish misalignment due to geomagnetic solar storm.",
+    sensorOverrides: {
+      byType: {
+        ANGLE:     { status: "CRITICAL", anomaly_score: 0.90, anomaly_status: "CRITICAL", quality: "ALERT" },
+        SIGNAL:    { value: 0.0, status: "OFFLINE", quality: "LOST", anomaly_score: null, anomaly_status: "OFFLINE" },
+        BANDWIDTH: { value: 0.0, status: "OFFLINE", quality: "LOST", anomaly_score: null, anomaly_status: "OFFLINE" }
+      }
+    },
     patch: {
       healthScore: 68,
       healthStatus: "DEGRADED",
@@ -579,6 +609,9 @@ export const DEMO_SCENARIOS = {
     badge: "RESTORING NOMINAL",
     description: "System recovery routines executed. Subsystems re-engaging to nominal baseline.",
     patch: {},
+    sensorOverrides: {
+      ALL_NORMAL: true
+    },
     addedAlerts: [
       {
         id: "ALT-SCN-REC",

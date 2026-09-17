@@ -130,40 +130,46 @@ export const StationZone = ({
       ))}
 
       {/* ------------------------------------------------------------- */}
-      {/* 2. INTERIOR SPATIAL CONDITION HEATMAP (Inspection Mode)       */}
-      {/* Shown inside each building volume above floor level           */}
+      {/* 2. INTERIOR ARCHITECTURAL INSPECTION FLOOR (Heatmap Mode)     */}
+      {/* Provides visible interior deck without coloring entire zone   */}
       {/* ------------------------------------------------------------- */}
       {showHeatmap && (
         <group position={[0, 0, 0]}>
-          {/* A. Base Illuminated Interior Floor Plate */}
+          {/* A. Neutral Interior Deck Plate */}
           <mesh
-            position={[0, 0.12, 0]}
+            position={[0, 0.10, 0]}
             rotation={[-Math.PI / 2, 0, 0]}
             renderOrder={5}
             raycast={() => null}
           >
             <planeGeometry args={[sx * 0.94, sz * 0.94]} />
             <meshBasicMaterial
-              color={meta.hex}
+              color="#dcd5c9"
               transparent
-              opacity={effectiveFloorOpacity}
+              opacity={0.35}
               depthWrite={false}
               side={THREE.DoubleSide}
             />
           </mesh>
 
-          {/* B. High-Contrast Soft Radial Gradient Condition Wash */}
+          {/* B. Subtle Zone Perimeter Floor Border */}
           <mesh
-            position={[0, 0.18, 0]}
+            position={[0, 0.12, 0]}
             rotation={[-Math.PI / 2, 0, 0]}
             renderOrder={6}
             raycast={() => null}
           >
-            <planeGeometry args={[sx * 0.90, sz * 0.90]} />
+            <ringGeometry
+              args={[
+                Math.min(sx, sz) * 0.44,
+                Math.min(sx, sz) * 0.46,
+                36
+              ]}
+            />
             <meshBasicMaterial
-              map={radialTexture}
+              color="#b8b0a2"
               transparent
-              opacity={effectiveGlowOpacity}
+              opacity={0.30}
               depthWrite={false}
               side={THREE.DoubleSide}
             />

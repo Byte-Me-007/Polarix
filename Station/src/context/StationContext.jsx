@@ -76,8 +76,94 @@ export const StationProvider = ({ children }) => {
     );
   }, [activeStation, activeScenario, alerts]);
 
+  // Optional sensor-level overrides for manual test sequences (e.g. TEST 1 - TEST 6)
+  const [sensorManualOverrides, setSensorManualOverrides] = useState({});
+
+  // Dynamically derive sensor telemetry based on active station, scenario, and manual overrides
+  const dynamicSensors = useMemo(() => {
+    const baseSensors = stationConfig.sensors || [];
+    const scenario = DEMO_SCENARIOS[activeScenario];
+    const overrides = scenario?.sensorOverrides;
+
+    return baseSensors.map((s) => {
+      let updated = { ...s };
+
+      // Apply scenario-level sensor consequences
+      if (overrides) {
+        if (overrides.ALL_NORMAL) {
+          updated.status = 'NORMAL';
+          updated.anomaly_score = 0.02;
+          updated.anomalyScore = 0.02;
+          updated.anomaly_status = 'NORMAL';
+          updated.anomalyStatus = 'NORMAL';
+          if (updated.quality === 'FAIL' || updated.quality === 'OFFLINE' || updated.quality === 'LOST') {
+            updated.quality = 'GOOD';
+          }
+        } else if (overrides.byType && overrides.byType[s.type]) {
+          const patch = overrides.byType[s.type];
+          updated = { ...updated, ...patch };
+          if (patch.anomaly_score !== undefined) {
+            updated.anomalyScore = patch.anomaly_score;
+          }
+          if (patch.anomaly_status !== undefined) {
+            updated.anomalyStatus = patch.anomaly_status;
+          }
+        } else if (overrides.byId && overrides.byId[s.id]) {
+          const patch = overrides.byId[s.id];
+          updated = { ...updated, ...patch };
+          if (patch.anomaly_score !== undefined) {
+            updated.anomalyScore = patch.anomaly_score;
+          }
+          if (patch.anomaly_status !== undefined) {
+            updated.anomalyStatus = patch.anomaly_status;
+          }
+        }
+      }
+
+      // Apply manual test override (if any)
+      if (sensorManualOverrides[s.id]) {
+        const manual = sensorManualOverrides[s.id];
+        updated = { ...updated, ...manual };
+        if (manual.anomaly_score !== undefined) {
+          updated.anomalyScore = manual.anomaly_score;
+        }
+        if (manual.anomaly_status !== undefined) {
+          updated.anomalyStatus = manual.anomaly_status;
+        }
+      }
+
+      // Standardize both snake_case and camelCase compatibility (Section 17)
+      if (updated.anomaly_score === undefined && updated.anomalyScore !== undefined) {
+        updated.anomaly_score = updated.anomalyScore;
+      } else if (updated.anomalyScore === undefined && updated.anomaly_score !== undefined) {
+        updated.anomalyScore = updated.anomaly_score;
+      }
+      if (updated.anomaly_status === undefined && updated.anomalyStatus !== undefined) {
+        updated.anomaly_status = updated.anomalyStatus;
+      } else if (updated.anomalyStatus === undefined && updated.anomaly_status !== undefined) {
+        updated.anomalyStatus = updated.anomaly_status;
+      }
+
+      return updated;
+    });
+  }, [stationConfig, activeScenario, sensorManualOverrides]);
+
   const applyScenario = (scenarioKey) => {
     setActiveScenario(scenarioKey);
+    setSensorManualOverrides({}); // Reset manual sensor overrides on scenario change
+    setLastUpdated(new Date());
+  };
+
+  const updateSensor = (sensorId, patch) => {
+    setSensorManualOverrides((prev) => ({
+      ...prev,
+      [sensorId]: { ...(prev[sensorId] || {}), ...patch }
+    }));
+    setLastUpdated(new Date());
+  };
+
+  const clearSensorOverrides = () => {
+    setSensorManualOverrides({});
     setLastUpdated(new Date());
   };
 
@@ -90,6 +176,7 @@ export const StationProvider = ({ children }) => {
   const handleStationChange = (newStation) => {
     if (STATIONS[newStation]) {
       setActiveStation(newStation);
+      setSensorManualOverrides({}); // Cleanly reset sensor overrides across stations
       setLastUpdated(new Date());
     }
   };
@@ -99,6 +186,9 @@ export const StationProvider = ({ children }) => {
     setActiveStation: handleStationChange,
     stationConfig,
     config: stationConfig,
+    sensors: dynamicSensors,
+    updateSensor,
+    clearSensorOverrides,
     telemetry,
     alerts: activeAlertsList,
     acknowledgeAlert,
