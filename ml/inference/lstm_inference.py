@@ -7,8 +7,11 @@ Features:
 - Independent, isolated rolling history buffers per (station_id, sensor_id).
 - Strict handling of streaming states:
   - INSUFFICIENT_DATA: History has < 30 observations.
-  - MISSING_DATA: Incoming value is null/NaN or quality != "GOOD".
+  - MISSING_DATA: Incoming value is null, non-finite (NaN/inf), or quality != "GOOD".
   - NORMAL / ANOMALY: Evaluated against frozen persisted threshold.
+- Chronological ordering & deduplication protection:
+  - Duplicate timestamps raise DuplicateTelemetryError without corrupting buffer.
+  - Out-of-order timestamps raise StaleTelemetryError without corrupting buffer.
 - Loads pre-trained model weights, configuration, scalers, and validation threshold once.
 - Strictly deterministic, zero online retraining.
 - Free of any FastAPI or external web framework dependency.
@@ -19,6 +22,7 @@ from __future__ import annotations
 import collections
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Tuple, Union
 
@@ -36,11 +40,14 @@ from ml.inference.inference_contract import (
     SUPPORTED_SENSORS,
     SUPPORTED_STATIONS,
     VALID_STATUSES,
+    DuplicateTelemetryError,
     InvalidContractError,
+    StaleTelemetryError,
     TelemetryInferenceOutput,
     TelemetryInput,
     UnsupportedSensorError,
     UnsupportedStationError,
+    parse_iso_timestamp,
 )
 from ml.models.model_registry import (
     ModelIntegrityError,
@@ -122,6 +129,8 @@ class LSTMAutoencoderInference:
 
         # 5. Stateful Rolling Buffers keyed by (station_id, sensor_id)
         self._buffers: Dict[Tuple[str, str], Deque[float]] = {}
+        # Track last processed timestamp per (station_id, sensor_id)
+        self._last_timestamps: Dict[Tuple[str, str], datetime] = {}
 
         # 6. Anomaly Type Classifier
         self.type_classifier = AnomalyTypeClassifier(min_window_len=self.config.seq_len)
@@ -135,17 +144,20 @@ class LSTMAutoencoderInference:
     def reset_history(
         self, station_id: Optional[str] = None, sensor_id: Optional[str] = None
     ) -> None:
-        """Reset historical sliding window buffer for specific sensor or all sensors."""
+        """Reset historical sliding window buffer and timestamp tracking for specific sensor or all sensors."""
         if station_id is not None and sensor_id is not None:
             key = (station_id, sensor_id)
             if key in self._buffers:
                 self._buffers[key].clear()
+            self._last_timestamps.pop(key, None)
         elif station_id is not None:
             keys_to_clear = [k for k in self._buffers.keys() if k[0] == station_id]
             for k in keys_to_clear:
                 self._buffers[k].clear()
+                self._last_timestamps.pop(k, None)
         else:
             self._buffers.clear()
+            self._last_timestamps.clear()
 
     def infer_telemetry(
         self, telemetry: Union[TelemetryInput, Dict[str, Any]]
@@ -171,15 +183,17 @@ class LSTMAutoencoderInference:
                 f"Unsupported sensor '{input_obj.sensor_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
             )
 
+        key = (input_obj.station_id, input_obj.sensor_id)
         buffer = self._get_buffer(input_obj.station_id, input_obj.sensor_id)
 
-        # Handle Missing or Bad-Quality Telemetry
-        if (
+        # 1. Handle Non-Finite (NaN, Inf, -Inf), Null, or Bad-Quality Telemetry
+        is_invalid_value = (
             input_obj.value is None
-            or (isinstance(input_obj.value, (int, float)) and np.isnan(input_obj.value))
-            or input_obj.quality != "GOOD"
-        ):
+            or not np.isfinite(input_obj.value)
+        )
+        if is_invalid_value or input_obj.quality != "GOOD":
             buffer.clear()
+            self._last_timestamps.pop(key, None)
             return TelemetryInferenceOutput(
                 station_id=input_obj.station_id,
                 sensor_id=input_obj.sensor_id,
@@ -194,10 +208,25 @@ class LSTMAutoencoderInference:
                 model_version=self.model_version,
             )
 
+        # 2. Chronological Ordering & Deduplication Check
+        current_dt = parse_iso_timestamp(input_obj.timestamp)
+        last_dt = self._last_timestamps.get(key)
+        if last_dt is not None:
+            if current_dt == last_dt:
+                raise DuplicateTelemetryError(
+                    f"Duplicate timestamp '{input_obj.timestamp}' received for sensor '{input_obj.sensor_id}'."
+                )
+            if current_dt < last_dt:
+                raise StaleTelemetryError(
+                    f"Stale out-of-order telemetry with timestamp '{input_obj.timestamp}' is older than last recorded '{last_dt.isoformat()}' for sensor '{input_obj.sensor_id}'."
+                )
+
+        # Update last processed timestamp and append to bounded buffer
+        self._last_timestamps[key] = current_dt
         float_val = float(input_obj.value)
         buffer.append(float_val)
 
-        # Handle Insufficient Observations (< seq_len)
+        # 3. Handle Insufficient Observations (< seq_len)
         if len(buffer) < self.config.seq_len:
             return TelemetryInferenceOutput(
                 station_id=input_obj.station_id,
@@ -213,7 +242,7 @@ class LSTMAutoencoderInference:
                 model_version=self.model_version,
             )
 
-        # Full Sequence Available
+        # 4. Full Sequence Available -> Scored Inference
         window_arr = np.array(buffer, dtype=np.float32)
         score, status = self._score_window_array(input_obj.sensor_id, window_arr)
         if status == "ANOMALY":
@@ -300,7 +329,7 @@ class LSTMAutoencoderInference:
             )
 
         arr = np.array(window_values, dtype=np.float32)
-        if np.isnan(arr).any():
+        if not np.all(np.isfinite(arr)):
             return TelemetryInferenceOutput(
                 station_id=station_id,
                 sensor_id=sensor_id,
@@ -363,5 +392,8 @@ class LSTMAutoencoderInference:
             mse = torch.mean((x - reconstructed) ** 2).item()
 
         score = round(float(mse), 6)
+        if not np.isfinite(score):
+            score = 0.0
+
         status = "ANOMALY" if score > self.threshold else "NORMAL"
         return score, status

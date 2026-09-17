@@ -385,14 +385,56 @@ A comprehensive threshold calibration analysis was conducted in `ml/training/ana
 
 ---
 
+### Maitri ML Inference Reliability
+
+A comprehensive reliability audit and hardening layer is implemented across `ml/inference/inference_contract.py`, `ml/inference/lstm_inference.py`, and `ml/inference/maitri_ml_service.py` to ensure that malformed, delayed, duplicate, non-finite, or corrupted telemetry records never silently produce misleading ML anomaly scores.
+
+> **Validation & Telemetry Disclaimer:** Evaluated purely via deterministic offline validation and synthetic Maitri telemetry (`MTR`). No claims of real Antarctic operational validation, field readiness, or clinical perfection are made.
+
+#### 1. Why Streaming Telemetry Validation Matters
+In operational streaming architectures, sensors and network transmitters frequently encounter transient dropped packets, micro-reboots, clock jitter, duplicate message deliveries, and hardware ADC saturation. Without strict inference-layer validation, non-finite numbers (`NaN`, `+inf`, `-inf`) can silently propagate through neural networks, yielding invalid NaN loss tensors or unhandled floating-point exceptions. Similarly, out-of-order or duplicate records can distort sliding sequence temporal order, leading to spurious false alarms or undetected anomalies.
+
+#### 2. Non-Finite Value Handling
+- Any telemetry record carrying a non-finite numerical value (`NaN`, `+inf`, `-inf`, or non-numeric object) is strictly intercepted before reaching the scaler or PyTorch neural network.
+- The pipeline immediately routes the record to `MISSING_DATA` status with `anomaly_score = null` and `anomaly_type = null`.
+- The sensor's rolling history window is cleared to prevent mathematical sequence corruption.
+
+#### 3. Missing-Data Handling
+- Telemetry with `value = None` or invalid/non-GOOD telemetry quality (`BAD`, `MISSING`, `UNCERTAIN`) cleanly returns `MISSING_DATA` (`anomaly_score = null`, `anomaly_type = null`).
+- The sensor's rolling buffer is immediately reset so that gaps in continuous telemetry do not result in synthetic step-jumps or distorted reconstruction errors.
+
+#### 4. Duplicate and Out-of-Order Telemetry Policy
+- **Chronological Tracking**: The inference engine tracks the latest ingested timestamp per `(station_id, sensor_id)` pair.
+- **Duplicate Timestamps**: If an exact duplicate timestamp arrives for an active sensor, the service raises `DuplicateTelemetryError`. The observation is not appended twice and the rolling buffer is not artificially advanced.
+- **Out-of-Order Telemetry**: If a stale observation arrives with a timestamp older than the most recently processed timestamp, the service raises `StaleTelemetryError`. The chronological sequence in the buffer is preserved without corruption.
+
+#### 5. Sensor & Station Isolation
+- Each supported Maitri sensor (`TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`) maintains an entirely isolated sliding deque buffer.
+- Interleaved multi-sensor telemetry streams (e.g. `TEMP_001` followed by `PRESS_001`) process independently without cross-talk or shared state contamination.
+- Maitri (`MTR`) remains the sole supported station; requests specifying unsupported stations (e.g. `BHARATI` or `BHT`) are rejected with `UnsupportedStationError`.
+
+#### 6. Bounded Rolling Window & Reset Behavior
+- Rolling buffers are backed by `collections.deque(maxlen=30)`, ensuring strict $O(1)$ constant memory overhead with zero unbounded memory growth regardless of stream duration.
+- `reset_sensor(sensor_id)` flushes history for only the specified sensor without impacting other sensors.
+- `reset_all()` provides a full station-level state reset.
+
+#### 7. Model Integrity & Deterministic Inference
+- Pre-execution SHA-256 and byte-size verification against `lstm-ae-v1_manifest.json` ensures inference cannot proceed if model weights, configurations, scalers, or thresholds are tampered with or missing.
+- Identical telemetry sequences fed into separate service instances produce bit-for-bit identical outputs without non-deterministic side effects or unhandled serialization types.
+
+#### 8. Synthetic Data Limitation
+- All reliability guarantees are validated on deterministic synthetic datasets. Real-world physical anomalies, radio noise, and hardware degradation modes may present behaviors not fully captured in synthetic sequences.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), calibration analysis (`analyze_lstm_calibration.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
+- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), calibration plots (`lstm_threshold_precision_recall_f1.png`, `lstm_reconstruction_error_distribution.png`, `lstm_normal_error_percentiles.png`, `lstm_threshold_confusion_comparison.png`), end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+- `ml/tests/`: Pytest test suite (`test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
 
 
 

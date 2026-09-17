@@ -12,6 +12,7 @@ Design Principles:
 - Artifact Integrity: Enforces cryptographic SHA-256 validation before loading artifacts.
 - State Isolation: Maintains independent 30-observation sliding windows per sensor.
 - Missing Data Safety: Resets sensor window on missing data or non-GOOD quality to prevent corruption.
+- Chronological Integrity: Protects against duplicate and out-of-order telemetry.
 """
 
 from __future__ import annotations
@@ -30,7 +31,9 @@ from ml.inference.inference_contract import (
     SUPPORTED_SENSORS,
     SUPPORTED_STATIONS,
     VALID_STATUSES,
+    DuplicateTelemetryError,
     InvalidContractError,
+    StaleTelemetryError,
     TelemetryInferenceOutput,
     TelemetryInput,
     UnsupportedSensorError,
@@ -134,6 +137,8 @@ class MaitriMLService:
         UnsupportedStationError: If station_id is not 'MTR'.
         UnsupportedSensorError: If sensor_id is not among the supported Maitri sensors.
         InvalidContractError: If payload fails schema, type, or contract validation.
+        DuplicateTelemetryError: If identical timestamp arrives twice for the same sensor.
+        StaleTelemetryError: If out-of-order telemetry with older timestamp arrives.
         """
         if isinstance(telemetry, dict):
             telemetry_input = TelemetryInput.from_dict(telemetry)
@@ -174,7 +179,7 @@ class MaitriMLService:
 
     def reset_sensor(self, sensor_id: str) -> None:
         """
-        Reset rolling historical sliding window for a specific sensor.
+        Reset rolling historical sliding window and timestamp state for a specific sensor.
 
         Parameters:
         -----------
@@ -189,9 +194,19 @@ class MaitriMLService:
 
     def reset_all(self) -> None:
         """
-        Reset all sensor rolling history buffers for Maitri station.
+        Reset all sensor rolling history buffers and timestamp states for Maitri station.
         """
         self._engine.reset_history(station_id=self.station_id)
+
+    def get_buffer_length(self, sensor_id: str) -> int:
+        """
+        Get the current number of buffered observations for a given sensor.
+        """
+        if sensor_id not in SUPPORTED_SENSORS:
+            raise UnsupportedSensorError(
+                f"Cannot get buffer for unsupported sensor '{sensor_id}'. Supported: {sorted(SUPPORTED_SENSORS)}"
+            )
+        return len(self._engine._get_buffer(self.station_id, sensor_id))
 
     def get_service_info(self) -> Dict[str, Any]:
         """

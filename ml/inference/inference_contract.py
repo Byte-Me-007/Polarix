@@ -11,13 +11,17 @@ Design Principles:
 - Strict station ('MTR') and sensor validation for Maitri station.
 - Raw reconstruction error scoring (MSE) without arbitrary scaling or invented probability transforms.
 - Clean handling of INSUFFICIENT_DATA and MISSING_DATA streaming states.
+- Robust edge-case hardening (non-finite values, timestamp parse validation, quality enforcement).
 """
 
 from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from typing import Any, Dict, Optional, Set, Union
+
+import numpy as np
 
 SUPPORTED_STATIONS: Set[str] = {"MTR"}
 
@@ -61,6 +65,34 @@ class InvalidContractError(ValueError):
     pass
 
 
+class DuplicateTelemetryError(InvalidContractError):
+    """Raised when duplicate telemetry with the same timestamp is received for a sensor."""
+    pass
+
+
+class StaleTelemetryError(InvalidContractError):
+    """Raised when out-of-order telemetry with an older timestamp is received for a sensor."""
+    pass
+
+
+def parse_iso_timestamp(ts: str) -> datetime:
+    """
+    Parse an ISO-8601 formatted timestamp string into a datetime object.
+
+    Raises:
+    -------
+    InvalidContractError: If timestamp is not a valid parseable ISO string.
+    """
+    if not isinstance(ts, str) or not ts.strip():
+        raise InvalidContractError("timestamp must be a non-empty string.")
+
+    clean_ts = ts.strip().replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(clean_ts)
+    except Exception as exc:
+        raise InvalidContractError(f"Invalid timestamp format '{ts}': {exc}") from exc
+
+
 @dataclass(frozen=True)
 class TelemetryInput:
     """
@@ -80,26 +112,34 @@ class TelemetryInput:
 
     def validate(self) -> None:
         """Validate station, sensor, and metadata integrity."""
-        if not self.station_id:
+        if not self.station_id or not isinstance(self.station_id, str):
             raise InvalidContractError("station_id must be a non-empty string.")
         if self.station_id not in SUPPORTED_STATIONS:
             raise UnsupportedStationError(
                 f"Unsupported station '{self.station_id}'. Currently supported stations: {sorted(SUPPORTED_STATIONS)}"
             )
 
-        if not self.sensor_id:
+        if not self.sensor_id or not isinstance(self.sensor_id, str):
             raise InvalidContractError("sensor_id must be a non-empty string.")
         if self.sensor_id not in SUPPORTED_SENSORS:
             raise UnsupportedSensorError(
                 f"Unsupported sensor '{self.sensor_id}' for station '{self.station_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
             )
 
-        if not self.timestamp:
+        if not self.timestamp or not isinstance(self.timestamp, str):
             raise InvalidContractError("timestamp must be a non-empty string.")
+        # Validate timestamp parseability
+        parse_iso_timestamp(self.timestamp)
+
+        if self.quality not in VALID_QUALITIES:
+            raise InvalidContractError(
+                f"Invalid quality '{self.quality}'. Valid qualities: {sorted(VALID_QUALITIES)}"
+            )
 
         if self.value is not None:
             try:
-                object.__setattr__(self, "value", float(self.value))
+                converted_val = float(self.value)
+                object.__setattr__(self, "value", converted_val)
             except (ValueError, TypeError) as exc:
                 raise InvalidContractError(f"Invalid numeric value '{self.value}': {exc}") from exc
 
@@ -185,10 +225,14 @@ class TelemetryInferenceOutput:
                 raise InvalidContractError(
                     f"anomaly_type must be None when status is '{self.anomaly_status}'."
                 )
-        if self.anomaly_status in {"NORMAL", "ANOMALY"} and self.anomaly_score is None:
-            raise InvalidContractError(
-                f"anomaly_score cannot be None when status is '{self.anomaly_status}'."
-            )
+        if self.anomaly_status in {"NORMAL", "ANOMALY"}:
+            if self.anomaly_score is None:
+                raise InvalidContractError(
+                    f"anomaly_score cannot be None when status is '{self.anomaly_status}'."
+                )
+            if not np.isfinite(self.anomaly_score):
+                raise InvalidContractError("anomaly_score must be a finite float.")
+
         if self.anomaly_type is not None and self.anomaly_type not in VALID_ANOMALY_TYPES:
             raise InvalidContractError(
                 f"Invalid anomaly_type '{self.anomaly_type}'. Valid types: {sorted(VALID_ANOMALY_TYPES)}"

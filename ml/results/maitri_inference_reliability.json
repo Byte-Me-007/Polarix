@@ -1,0 +1,60 @@
+{
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.017674,
+  "station_id": "MTR",
+  "validation_environment": "synthetic_offline",
+  "validation_statement": "Explicit synthetic and offline validation only. No real Antarctic operational telemetry used.",
+  "limitations": "Evaluated exclusively on synthetic normal and anomaly patterns generated for Maitri station. Real-world physical noise and unexpected failure modes may differ.",
+  "test_counts": {
+    "reliability_edge_case_tests": 25,
+    "total_ml_suite_tests": 151
+  },
+  "edge_cases": {
+    "normal_warmup": {
+      "status": "PASSED",
+      "behavior": "Steps 1 to 29 return INSUFFICIENT_DATA with null anomaly_score and anomaly_type."
+    },
+    "normal_scored_inference": {
+      "status": "PASSED",
+      "behavior": "Step 30 scored successfully with status=NORMAL and finite score=0.002237."
+    },
+    "missing_data": {
+      "status": "PASSED",
+      "behavior": "Missing/None value routes to MISSING_DATA, clears rolling buffer, returns null score."
+    },
+    "duplicate_telemetry": {
+      "status": "PASSED",
+      "behavior": "Duplicate timestamp raises DuplicateTelemetryError without advancing or duplicating buffer."
+    },
+    "out_of_order_telemetry": {
+      "status": "PASSED",
+      "behavior": "Older timestamp raises StaleTelemetryError without corrupting chronological sequence."
+    },
+    "non_finite_values": {
+      "status": "PASSED",
+      "behavior": "NaN, +inf, and -inf never reach LSTM; safely routed to MISSING_DATA with cleared buffer."
+    },
+    "sensor_isolation": {
+      "status": "PASSED",
+      "behavior": "Each sensor maintains independent rolling deque; interleaved records do not cross-contaminate."
+    },
+    "reset_behavior": {
+      "status": "PASSED",
+      "behavior": "reset_sensor clears only the specified sensor; reset_all clears all sensor histories."
+    },
+    "determinism": {
+      "status": "PASSED",
+      "behavior": "Identical inputs across fresh service instances yield bit-for-bit identical inference dictionaries."
+    },
+    "bounded_buffer": {
+      "status": "PASSED",
+      "behavior": "Rolling history bounded strictly to 30 steps with collections.deque(maxlen=30)."
+    }
+  },
+  "validation_summary": {
+    "overall_status": "PASSED",
+    "total_edge_cases_tested": 10,
+    "passed_edge_cases": 10,
+    "failed_edge_cases": 0
+  }
+}
