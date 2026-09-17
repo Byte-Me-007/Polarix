@@ -97,35 +97,35 @@ export const STATIONS = {
       visibility: "24 km"
     },
 
-    // 3D Digital Twin configuration with 6 required spatial zones
+    // 3D Digital Twin configuration with 6 required spatial zones arranged in modular connected layout
     digitalTwin: {
       model: "procedural-parametric",
       elevationStilts: true,
       zones: [
-        { id: "Z-MTR-01", name: "MAIN BUILDING", code: "MAIN", position: [0, 1.4, 0], size: [10, 2.8, 7], shape: "box", color: "#e8e4dc", status: "NOMINAL", description: "Central living module, briefing facility, and command hub" },
-        { id: "Z-MTR-02", name: "ENERGY", code: "ENERGY", position: [-7.5, 1.2, -1.5], size: [4.5, 2.4, 5.5], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Microgrid power conditioning, solar inverters, and battery bank" },
-        { id: "Z-MTR-03", name: "RESEARCH", code: "RESEARCH", position: [7.5, 1.2, -1.5], size: [4.5, 2.4, 5.5], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Meteorological, atmospheric, and geomagnetic research lab" },
-        { id: "Z-MTR-04", name: "STORAGE", code: "STORAGE", position: [0, 1.0, -6.5], size: [6.5, 2.0, 4.5], shape: "box", color: "#d6cfc3", status: "NOMINAL", description: "Deep cold provisions, spares, and life support consumables" },
-        { id: "Z-MTR-05", name: "GENERATOR", code: "GENERATOR", position: [-7.0, 1.0, 6.5], size: [5.5, 2.0, 4.5], shape: "box", color: "#d9d0c2", status: "WARNING", description: "Auxiliary diesel generators #1 and #2" },
-        { id: "Z-MTR-06", name: "COMMS", code: "COMMS", position: [0, 3.8, 2.5], size: [1.2, 3.8, 1.2], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Primary Ku-Band satellite dish and UHF/VHF antenna mast" }
+        { id: "Z-MTR-01", name: "MAIN BUILDING", code: "MAIN", position: [0, 1.6, 0], size: [11.5, 3.0, 7.0], shape: "box", color: "#e8e4dc", status: "NOMINAL", description: "Central living module, briefing facility, command hub, and life support" },
+        { id: "Z-MTR-02", name: "ENERGY", code: "ENERGY", position: [0, 1.4, -7.2], size: [6.0, 2.5, 5.0], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Microgrid power conditioning, battery storage banks, and solar inverters" },
+        { id: "Z-MTR-03", name: "RESEARCH", code: "RESEARCH", position: [9.5, 1.4, 0], size: [5.5, 2.5, 5.5], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Meteorological, atmospheric, and geomagnetic scientific research labs" },
+        { id: "Z-MTR-04", name: "STORAGE", code: "STORAGE", position: [8.5, 1.2, -7.2], size: [6.0, 2.2, 4.8], shape: "box", color: "#d6cfc3", status: "NOMINAL", description: "Deep cold provisions, spares, logistics container modules, and supplies" },
+        { id: "Z-MTR-05", name: "GENERATOR", code: "GENERATOR", position: [-8.5, 1.3, -7.2], size: [5.5, 2.3, 4.8], shape: "box", color: "#d9d0c2", status: "WARNING", description: "Auxiliary diesel generator units #1 & #2, fuel buffer, and exhaust plant" },
+        { id: "Z-MTR-06", name: "COMMS", code: "COMMS", position: [0, 3.2, -13.5], size: [2.2, 4.5, 2.2], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Primary Ku-Band satellite tracking dish, telemetry shelter, and antenna mast" }
       ],
       sensors: []
     },
 
     // Comprehensive sensor registry configuration mapped to 3D station zones
     sensors: [
-      { id: "ENV-MTR-001", name: "Ambient Meteorological RTD", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -18.4, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:09 UTC", criticality: "HIGH", minValue: -50.0, maxValue: 10.0, x: 2.5, y: 2.8, z: 3.5 },
-      { id: "ENV-MTR-002", name: "Anemometer Mast Alpha", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 42.5, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:07 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 160.0, x: 0.0, y: 5.8, z: 2.5 },
-      { id: "ENV-MTR-003", name: "Barometric Pressure Transducer", domain: "ENVIRONMENT", type: "PRESSURE", value: 986.2, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:55 UTC", criticality: "MEDIUM", minValue: 920.0, maxValue: 1040.0, x: 1.5, y: 1.8, z: 0.5 },
-      { id: "ENV-MTR-004", name: "East Mast Humidity Probe", domain: "ENVIRONMENT", type: "HUMIDITY", value: 58.0, unit: "%", status: "WARNING", quality: "DEGRADED", lastUpdate: "19:26:40 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 100.0, x: 7.5, y: 2.5, z: -1.5 },
-      { id: "ENG-MTR-001", name: "Solar Array Pyranometer", domain: "ENERGY", type: "IRRADIANCE", value: 420.0, unit: "W/m²", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:02 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 1200.0, x: -7.5, y: 2.6, z: -1.5 },
-      { id: "ENG-MTR-002", name: "DG-2 Vibration Accelerometer", domain: "ENERGY", type: "VIBRATION", value: 4.8, unit: "mm/s", status: "CRITICAL", quality: "DEGRADED", lastUpdate: "19:27:12 UTC", criticality: "CRITICAL", minValue: 0.0, maxValue: 3.5, x: -7.0, y: 1.2, z: 6.5 },
-      { id: "ENG-MTR-003", name: "Battery Bank B Voltage Monitor", domain: "ENERGY", type: "VOLTAGE", value: 418.2, unit: "V", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:05 UTC", criticality: "HIGH", minValue: 380.0, maxValue: 440.0, x: -7.5, y: 0.8, z: -0.5 },
-      { id: "ENG-MTR-004", name: "Wind Turbine Generator Load", domain: "ENERGY", type: "POWER", value: 18.4, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 50.0, x: 9.5, y: 3.2, z: 4.5 },
-      { id: "STR-MTR-001", name: "Main Living Module Strain Gauge 1", domain: "STRUCTURE", type: "STRAIN", value: 142.0, unit: "με", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:48 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 800.0, x: 0.0, y: 0.2, z: 0.0 },
-      { id: "STR-MTR-002", name: "Stilt Foundation Thermal Sensor", domain: "STRUCTURE", type: "TEMPERATURE", value: -14.2, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:30 UTC", criticality: "MEDIUM", minValue: -40.0, maxValue: 5.0, x: -2.5, y: -0.5, z: 2.0 },
-      { id: "LOG-MTR-001", name: "Bulk Fuel Tank #1 Ultrasonic Level", domain: "LOGISTICS", type: "LEVEL", value: 64.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:25:10 UTC", criticality: "HIGH", minValue: 15.0, maxValue: 100.0, x: 0.0, y: 1.2, z: -6.5 },
-      { id: "LOG-MTR-002", name: "Day Tank Flow Transducer", domain: "LOGISTICS", type: "FLOW", value: 0.0, unit: "L/min", status: "OFFLINE", quality: "OFFLINE", lastUpdate: "18:42:00 UTC", criticality: "LOW", minValue: 0.0, maxValue: 50.0, x: -5.5, y: 0.8, z: 5.5 }
+      { id: "ENV-MTR-001", name: "Ambient Meteorological RTD", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -18.4, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:09 UTC", criticality: "HIGH", minValue: -50.0, maxValue: 10.0, x: 2.5, y: 3.1, z: 2.5 },
+      { id: "ENV-MTR-002", name: "Anemometer Mast Alpha", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 42.5, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:07 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 160.0, x: 0.0, y: 6.8, z: -13.5 },
+      { id: "ENV-MTR-003", name: "Barometric Pressure Transducer", domain: "ENVIRONMENT", type: "PRESSURE", value: 986.2, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:55 UTC", criticality: "MEDIUM", minValue: 920.0, maxValue: 1040.0, x: -2.5, y: 3.1, z: 1.0 },
+      { id: "ENV-MTR-004", name: "East Mast Humidity Probe", domain: "ENVIRONMENT", type: "HUMIDITY", value: 58.0, unit: "%", status: "WARNING", quality: "DEGRADED", lastUpdate: "19:26:40 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 100.0, x: 9.5, y: 2.8, z: 0.0 },
+      { id: "ENG-MTR-001", name: "Solar Array Pyranometer", domain: "ENERGY", type: "IRRADIANCE", value: 420.0, unit: "W/m²", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:02 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 1200.0, x: 0.0, y: 2.8, z: -7.2 },
+      { id: "ENG-MTR-002", name: "DG-2 Vibration Accelerometer", domain: "ENERGY", type: "VIBRATION", value: 4.8, unit: "mm/s", status: "CRITICAL", quality: "DEGRADED", lastUpdate: "19:27:12 UTC", criticality: "CRITICAL", minValue: 0.0, maxValue: 3.5, x: -8.5, y: 2.2, z: -7.2 },
+      { id: "ENG-MTR-003", name: "Battery Bank B Voltage Monitor", domain: "ENERGY", type: "VOLTAGE", value: 418.2, unit: "V", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:05 UTC", criticality: "HIGH", minValue: 380.0, maxValue: 440.0, x: 1.8, y: 2.2, z: -7.2 },
+      { id: "ENG-MTR-004", name: "Wind Turbine Generator Load", domain: "ENERGY", type: "POWER", value: 18.4, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 50.0, x: 12.5, y: 3.2, z: -3.5 },
+      { id: "STR-MTR-001", name: "Main Living Module Strain Gauge 1", domain: "STRUCTURE", type: "STRAIN", value: 142.0, unit: "με", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:48 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 800.0, x: 0.0, y: 2.8, z: 0.0 },
+      { id: "STR-MTR-002", name: "Stilt Foundation Thermal Sensor", domain: "STRUCTURE", type: "TEMPERATURE", value: -14.2, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:30 UTC", criticality: "MEDIUM", minValue: -40.0, maxValue: 5.0, x: -4.2, y: 0.6, z: 2.8 },
+      { id: "LOG-MTR-001", name: "Bulk Fuel Tank #1 Ultrasonic Level", domain: "LOGISTICS", type: "LEVEL", value: 64.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:25:10 UTC", criticality: "HIGH", minValue: 15.0, maxValue: 100.0, x: 8.5, y: 2.4, z: -7.2 },
+      { id: "LOG-MTR-002", name: "Day Tank Flow Transducer", domain: "LOGISTICS", type: "FLOW", value: 0.0, unit: "L/min", status: "OFFLINE", quality: "OFFLINE", lastUpdate: "18:42:00 UTC", criticality: "LOW", minValue: 0.0, maxValue: 50.0, x: -6.0, y: 1.5, z: -7.2 }
     ]
   },
 
@@ -220,33 +220,33 @@ export const STATIONS = {
       visibility: "35 km"
     },
 
-    // 3D Digital Twin configuration with 6 required spatial zones
+    // 3D Digital Twin configuration with 6 required spatial zones arranged in modular connected layout
     digitalTwin: {
       model: "procedural-parametric",
       elevationStilts: true,
       zones: [
-        { id: "Z-BHR-01", name: "MAIN BUILDING", code: "MAIN", position: [0, 1.8, 0], size: [14, 3.4, 8], shape: "box", color: "#ece8df", status: "NOMINAL", description: "Integrated aerodynamic habitat, remote sensing ops, and expedition command" },
-        { id: "Z-BHR-02", name: "ENERGY", code: "ENERGY", position: [-10.5, 1.4, 0], size: [5.5, 2.6, 6], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Clean microgrid power management and LiFePO4 battery banks" },
-        { id: "Z-BHR-03", name: "RESEARCH", code: "RESEARCH", position: [10.5, 1.4, 0], size: [5.5, 2.6, 6], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Cryosphere, oceanography, and satellite earth observation labs" },
-        { id: "Z-BHR-04", name: "STORAGE", code: "STORAGE", position: [0, 1.2, -7.5], size: [7.5, 2.2, 5], shape: "box", color: "#d6cfc3", status: "NOMINAL", description: "Scientific samples, field equipment, and provisions storage" },
-        { id: "Z-BHR-05", name: "GENERATOR", code: "GENERATOR", position: [-7.0, 1.1, 7.5], size: [6.0, 2.2, 5], shape: "box", color: "#d9d0c2", status: "NOMINAL", description: "Clean emission CHP generator plant and waste heat recovery" },
-        { id: "Z-BHR-06", name: "COMMS", code: "COMMS", position: [0, 4.2, 0], size: [2.5, 2.2, 2.5], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Radome tracking GSAT-30 and polar orbiting remote sensing satellites" }
+        { id: "Z-BHR-01", name: "MAIN BUILDING", code: "MAIN", position: [0, 1.8, 0], size: [13.5, 3.4, 7.5], shape: "box", color: "#ece8df", status: "NOMINAL", description: "Integrated aerodynamic habitat, remote sensing ops, and expedition command" },
+        { id: "Z-BHR-02", name: "ENERGY", code: "ENERGY", position: [0, 1.5, -7.5], size: [6.5, 2.6, 5.0], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Clean microgrid power management, LiFePO4 battery banks, and solar array bus" },
+        { id: "Z-BHR-03", name: "RESEARCH", code: "RESEARCH", position: [10.5, 1.5, 0], size: [6.0, 2.6, 5.8], shape: "box", color: "#dfd9ce", status: "NOMINAL", description: "Cryosphere, oceanography, geomagnetism, and satellite earth observation labs" },
+        { id: "Z-BHR-04", name: "STORAGE", code: "STORAGE", position: [9.5, 1.3, -7.5], size: [6.5, 2.3, 5.0], shape: "box", color: "#d6cfc3", status: "NOMINAL", description: "Scientific samples deep freezer, field equipment, and logistics containers" },
+        { id: "Z-BHR-05", name: "GENERATOR", code: "GENERATOR", position: [-9.5, 1.3, -7.5], size: [6.2, 2.3, 5.0], shape: "box", color: "#d9d0c2", status: "NOMINAL", description: "Clean emission CHP generator plant, exhaust stacks, and waste heat recovery" },
+        { id: "Z-BHR-06", name: "COMMS", code: "COMMS", position: [0, 3.8, -13.8], size: [2.4, 4.8, 2.4], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Optical radome tracking GSAT-30, Starlink polar gateway, and RF mast" }
       ],
       sensors: []
     },
 
     // Comprehensive sensor registry configuration mapped to 3D station zones
     sensors: [
-      { id: "ENV-BHR-001", name: "Larsemann Hills Optical Anemometer", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 26.4, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:10 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 180.0, x: 0.0, y: 5.6, z: 0.0 },
-      { id: "ENV-BHR-002", name: "Surface Temperature Array", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -12.6, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:08 UTC", criticality: "HIGH", minValue: -45.0, maxValue: 15.0, x: 4.0, y: 2.0, z: 1.0 },
-      { id: "ENV-BHR-003", name: "Digital Microbarometer", domain: "ENVIRONMENT", type: "PRESSURE", value: 994.5, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:50 UTC", criticality: "MEDIUM", minValue: 930.0, maxValue: 1050.0, x: 0.5, y: 2.0, z: 2.5 },
-      { id: "ENG-BHR-001", name: "Clean Microgrid Solar Bus", domain: "ENERGY", type: "POWER", value: 54.2, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:04 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 80.0, x: -10.5, y: 3.0, z: 0.0 },
-      { id: "ENG-BHR-002", name: "Lithium Iron Phosphate Battery SOH", domain: "ENERGY", type: "HEALTH", value: 99.4, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 70.0, maxValue: 100.0, x: -9.5, y: 1.2, z: -1.0 },
-      { id: "ENG-BHR-003", name: "Wind Turbine #2 Pitch Actuator", domain: "ENERGY", type: "ANGLE", value: 14.5, unit: "deg", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:35 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 90.0, x: 12.0, y: 3.8, z: 4.0 },
-      { id: "STR-BHR-001", name: "Integrated Pod Aerodynamic Load", domain: "STRUCTURE", type: "LOAD", value: 38.2, unit: "kN", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:42 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 250.0, x: 0.0, y: 2.5, z: 4.0 },
-      { id: "STR-BHR-002", name: "Structural Joint Expansion Gauge", domain: "STRUCTURE", type: "DISPLACEMENT", value: 0.85, unit: "mm", status: "NORMAL", quality: "GOOD", lastUpdate: "19:26:50 UTC", criticality: "LOW", minValue: 0.0, maxValue: 5.0, x: 6.0, y: 1.5, z: 0.0 },
-      { id: "LOG-BHR-001", name: "Primary Polar Diesel Reserve", domain: "LOGISTICS", type: "LEVEL", value: 84.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:15 UTC", criticality: "HIGH", minValue: 20.0, maxValue: 100.0, x: 0.0, y: 1.2, z: -7.5 },
-      { id: "LOG-BHR-002", name: "Waste Heat Glycol Circulation", domain: "LOGISTICS", type: "FLOW", value: 42.0, unit: "L/min", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:00 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 60.0, x: -7.0, y: 1.2, z: 7.5 }
+      { id: "ENV-BHR-001", name: "Larsemann Hills Optical Anemometer", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 26.4, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:10 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 180.0, x: 0.0, y: 7.5, z: -13.8 },
+      { id: "ENV-BHR-002", name: "Surface Temperature Array", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -12.6, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:08 UTC", criticality: "HIGH", minValue: -45.0, maxValue: 15.0, x: 3.5, y: 3.6, z: 1.5 },
+      { id: "ENV-BHR-003", name: "Digital Microbarometer", domain: "ENVIRONMENT", type: "PRESSURE", value: 994.5, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:50 UTC", criticality: "MEDIUM", minValue: 930.0, maxValue: 1050.0, x: -2.5, y: 3.6, z: 1.0 },
+      { id: "ENG-BHR-001", name: "Clean Microgrid Solar Bus", domain: "ENERGY", type: "POWER", value: 54.2, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:04 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 80.0, x: 0.0, y: 3.0, z: -7.5 },
+      { id: "ENG-BHR-002", name: "Lithium Iron Phosphate Battery SOH", domain: "ENERGY", type: "HEALTH", value: 99.4, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 70.0, maxValue: 100.0, x: 1.8, y: 2.2, z: -7.5 },
+      { id: "ENG-BHR-003", name: "Wind Turbine #2 Pitch Actuator", domain: "ENERGY", type: "ANGLE", value: 14.5, unit: "deg", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:35 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 90.0, x: 13.0, y: 4.0, z: -3.5 },
+      { id: "STR-BHR-001", name: "Integrated Pod Aerodynamic Load", domain: "STRUCTURE", type: "LOAD", value: 38.2, unit: "kN", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:42 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 250.0, x: 0.0, y: 3.0, z: 3.2 },
+      { id: "STR-BHR-002", name: "Structural Joint Expansion Gauge", domain: "STRUCTURE", type: "DISPLACEMENT", value: 0.85, unit: "mm", status: "NORMAL", quality: "GOOD", lastUpdate: "19:26:50 UTC", criticality: "LOW", minValue: 0.0, maxValue: 5.0, x: 6.8, y: 2.0, z: 0.0 },
+      { id: "LOG-BHR-001", name: "Primary Polar Diesel Reserve", domain: "LOGISTICS", type: "LEVEL", value: 84.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:15 UTC", criticality: "HIGH", minValue: 20.0, maxValue: 100.0, x: 9.5, y: 2.5, z: -7.5 },
+      { id: "LOG-BHR-002", name: "Waste Heat Glycol Circulation", domain: "LOGISTICS", type: "FLOW", value: 42.0, unit: "L/min", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:00 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 60.0, x: -9.5, y: 2.0, z: -7.5 }
     ]
   }
 };

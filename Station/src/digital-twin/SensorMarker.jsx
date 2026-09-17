@@ -5,13 +5,16 @@ import { Html } from '@react-three/drei';
 export const SensorMarker = ({ sensor, isSelected, onSelect }) => {
   const [hovered, setHovered] = useState(false);
   const beaconRef = useRef();
+  const ringRef = useRef();
 
+  // Strict visual color language from POLARIS design system
+  // NORMAL: muted sage, WARNING: amber, CRITICAL: restrained red, OFFLINE/UNKNOWN: neutral gray
   const getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
-      case 'NORMAL': return '#3f6e4a'; // Muted sage
-      case 'WARNING': return '#b26814'; // Restrained amber
+      case 'NORMAL': return '#3f6e4a';   // Muted sage
+      case 'WARNING': return '#b26814';  // Restrained amber
       case 'CRITICAL': return '#b5382b'; // Restrained red
-      case 'OFFLINE': return '#5d6672'; // Neutral gray
+      case 'OFFLINE': return '#5d6672';  // Neutral gray
       default: return '#727b87';
     }
   };
@@ -19,31 +22,66 @@ export const SensorMarker = ({ sensor, isSelected, onSelect }) => {
   const color = getStatusColor(sensor.status);
   const isCritical = sensor.status?.toUpperCase() === 'CRITICAL';
 
-  // Subtle beacon pulse animation for critical / active sensors
+  // Pulse animation for critical sensors or currently selected sensor
   useFrame(({ clock }) => {
-    if (beaconRef.current && isCritical) {
-      const t = clock.getElapsedTime();
-      const scale = 1 + Math.sin(t * 5) * 0.25;
+    const t = clock.getElapsedTime();
+    if (beaconRef.current && (isCritical || isSelected)) {
+      const scale = 1 + Math.sin(t * 4.5) * (isCritical ? 0.22 : 0.15);
       beaconRef.current.scale.set(scale, scale, scale);
+    }
+    if (ringRef.current) {
+      ringRef.current.rotation.z = t * 0.5;
     }
   });
 
-  const position = [sensor.x || 0, sensor.y || 0, sensor.z || 0];
+  // Keep stored sensor position intact for data/inspection,
+  // but add small visual Y elevation offset so marker is prominently visible
+  // above roofs and never hidden inside building geometry.
+  const visualOffset = 0.85;
+  const visualX = sensor.x || 0;
+  const visualY = (sensor.y || 0) + visualOffset;
+  const visualZ = sensor.z || 0;
 
   return (
-    <group position={position}>
-      {/* Sensor Pin Stem (connecting down to mounting surface) */}
-      <mesh position={[0, -0.25, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, 0.5, 8]} />
-        <meshBasicMaterial color="#191c20" />
+    <group position={[visualX, visualY, visualZ]}>
+      {/* ----------------------------------------------------------- */}
+      {/* 1. VERTICAL INDICATOR STEM (Anchors down to mounting plane) */}
+      {/* ----------------------------------------------------------- */}
+      <mesh position={[0, -visualOffset / 2, 0]}>
+        <cylinderGeometry args={[0.025, 0.025, visualOffset, 8]} />
+        <meshBasicMaterial color="#2d333b" />
       </mesh>
 
-      {/* Main Sensor Beacon Sphere */}
+      {/* Surface Mounting Foot Ring */}
+      <mesh position={[0, -visualOffset, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.08, 0.16, 12]} />
+        <meshBasicMaterial color="#3d444e" side={2} />
+      </mesh>
+
+      {/* ----------------------------------------------------------- */}
+      {/* 2. CIRCULAR STATUS RING (Horizontal instrumentation ring)   */}
+      {/* ----------------------------------------------------------- */}
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.32, 0.40, 24]} />
+        <meshBasicMaterial color={color} side={2} transparent opacity={0.85} />
+      </mesh>
+
+      {/* Outer Selected Ring */}
+      {isSelected && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.48, 0.56, 32]} />
+          <meshBasicMaterial color="#b65a1f" side={2} />
+        </mesh>
+      )}
+
+      {/* ----------------------------------------------------------- */}
+      {/* 3. LUMINOUS BEACON POINT (Clickable instrument head)       */}
+      {/* ----------------------------------------------------------- */}
       <mesh
         ref={beaconRef}
         onClick={(e) => {
           e.stopPropagation();
-          onSelect(sensor);
+          onSelect(sensor); // Passes the pristine source sensor coordinate
         }}
         onPointerOver={(e) => {
           e.stopPropagation();
@@ -56,31 +94,25 @@ export const SensorMarker = ({ sensor, isSelected, onSelect }) => {
           document.body.style.cursor = 'default';
         }}
       >
-        <sphereGeometry args={[hovered || isSelected ? 0.32 : 0.24, 16, 16]} />
+        <sphereGeometry args={[hovered || isSelected ? 0.28 : 0.22, 16, 16]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={hovered || isSelected ? 0.6 : 0.3}
-          roughness={0.2}
-          metalness={0.4}
+          emissiveIntensity={hovered || isSelected ? 0.7 : 0.4}
+          roughness={0.25}
+          metalness={0.3}
         />
       </mesh>
 
-      {/* Selected Indicator Ring */}
-      {isSelected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.38, 0.46, 24]} />
-          <meshBasicMaterial color="#b65a1f" side={2} />
-        </mesh>
-      )}
-
-      {/* Hover & Permanent Technical Tag */}
+      {/* ----------------------------------------------------------- */}
+      {/* 4. FLOATING SENSOR IDENTIFIER TAG                           */}
+      {/* ----------------------------------------------------------- */}
       {(hovered || isSelected || isCritical) && (
         <Html
-          position={[0, 0.45, 0]}
+          position={[0, 0.52, 0]}
           center
           distanceFactor={22}
-          zIndexRange={[200, 0]}
+          zIndexRange={[300, 0]}
         >
           <div
             onClick={(e) => {
@@ -90,9 +122,9 @@ export const SensorMarker = ({ sensor, isSelected, onSelect }) => {
             style={{
               background: '#ffffff',
               border: `1.5px solid ${isSelected ? '#b65a1f' : color}`,
-              borderRadius: '3px',
-              padding: '2px 6px',
-              boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
+              borderRadius: '2px',
+              padding: '3px 7px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '10px',
               whiteSpace: 'nowrap',
@@ -101,14 +133,30 @@ export const SensorMarker = ({ sensor, isSelected, onSelect }) => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              lineHeight: 1.2
+              lineHeight: 1.25
             }}
           >
-            <div style={{ fontWeight: 700, color: '#191c20', display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: color }} />
+            <div
+              style={{
+                fontWeight: 700,
+                color: '#191c20',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                letterSpacing: '0.04em'
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: color
+                }}
+              />
               <span>{sensor.id}</span>
             </div>
-            <div style={{ fontSize: '9px', color: '#4b525d' }}>
+            <div style={{ fontSize: '9px', color: '#4b525d', fontWeight: 600 }}>
               {sensor.value} {sensor.unit}
             </div>
           </div>
