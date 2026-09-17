@@ -260,11 +260,58 @@ A cryptographic model registry layer (`ml/models/model_registry.py`) and manifes
 
 ---
 
+---
+
+### End-to-End Maitri ML Validation
+
+The complete end-to-end ML inference pipeline is validated via `ml/inference/validate_maitri_pipeline.py` and tested under `ml/tests/test_maitri_end_to_end_pipeline.py`.
+
+> **Dataset & Scope Notice:** All validation is performed strictly on synthetic telemetry generated for Maitri station (`MTR`). No real Antarctic deployment, historical Maitri data, production readiness, perfect anomaly detection, or guaranteed operational reliability is claimed.
+
+#### 1. End-to-End Pipeline Flow
+```text
+TelemetryInput
+  → Contract validation (Schema, station, sensor)
+  → Model integrity validation (SHA-256 Checksums)
+  → Rolling window buffer (30-step minimum per sensor)
+  → LSTM reconstruction error (MSE vs threshold 0.017674)
+  → Anomaly status (NORMAL / ANOMALY / INSUFFICIENT_DATA / MISSING_DATA)
+  → Anomaly type classification (SPIKE / DRIFT / STUCK_VALUE / NORMAL / UNKNOWN)
+  → TelemetryInferenceOutput (Typed contract)
+  → JSON Serializable Result
+```
+
+#### 2. Key Pipeline Architectural Guarantees
+- **30-Observation Minimum Window**: Observations 1 to 29 yield `INSUFFICIENT_DATA` (`anomaly_score = null`, `anomaly_type = null`). Scored inference begins strictly upon reaching 30 valid observations.
+- **Per-Sensor History Isolation**: Each sensor (`TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`) maintains an isolated sliding deque buffer. Interleaving observations across multiple sensors never causes cross-sensor buffer contamination.
+- **Missing Data Handling**: Telemetry with `value = None`, `NaN`, or non-GOOD quality (`BAD`, `MISSING`, `UNCERTAIN`) immediately produces `MISSING_DATA` (`anomaly_score = null`, `anomaly_type = null`) and clears the rolling window to prevent sequence contamination.
+- **Model Version Propagation**: The model version string (`lstm-ae-v1`) is deterministically propagated through all output contracts.
+- **Model Integrity Enforcement**: Cryptographic SHA-256 checksums and file sizes for all registered model artifacts (`lstm-ae-v1.pt`, `lstm-ae-v1_config.json`, `lstm-ae-v1_scaler.json`, `lstm_threshold.json`) are verified prior to inference execution.
+- **Pipeline Correctness vs. Model Accuracy**: Pipeline validation tests assert structural correctness, contract integrity, isolation, state handling, and JSON serialization independently of model false positive variations on synthetic signals.
+
+#### 3. Validation Summary (`ml/results/maitri_end_to_end_validation.json`)
+- **Overall Status**: `PASS`
+- **Total Telemetry Records Processed**: 1,093
+- **Sensors Tested**: `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`
+- **Scenarios Evaluated**:
+  1. `NORMAL`: Initial 29 steps return `INSUFFICIENT_DATA`; valid steps output `NORMAL` status with `anomaly_type = "NORMAL"`.
+  2. `SPIKE`: Abrupt pulses trigger `ANOMALY` with `anomaly_type = "SPIKE"` or `"UNKNOWN"`.
+  3. `DRIFT`: Sustained monotonic ramps trigger `ANOMALY` with `anomaly_type = "DRIFT"` or `"UNKNOWN"`.
+  4. `STUCK_VALUE`: Flatline values trigger `ANOMALY` with `anomaly_type = "STUCK_VALUE"` or `"UNKNOWN"`.
+  5. `DROPOUT_MISSING_DATA`: Null values and bad quality tags return `MISSING_DATA` and reset rolling buffers.
+  6. `INSUFFICIENT_DATA`: Sequences $<30$ steps return `INSUFFICIENT_DATA`.
+  7. `MULTI_SENSOR_ISOLATION`: Interleaved multi-sensor observations maintain independent histories without cross-talk.
+  8. `MODEL_INTEGRITY`: Artifact checksums and byte sizes match manifest specifications.
+  9. `JSON_SERIALIZATION`: Complete round-trip serialization between typed contracts and JSON.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), contract demo (`run_maitri_contract_demo.py`), and streaming demo (`run_maitri_inference_demo.py`).
+- `ml/inference/`: Production inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), validation harness (`validate_maitri_pipeline.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), anomaly type validation artifacts (`maitri_anomaly_type_validation.json`, `maitri_anomaly_type_metrics.csv`, `maitri_anomaly_type_confusion_matrix.png`), registry validation reports (`maitri_model_registry_validation.json`), and contract examples (`maitri_inference_contract_example.json`).
+- `ml/tests/`: Pytest test suite (`test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+

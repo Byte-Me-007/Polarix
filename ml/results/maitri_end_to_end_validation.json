@@ -1,0 +1,1169 @@
+{
+  "validation_timestamp": "2026-09-17T19:40:45.699683+00:00",
+  "model_version": "lstm-ae-v1",
+  "station_id": "MTR",
+  "sensors_tested": [
+    "HUM_001",
+    "POWER_001",
+    "PRESS_001",
+    "TEMP_001",
+    "VIB_001"
+  ],
+  "total_records_processed": 1093,
+  "counts_by_status": {
+    "MISSING_DATA": 2,
+    "INSUFFICIENT_DATA": 693,
+    "NORMAL": 125,
+    "ANOMALY": 273
+  },
+  "counts_by_type": {
+    "SPIKE": 60,
+    "NORMAL": 125,
+    "DRIFT": 107,
+    "STUCK_VALUE": 65,
+    "UNKNOWN": 41,
+    "NONE": 695
+  },
+  "scenario_results": {
+    "model_integrity": {
+      "scenario": "MODEL_INTEGRITY",
+      "status": "PASS",
+      "overall_integrity": "VALID",
+      "artifacts_checked": 4,
+      "errors": [],
+      "details": {
+        "model": {
+          "role": "Model neural network weights (PyTorch state_dict)",
+          "file": "lstm-ae-v1.pt",
+          "expected_sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+          "actual_sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+          "expected_size": 50613,
+          "actual_size": 50613,
+          "status": "VALID",
+          "error_message": null
+        },
+        "config": {
+          "role": "Model architecture hyperparameters",
+          "file": "lstm-ae-v1_config.json",
+          "expected_sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+          "actual_sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+          "expected_size": 187,
+          "actual_size": 187,
+          "status": "VALID",
+          "error_message": null
+        },
+        "scaler": {
+          "role": "Per-sensor normalization mean and standard deviation parameters",
+          "file": "lstm-ae-v1_scaler.json",
+          "expected_sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+          "actual_sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+          "expected_size": 657,
+          "actual_size": 657,
+          "status": "VALID",
+          "error_message": null
+        },
+        "threshold": {
+          "role": "Validation-selected reconstruction error threshold",
+          "file": "../results/lstm_threshold.json",
+          "expected_sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+          "actual_sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+          "expected_size": 493,
+          "actual_size": 493,
+          "status": "VALID",
+          "error_message": null
+        }
+      }
+    },
+    "contract_validation": {
+      "scenario": "CONTRACT_VALIDATION",
+      "status": "PASS",
+      "rejections": {
+        "unsupported_station": true,
+        "unsupported_sensor": true,
+        "empty_station": true,
+        "empty_sensor": true,
+        "empty_timestamp": true,
+        "malformed_value": true
+      },
+      "all_invalid_inputs_rejected": true
+    },
+    "normal": {
+      "scenario": "NORMAL",
+      "status": "PASS",
+      "note": "Initial 29 observations produced INSUFFICIENT_DATA. Validated anomaly_type='NORMAL' when status='NORMAL'.",
+      "per_sensor": {
+        "HUM_001": {
+          "records_tested": 50,
+          "insufficient_data_steps": 29,
+          "normal_inferences": 21,
+          "model_variation_anomalies": 0,
+          "status": "PASS"
+        },
+        "POWER_001": {
+          "records_tested": 50,
+          "insufficient_data_steps": 29,
+          "normal_inferences": 21,
+          "model_variation_anomalies": 0,
+          "status": "PASS"
+        },
+        "PRESS_001": {
+          "records_tested": 50,
+          "insufficient_data_steps": 29,
+          "normal_inferences": 21,
+          "model_variation_anomalies": 0,
+          "status": "PASS"
+        },
+        "TEMP_001": {
+          "records_tested": 50,
+          "insufficient_data_steps": 29,
+          "normal_inferences": 21,
+          "model_variation_anomalies": 0,
+          "status": "PASS"
+        },
+        "VIB_001": {
+          "records_tested": 50,
+          "insufficient_data_steps": 29,
+          "normal_inferences": 0,
+          "model_variation_anomalies": 21,
+          "status": "PASS"
+        }
+      }
+    },
+    "spike": {
+      "scenario": "SPIKE",
+      "status": "PASS",
+      "note": "When spike observations triggered ANOMALY, type classifier assigned SPIKE or UNKNOWN.",
+      "per_sensor": {
+        "HUM_001": {
+          "spikes_evaluated": 5,
+          "spike_outputs": [
+            {
+              "timestamp": "2026-03-02T00:00:00+00:00",
+              "value": 82.98509873060833,
+              "anomaly_score": 0.496547,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:01:00+00:00",
+              "value": 82.47615703863421,
+              "anomaly_score": 0.86723,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:02:00+00:00",
+              "value": 82.86796793046305,
+              "anomaly_score": 1.214497,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T05:00:00+00:00",
+              "value": 31.49883268332174,
+              "anomaly_score": 2.227003,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T05:01:00+00:00",
+              "value": 32.295059548269094,
+              "anomaly_score": 3.152828,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "POWER_001": {
+          "spikes_evaluated": 5,
+          "spike_outputs": [
+            {
+              "timestamp": "2026-03-02T00:00:00+00:00",
+              "value": 52.659149569985914,
+              "anomaly_score": 0.313453,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:01:00+00:00",
+              "value": 52.72171347229745,
+              "anomaly_score": 0.557847,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:02:00+00:00",
+              "value": 52.47527129711301,
+              "anomaly_score": 0.75924,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:03:00+00:00",
+              "value": 52.91695905355617,
+              "anomaly_score": 0.960723,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:04:00+00:00",
+              "value": 53.403701214419314,
+              "anomaly_score": 1.165451,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "PRESS_001": {
+          "spikes_evaluated": 5,
+          "spike_outputs": [
+            {
+              "timestamp": "2026-03-02T00:00:00+00:00",
+              "value": 996.9742373915348,
+              "anomaly_score": 0.554541,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:01:00+00:00",
+              "value": 996.8726328048048,
+              "anomaly_score": 0.960247,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:02:00+00:00",
+              "value": 996.9250623386572,
+              "anomaly_score": 1.33414,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:03:00+00:00",
+              "value": 996.7215473327992,
+              "anomaly_score": 1.646385,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:04:00+00:00",
+              "value": 997.00359428555,
+              "anomaly_score": 1.976752,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "TEMP_001": {
+          "spikes_evaluated": 5,
+          "spike_outputs": [
+            {
+              "timestamp": "2026-03-02T00:00:00+00:00",
+              "value": -1.5228548758087117,
+              "anomaly_score": 0.383124,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:01:00+00:00",
+              "value": -1.6543396542199602,
+              "anomaly_score": 0.661727,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:02:00+00:00",
+              "value": -1.6857007908792667,
+              "anomaly_score": 0.905514,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T05:00:00+00:00",
+              "value": -27.970055942029127,
+              "anomaly_score": 1.936923,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T05:01:00+00:00",
+              "value": -27.592043442810287,
+              "anomaly_score": 2.802604,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "VIB_001": {
+          "spikes_evaluated": 5,
+          "spike_outputs": [
+            {
+              "timestamp": "2026-03-02T00:00:00+00:00",
+              "value": 1.4878841325864414,
+              "anomaly_score": 0.613094,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:01:00+00:00",
+              "value": 1.493706948665843,
+              "anomaly_score": 1.062055,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:02:00+00:00",
+              "value": 1.5117566966896767,
+              "anomaly_score": 1.512363,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:03:00+00:00",
+              "value": 1.4653564119724325,
+              "anomaly_score": 1.833946,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T00:04:00+00:00",
+              "value": 1.4744350283424803,
+              "anomaly_score": 2.161805,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            }
+          ],
+          "status": "PASS"
+        }
+      }
+    },
+    "drift": {
+      "scenario": "DRIFT",
+      "status": "PASS",
+      "note": "When drift observations triggered ANOMALY, type classifier assigned DRIFT or UNKNOWN.",
+      "per_sensor": {
+        "HUM_001": {
+          "drift_records_evaluated": 30,
+          "drift_outputs": [
+            {
+              "timestamp": "2026-03-01T01:00:00Z",
+              "value": 55.0,
+              "anomaly_score": 0.000299,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:01:00Z",
+              "value": 55.5,
+              "anomaly_score": 0.00052,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:02:00Z",
+              "value": 56.0,
+              "anomaly_score": 0.001334,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:03:00Z",
+              "value": 56.5,
+              "anomaly_score": 0.002964,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:04:00Z",
+              "value": 57.0,
+              "anomaly_score": 0.005471,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:05:00Z",
+              "value": 57.5,
+              "anomaly_score": 0.008755,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:06:00Z",
+              "value": 58.0,
+              "anomaly_score": 0.012564,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:07:00Z",
+              "value": 58.5,
+              "anomaly_score": 0.016543,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:08:00Z",
+              "value": 59.0,
+              "anomaly_score": 0.020362,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            },
+            {
+              "timestamp": "2026-03-01T01:09:00Z",
+              "value": 59.5,
+              "anomaly_score": 0.023821,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            }
+          ],
+          "status": "PASS"
+        },
+        "POWER_001": {
+          "drift_records_evaluated": 30,
+          "drift_outputs": [
+            {
+              "timestamp": "2026-03-01T01:00:00Z",
+              "value": 35.0,
+              "anomaly_score": 0.000333,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:01:00Z",
+              "value": 35.4,
+              "anomaly_score": 0.000577,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:02:00Z",
+              "value": 35.8,
+              "anomaly_score": 0.001475,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:03:00Z",
+              "value": 36.2,
+              "anomaly_score": 0.00328,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:04:00Z",
+              "value": 36.6,
+              "anomaly_score": 0.006058,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:05:00Z",
+              "value": 37.0,
+              "anomaly_score": 0.009696,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:06:00Z",
+              "value": 37.4,
+              "anomaly_score": 0.013899,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:07:00Z",
+              "value": 37.8,
+              "anomaly_score": 0.018252,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:08:00Z",
+              "value": 38.2,
+              "anomaly_score": 0.022392,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            },
+            {
+              "timestamp": "2026-03-01T01:09:00Z",
+              "value": 38.6,
+              "anomaly_score": 0.026137,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            }
+          ],
+          "status": "PASS"
+        },
+        "PRESS_001": {
+          "drift_records_evaluated": 30,
+          "drift_outputs": [
+            {
+              "timestamp": "2026-03-01T01:00:00Z",
+              "value": 990.0,
+              "anomaly_score": 0.000907,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:01:00Z",
+              "value": 990.35,
+              "anomaly_score": 0.002782,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:02:00Z",
+              "value": 990.7,
+              "anomaly_score": 0.009592,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:03:00Z",
+              "value": 991.05,
+              "anomaly_score": 0.022808,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:04:00Z",
+              "value": 991.4,
+              "anomaly_score": 0.042004,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:05:00Z",
+              "value": 991.75,
+              "anomaly_score": 0.065305,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:06:00Z",
+              "value": 992.1,
+              "anomaly_score": 0.090786,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:07:00Z",
+              "value": 992.45,
+              "anomaly_score": 0.118838,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:08:00Z",
+              "value": 992.8,
+              "anomaly_score": 0.152992,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            },
+            {
+              "timestamp": "2026-03-01T01:09:00Z",
+              "value": 993.15,
+              "anomaly_score": 0.197119,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            }
+          ],
+          "status": "PASS"
+        },
+        "TEMP_001": {
+          "drift_records_evaluated": 30,
+          "drift_outputs": [
+            {
+              "timestamp": "2026-03-01T01:00:00Z",
+              "value": -15.0,
+              "anomaly_score": 0.000394,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:01:00Z",
+              "value": -14.75,
+              "anomaly_score": 0.00057,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:02:00Z",
+              "value": -14.5,
+              "anomaly_score": 0.001242,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:03:00Z",
+              "value": -14.25,
+              "anomaly_score": 0.002624,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:04:00Z",
+              "value": -14.0,
+              "anomaly_score": 0.004777,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:05:00Z",
+              "value": -13.75,
+              "anomaly_score": 0.007623,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:06:00Z",
+              "value": -13.5,
+              "anomaly_score": 0.010936,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:07:00Z",
+              "value": -13.25,
+              "anomaly_score": 0.014375,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:08:00Z",
+              "value": -13.0,
+              "anomaly_score": 0.017656,
+              "anomaly_status": "NORMAL",
+              "anomaly_type": "NORMAL"
+            },
+            {
+              "timestamp": "2026-03-01T01:09:00Z",
+              "value": -12.75,
+              "anomaly_score": 0.020665,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "DRIFT"
+            }
+          ],
+          "status": "PASS"
+        },
+        "VIB_001": {
+          "drift_records_evaluated": 30,
+          "drift_outputs": [
+            {
+              "timestamp": "2026-03-01T01:00:00Z",
+              "value": 0.85,
+              "anomaly_score": 0.082347,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:01:00Z",
+              "value": 0.89,
+              "anomaly_score": 0.081433,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:02:00Z",
+              "value": 0.93,
+              "anomaly_score": 0.086105,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:03:00Z",
+              "value": 0.97,
+              "anomaly_score": 0.105898,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:04:00Z",
+              "value": 1.01,
+              "anomaly_score": 0.136519,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:05:00Z",
+              "value": 1.05,
+              "anomaly_score": 0.175669,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:06:00Z",
+              "value": 1.09,
+              "anomaly_score": 0.223498,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:07:00Z",
+              "value": 1.13,
+              "anomaly_score": 0.273812,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:08:00Z",
+              "value": 1.17,
+              "anomaly_score": 0.337316,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            },
+            {
+              "timestamp": "2026-03-01T01:09:00Z",
+              "value": 1.21,
+              "anomaly_score": 0.434553,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "UNKNOWN"
+            }
+          ],
+          "status": "PASS"
+        }
+      }
+    },
+    "stuck_value": {
+      "scenario": "STUCK_VALUE",
+      "status": "PASS",
+      "note": "When stuck-value observations triggered ANOMALY, type classifier assigned STUCK_VALUE, UNKNOWN, or SPIKE.",
+      "per_sensor": {
+        "HUM_001": {
+          "stuck_records_evaluated": 20,
+          "stuck_outputs": [
+            {
+              "timestamp": "2026-03-02T10:00:00Z",
+              "value": 85.0,
+              "anomaly_score": 0.590121,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:01:00Z",
+              "value": 85.0,
+              "anomaly_score": 1.060934,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:02:00Z",
+              "value": 85.0,
+              "anomaly_score": 1.483005,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:03:00Z",
+              "value": 85.0,
+              "anomaly_score": 1.87228,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:04:00Z",
+              "value": 85.0,
+              "anomaly_score": 2.234501,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:05:00Z",
+              "value": 85.0,
+              "anomaly_score": 2.570811,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:06:00Z",
+              "value": 85.0,
+              "anomaly_score": 2.877084,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:07:00Z",
+              "value": 85.0,
+              "anomaly_score": 3.184113,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:08:00Z",
+              "value": 85.0,
+              "anomaly_score": 3.483632,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:09:00Z",
+              "value": 85.0,
+              "anomaly_score": 3.781183,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "POWER_001": {
+          "stuck_records_evaluated": 20,
+          "stuck_outputs": [
+            {
+              "timestamp": "2026-03-02T10:00:00Z",
+              "value": 55.0,
+              "anomaly_score": 0.430672,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:01:00Z",
+              "value": 55.0,
+              "anomaly_score": 0.76999,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:02:00Z",
+              "value": 55.0,
+              "anomaly_score": 1.067778,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:03:00Z",
+              "value": 55.0,
+              "anomaly_score": 1.341744,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:04:00Z",
+              "value": 55.0,
+              "anomaly_score": 1.5975,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:05:00Z",
+              "value": 55.0,
+              "anomaly_score": 1.82645,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:06:00Z",
+              "value": 55.0,
+              "anomaly_score": 2.038369,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:07:00Z",
+              "value": 55.0,
+              "anomaly_score": 2.227798,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:08:00Z",
+              "value": 55.0,
+              "anomaly_score": 2.415166,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:09:00Z",
+              "value": 55.0,
+              "anomaly_score": 2.587414,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "PRESS_001": {
+          "stuck_records_evaluated": 20,
+          "stuck_outputs": [
+            {
+              "timestamp": "2026-03-02T10:00:00Z",
+              "value": 1020.0,
+              "anomaly_score": 14.039007,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:01:00Z",
+              "value": 1020.0,
+              "anomaly_score": 26.955383,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:02:00Z",
+              "value": 1020.0,
+              "anomaly_score": 40.010418,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:03:00Z",
+              "value": 1020.0,
+              "anomaly_score": 53.294838,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:04:00Z",
+              "value": 1020.0,
+              "anomaly_score": 66.748642,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:05:00Z",
+              "value": 1020.0,
+              "anomaly_score": 80.345528,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:06:00Z",
+              "value": 1020.0,
+              "anomaly_score": 94.043289,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:07:00Z",
+              "value": 1020.0,
+              "anomaly_score": 107.829201,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:08:00Z",
+              "value": 1020.0,
+              "anomaly_score": 121.688316,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:09:00Z",
+              "value": 1020.0,
+              "anomaly_score": 135.604355,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "TEMP_001": {
+          "stuck_records_evaluated": 20,
+          "stuck_outputs": [
+            {
+              "timestamp": "2026-03-02T10:00:00Z",
+              "value": -30.0,
+              "anomaly_score": 0.931164,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:01:00Z",
+              "value": -30.0,
+              "anomaly_score": 1.589544,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:02:00Z",
+              "value": -30.0,
+              "anomaly_score": 2.117196,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:03:00Z",
+              "value": -30.0,
+              "anomaly_score": 2.660412,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:04:00Z",
+              "value": -30.0,
+              "anomaly_score": 3.182315,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:05:00Z",
+              "value": -30.0,
+              "anomaly_score": 3.665507,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:06:00Z",
+              "value": -30.0,
+              "anomaly_score": 4.103289,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:07:00Z",
+              "value": -30.0,
+              "anomaly_score": 4.496745,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:08:00Z",
+              "value": -30.0,
+              "anomaly_score": 4.848179,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:09:00Z",
+              "value": -30.0,
+              "anomaly_score": 5.164546,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            }
+          ],
+          "status": "PASS"
+        },
+        "VIB_001": {
+          "stuck_records_evaluated": 20,
+          "stuck_outputs": [
+            {
+              "timestamp": "2026-03-02T10:00:00Z",
+              "value": 2.5,
+              "anomaly_score": 5.30748,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:01:00Z",
+              "value": 2.5,
+              "anomaly_score": 9.898345,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:02:00Z",
+              "value": 2.5,
+              "anomaly_score": 14.476016,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:03:00Z",
+              "value": 2.5,
+              "anomaly_score": 19.137487,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:04:00Z",
+              "value": 2.5,
+              "anomaly_score": 23.912397,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:05:00Z",
+              "value": 2.5,
+              "anomaly_score": 28.771599,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:06:00Z",
+              "value": 2.5,
+              "anomaly_score": 33.713581,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "SPIKE"
+            },
+            {
+              "timestamp": "2026-03-02T10:07:00Z",
+              "value": 2.5,
+              "anomaly_score": 38.708065,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:08:00Z",
+              "value": 2.5,
+              "anomaly_score": 43.753654,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            },
+            {
+              "timestamp": "2026-03-02T10:09:00Z",
+              "value": 2.5,
+              "anomaly_score": 48.851562,
+              "anomaly_status": "ANOMALY",
+              "anomaly_type": "STUCK_VALUE"
+            }
+          ],
+          "status": "PASS"
+        }
+      }
+    },
+    "dropout_missing": {
+      "scenario": "DROPOUT_MISSING_DATA",
+      "status": "PASS",
+      "null_value_status": "MISSING_DATA",
+      "bad_quality_status": "MISSING_DATA",
+      "buffer_reset_verified": true
+    },
+    "insufficient_data": {
+      "scenario": "INSUFFICIENT_DATA",
+      "status": "PASS",
+      "steps_tested": 15,
+      "all_insufficient_data": true
+    },
+    "multi_sensor_isolation": {
+      "scenario": "MULTI_SENSOR_ISOLATION",
+      "status": "PASS",
+      "interleaved_records": 55,
+      "temp_reached_window": true,
+      "vib_insufficient_during_interleave": true,
+      "vib_completed_window_independently": true,
+      "zero_cross_sensor_contamination": true
+    },
+    "json_serialization": {
+      "scenario": "JSON_SERIALIZATION",
+      "status": "PASS",
+      "records_tested": 32,
+      "roundtrip_verified": true,
+      "preserves_all_metadata": true
+    }
+  },
+  "contract_validation": {
+    "status": "PASS",
+    "unsupported_stations_rejected": true,
+    "unsupported_sensors_rejected": true,
+    "malformed_records_rejected": true
+  },
+  "multi_sensor_isolation": {
+    "status": "PASS",
+    "isolated_sensors_count": 5,
+    "zero_cross_sensor_contamination": true
+  },
+  "model_integrity": {
+    "status": "PASS",
+    "all_artifacts_valid": true
+  },
+  "serialization_result": {
+    "status": "PASS",
+    "roundtrip_verified": true
+  },
+  "overall_status": "PASS",
+  "notes": "End-to-end ML inference pipeline verified for Maitri station. Pipeline correctness (contracts, artifact validation, rolling window buffers, sensor isolation, missing data handling, type classification, and JSON serialization) is validated independently of known synthetic model variation. Synthetic telemetry dataset only; no real Antarctic data is claimed."
+}
