@@ -56,19 +56,25 @@ This module is dedicated to machine learning, telemetry anomaly detection, model
   - **Sensor-Specific Normalization**: Mean and standard deviation are calculated strictly from NORMAL training records and saved in `ml/models/lstm-ae-v1_scaler.json`.
   - **Dropout Handling**: Sequences containing missing (`NaN`) values are omitted from model training.
   - **Reconstruction Error**: Computed as per-sample Mean Squared Error $\text{MSE} = \frac{1}{L} \sum_{t=1}^L (x_t - \hat{x}_t)^2$.
-  - **Threshold Strategy**: Anomaly thresholding is intentionally deferred to the subsequent validation step. Raw reconstruction errors are preserved in `ml/results/lstm_reconstruction_errors.csv`.
+
+#### 4. Validation Threshold Selection & Test Evaluation (`lstm-ae-v1`)
+- **Module**: `ml/training/select_lstm_threshold.py`
+- **Methodology**:
+  - **Validation-Only Tuning**: Optimal threshold selected strictly across validation reconstruction errors via dense quantile and linear candidate grid search.
+  - **Optimization Criterion**: Maximize validation F1-score with deterministic tie-breaking (1. higher recall, 2. higher precision, 3. lower threshold).
+  - **Selected Threshold**: `0.184530` (Validation F1 = 0.5650, Recall = 0.9314, Precision = 0.4055).
+  - **Frozen Test Evaluation**: The exact selected threshold is applied to the untouched test split (15% chronological partition).
 - **Artifacts Saved**:
-  - Model Weights: `ml/models/lstm-ae-v1.pt`
-  - Config: `ml/models/lstm-ae-v1_config.json`
-  - Scalers: `ml/models/lstm-ae-v1_scaler.json`
-  - Training History: `ml/results/lstm_training_history.json`
-  - Evaluation Reconstruction Errors: `ml/results/lstm_reconstruction_errors.csv`
+  - Threshold Search Grid: `ml/results/lstm_threshold_search.csv`
+  - Validation Threshold Config: `ml/results/lstm_threshold.json`
+  - Test Metrics Summary: `ml/results/lstm_test_metrics.json`
+  - Detailed Test Predictions: `ml/results/lstm_test_predictions.csv`
+  - Distribution Plot: `ml/results/lstm_threshold_evaluation.png`
 
 ---
 
 ### Planned Future ML Work
-- **Threshold Selection**: Formal validation-set threshold optimization (e.g. percentile/F1-optimal threshold tuning).
-- **Benchmarking & Model Comparison**: Head-to-head comparison between `zscore-v1` and `lstm-ae-v1` on test set.
+- **Benchmarking & Model Comparison**: Head-to-head comparison between `zscore-v1` and `lstm-ae-v1`.
 - **Inference Interface**: Unified real-time/batch inference service.
 
 ---
@@ -76,8 +82,8 @@ This module is dedicated to machine learning, telemetry anomaly detection, model
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
-- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), and evaluation scripts.
+- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and evaluation scripts.
 - `ml/inference/`: Inference engine and scoring pipelines.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
 - `ml/tests/`: Pytest test suite.
-- `ml/results/`: Evaluation predictions, metrics JSON, confusion matrix plots, and reconstruction errors.
+- `ml/results/`: Evaluation predictions, metrics JSON, confusion matrix plots, threshold search data, and reconstruction errors.

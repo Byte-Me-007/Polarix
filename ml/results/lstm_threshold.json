@@ -1,0 +1,16 @@
+{
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.18453,
+  "selection_metric": "F1-score",
+  "selection_method": "Grid search over quantiles & linear space on validation split",
+  "candidate_count": 298,
+  "selected_at_step": "Step 4 - Validation Threshold Selection",
+  "validation_TP": 163,
+  "validation_TN": 191,
+  "validation_FP": 239,
+  "validation_FN": 12,
+  "validation_precision": 0.4055,
+  "validation_recall": 0.9314,
+  "validation_f1": 0.565,
+  "validation_accuracy": 0.5851
+}

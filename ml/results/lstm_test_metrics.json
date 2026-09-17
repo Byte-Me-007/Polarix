@@ -1,0 +1,21 @@
+{
+  "TP": 0,
+  "TN": 0,
+  "FP": 605,
+  "FN": 0,
+  "total": 605,
+  "accuracy": 0.0,
+  "precision": 0.0,
+  "recall": 0.0,
+  "f1": 0.0,
+  "threshold_used": 0.18453036128394557,
+  "model_version": "lstm-ae-v1",
+  "test_sample_count": 605,
+  "per_anomaly_type": {
+    "NORMAL": {
+      "total_instances": 605,
+      "false_alarms": 605,
+      "false_positive_rate": 1.0
+    }
+  }
+}
