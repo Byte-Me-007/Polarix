@@ -33,3 +33,16 @@
    ```text
    http://127.0.0.1:8000/health
    ```
+
+## Maitri Smoke Test
+
+1. **Start server:**
+   ```bash
+   uvicorn maitri.main:app --reload
+   ```
+
+2. **In another terminal:**
+   ```bash
+   python scripts/smoke_test_maitri.py
+   ```
+
