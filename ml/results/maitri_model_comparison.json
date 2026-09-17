@@ -1,0 +1,147 @@
+{
+  "dataset": {
+    "source": "ml/data/maitri_synthetic_telemetry.csv",
+    "total_records": 10000,
+    "station_id": "MTR",
+    "sensors": [
+      "TEMP_001",
+      "PRESS_001",
+      "HUM_001",
+      "VIB_001",
+      "POWER_001"
+    ],
+    "split_ratio": "70% Train (7,000) / 15% Validation (1,500) / 15% Test (1,500)",
+    "note": "Purely synthetic telemetry; no real Antarctic data is claimed or used."
+  },
+  "evaluation_methodology": {
+    "leakage_prevention": "Thresholds tuned strictly on Validation split; evaluation reported on untouched Test split.",
+    "metrics": [
+      "Precision",
+      "Recall",
+      "F1-Score",
+      "Accuracy",
+      "Per-Anomaly Detection Rate"
+    ]
+  },
+  "models": {
+    "zscore_v1": {
+      "name": "Rolling Z-Score Statistical Baseline",
+      "version": "zscore-v1",
+      "window": 30,
+      "threshold": 3.0,
+      "threshold_type": "Fixed heuristic baseline (3.0 standard deviations)",
+      "validation_metrics": {
+        "TP": 40,
+        "TN": 1160,
+        "FP": 19,
+        "FN": 281,
+        "total": 1500,
+        "accuracy": 0.8,
+        "precision": 0.678,
+        "recall": 0.1246,
+        "f1_score": 0.2105,
+        "false_positive_rate": 0.0161,
+        "false_negative_rate": 0.8754
+      },
+      "test_metrics": {
+        "TP": 42,
+        "TN": 1166,
+        "FP": 17,
+        "FN": 275,
+        "precision": 0.7119,
+        "recall": 0.1325,
+        "f1_score": 0.2234,
+        "accuracy": 0.8053
+      },
+      "per_anomaly_type_test": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 4,
+          "missed_anomalies": 146,
+          "detection_rate": 0.0267
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "detected_anomalies": 28,
+          "missed_anomalies": 0,
+          "detection_rate": 1.0
+        },
+        "NORMAL": {
+          "total_instances": 1183,
+          "correct_normal": 1166,
+          "false_alarms": 17,
+          "false_alarm_rate": 0.0144
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 10,
+          "missed_anomalies": 9,
+          "detection_rate": 0.5263
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 0,
+          "missed_anomalies": 120,
+          "detection_rate": 0.0
+        }
+      },
+      "behavior_summary": "High precision (0.71) and low false alarm rate (1.44%), but low recall on slow drift (2.67%) and stuck flatlines (0%)."
+    },
+    "lstm_ae_v1": {
+      "name": "Sequence-to-Sequence LSTM Autoencoder",
+      "version": "lstm-ae-v1",
+      "window": 30,
+      "threshold": 0.017674,
+      "threshold_type": "Validation F1-optimal threshold (0.017674)",
+      "validation_metrics": {
+        "TP": 173,
+        "TN": 483,
+        "FP": 406,
+        "FN": 119,
+        "precision": 0.2988,
+        "recall": 0.5925,
+        "f1_score": 0.3972,
+        "accuracy": 0.5555
+      },
+      "test_metrics": {
+        "TP": 152,
+        "TN": 463,
+        "FP": 430,
+        "FN": 137,
+        "precision": 0.2612,
+        "recall": 0.526,
+        "f1_score": 0.349,
+        "accuracy": 0.5203
+      },
+      "per_anomaly_type_test": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 127,
+          "detection_rate": 0.8467
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "false_alarms": 430,
+          "false_positive_rate": 0.4815
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "detection_rate": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 6,
+          "detection_rate": 0.05
+        }
+      },
+      "behavior_summary": "Superior temporal sequence sensitivity (Spike: 100%, Drift: 84.67%), higher overall test recall (52.60%) and F1 (0.3490), with higher false positive rate on normal fluctuations (48.15%)."
+    }
+  },
+  "comparative_analysis": {
+    "spike_detection": "LSTM-AE (100.0%) outperforms Z-score (52.63%) on contextual sequence shocks.",
+    "drift_detection": "LSTM-AE (84.67%) significantly outperforms Z-score (2.67%), as rolling mean adapts to gradual drift whereas autoencoder latent bottleneck detects pattern deviations.",
+    "stuck_value_detection": "Both models struggle on mid-range flatlines without dedicated variance features (Z-score: 0%, LSTM-AE: 5%).",
+    "false_alarm_tradeoff": "Z-score exhibits strict false alarm suppression (FPR = 1.44%), whereas LSTM-AE trades off precision (FPR = 48.15%) for substantially higher anomaly recall."
+  }
+}

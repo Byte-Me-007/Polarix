@@ -104,11 +104,55 @@ During the Step 5 audit of the model evaluation pipeline:
 
 ---
 
+### Maitri Model Comparison
+
+A head-to-head comparison was conducted between the Rolling Z-Score baseline (`zscore-v1`) and the LSTM Autoencoder (`lstm-ae-v1`) on the corrected Maitri synthetic telemetry dataset.
+
+> **Dataset Notice:** All metrics and evaluations reported below are derived from synthetic telemetry generated for Maitri station (`MTR`). No real Antarctic telemetry is claimed or used.
+
+#### 1. Baseline & Model Rationale
+- **Rolling Z-Score Baseline (`zscore-v1`)**: Simple, univariate statistical detector measuring standard score deviations relative to a 30-step trailing rolling window. Threshold is fixed at $3.0\sigma$.
+- **LSTM Autoencoder (`lstm-ae-v1`)**: Deep sequence-to-sequence neural network learning compressed temporal representations (32 hidden units, 16 latent bottleneck units) across 30-step windows to detect multivariate temporal pattern deviations via reconstruction loss.
+
+#### 2. Evaluation Methodology
+- **Dataset Partitioning**: 10,000 synthetic records chronologically partitioned into Train (70%, 7,000 records, normal-only), Validation (15%, 1,500 records), and Test (15%, 1,500 records) across 5 sensors.
+- **Leakage Prevention**: The LSTM decision threshold (`0.017674`) was tuned exclusively on Validation data to maximize F1-score and frozen. Test split remained untouched during selection.
+- **Missing Data Handling**: Dropout telemetry (`NaN`) is categorized as `MISSING_DATA` at ingestion/inference; in LSTM sequence processing, sequences with missing steps are handled explicitly.
+
+#### 3. Measured Results Summary
+
+| Metric | Rolling Z-Score (`zscore-v1`) | LSTM Autoencoder (`lstm-ae-v1`) |
+| :--- | :--- | :--- |
+| **Threshold Strategy** | Heuristic ($3.0\sigma$) | Validation F1-Tuned ($0.017674$) |
+| **Validation Precision / Recall / F1** | 0.6780 / 0.1246 / 0.2105 | 0.2988 / 0.5925 / 0.3972 |
+| **Validation Accuracy** | 80.00% | 55.55% |
+| **Test Precision / Recall / F1** | **0.7119 / 0.1325 / 0.2234** | **0.2612 / 0.5260 / 0.3490** |
+| **Test Accuracy** | 80.53% | 52.03% |
+| **Test TP / TN / FP / FN** | 42 / 1166 / 17 / 275 | 152 / 463 / 430 / 137 |
+
+#### 4. Anomaly-Type & False-Alarm Behavior (Test Set)
+
+| Anomaly Type / Class | Total Instances | Z-Score Detected (Recall) | LSTM-AE Detected (Recall) |
+| :--- | :--- | :--- | :--- |
+| **`SPIKE`** | 19 | 10 (52.63%) | 19 (100.0%) |
+| **`DRIFT`** | 150 | 4 (2.67%) | 127 (84.67%) |
+| **`STUCK_VALUE`** | 120 | 0 (0.00%) | 6 (5.00%) |
+| **`DROPOUT`** | 28 | 28 (100.0% via `MISSING_DATA`) | Handled via missing quality rule |
+| **`NORMAL` (False Alarms)** | 1183 (Z) / 893 (LSTM) | 17 (FPR = 1.44%) | 430 (FPR = 48.15%) |
+
+#### 5. Behavioral Analysis & Model Limitations
+- **Spike Detection**: LSTM Autoencoder captured 100% of sudden spike anomalies; Z-score detected 52.63% (missing lower-magnitude sudden shocks within $\pm 3\sigma$).
+- **Drift Detection**: LSTM Autoencoder detected 84.67% of gradual drift anomalies due to sequence-level pattern sensitivity; Z-score detected 2.67% because the trailing rolling mean dynamically adjusted to gradual shifts.
+- **Stuck Flatlines**: Both architectures exhibited low sensitivity on mid-range stuck values (Z-score: 0.0%, LSTM-AE: 5.0%), as flatline values remained within normal sensor operating ranges without explicit rolling variance features.
+- **False Alarm Trade-off**: Z-score achieved low false alarm rate (1.44% FPR, Precision = 0.7119) with low recall (13.25%). The LSTM Autoencoder achieved higher recall (52.60%, F1 = 0.3490) while incurring a higher false positive rate (48.15% FPR, Precision = 0.2612) on normal diurnal fluctuations.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
-- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and evaluation scripts.
+- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and model comparison (`compare_models.py`).
 - `ml/inference/`: Production inference service (`lstm_inference.py`) and streaming demo (`run_maitri_inference_demo.py`).
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
 - `ml/tests/`: Pytest test suite.
-- `ml/results/`: Evaluation predictions, metrics JSON, confusion matrix plots, threshold search data, reconstruction errors, and inference demo results (`maitri_inference_demo.json`).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), and visualization figures (`maitri_model_f1_comparison.png`, `maitri_model_confusion_matrices.png`, `maitri_anomaly_type_detection.png`).
