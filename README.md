@@ -49,4 +49,11 @@ The smoke test verifies the HTTP API endpoints (`/health`, `/devices/`, `/sensor
    python scripts/smoke_test_maitri.py
    ```
 
+## Maitri Environment Configuration
+
+- Copy `.env.example` to `.env` if local custom settings are needed.
+- `DATABASE_URL` controls the database connection.
+- Default database is local SQLite: `sqlite:///./maitri.db`.
+
+
 
