@@ -1,0 +1,49 @@
+{
+  "model_version": "lstm-ae-v1",
+  "manifest_file": "/Users/rexjohnabraham/Documents/Polarix_C/ml/models/lstm-ae-v1_manifest.json",
+  "overall_status": "VALID",
+  "validated_at": "2026-09-17T19:29:57.391047+00:00",
+  "artifact_results": {
+    "model": {
+      "role": "Model neural network weights (PyTorch state_dict)",
+      "file": "lstm-ae-v1.pt",
+      "expected_sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+      "actual_sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+      "expected_size": 50613,
+      "actual_size": 50613,
+      "status": "VALID",
+      "error_message": null
+    },
+    "config": {
+      "role": "Model architecture hyperparameters",
+      "file": "lstm-ae-v1_config.json",
+      "expected_sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+      "actual_sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+      "expected_size": 187,
+      "actual_size": 187,
+      "status": "VALID",
+      "error_message": null
+    },
+    "scaler": {
+      "role": "Per-sensor normalization mean and standard deviation parameters",
+      "file": "lstm-ae-v1_scaler.json",
+      "expected_sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+      "actual_sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+      "expected_size": 657,
+      "actual_size": 657,
+      "status": "VALID",
+      "error_message": null
+    },
+    "threshold": {
+      "role": "Validation-selected reconstruction error threshold",
+      "file": "../results/lstm_threshold.json",
+      "expected_sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+      "actual_sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+      "expected_size": 493,
+      "actual_size": 493,
+      "status": "VALID",
+      "error_message": null
+    }
+  },
+  "errors": []
+}

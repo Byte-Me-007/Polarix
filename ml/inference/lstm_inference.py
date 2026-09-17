@@ -42,6 +42,11 @@ from ml.inference.inference_contract import (
     UnsupportedSensorError,
     UnsupportedStationError,
 )
+from ml.models.model_registry import (
+    ModelIntegrityError,
+    ModelManifestNotFoundError,
+    validate_model_artifacts,
+)
 from ml.training.lstm_autoencoder import (
     MODEL_VERSION,
     LSTMAutoencoder,
@@ -53,6 +58,7 @@ DEFAULT_MODEL_PATH = "ml/models/lstm-ae-v1.pt"
 DEFAULT_CONFIG_PATH = "ml/models/lstm-ae-v1_config.json"
 DEFAULT_SCALER_PATH = "ml/models/lstm-ae-v1_scaler.json"
 DEFAULT_THRESHOLD_PATH = "ml/results/lstm_threshold.json"
+DEFAULT_MANIFEST_PATH = "ml/models/lstm-ae-v1_manifest.json"
 
 
 class LSTMAutoencoderInference:
@@ -66,6 +72,8 @@ class LSTMAutoencoderInference:
         config_path: Union[str, Path] = DEFAULT_CONFIG_PATH,
         scaler_path: Union[str, Path] = DEFAULT_SCALER_PATH,
         threshold_path: Union[str, Path] = DEFAULT_THRESHOLD_PATH,
+        manifest_path: Optional[Union[str, Path]] = None,
+        verify_manifest: bool = True,
         device: str = "cpu",
     ) -> None:
         self.device = torch.device(device)
@@ -73,6 +81,16 @@ class LSTMAutoencoderInference:
         self.config_path = Path(config_path)
         self.scaler_path = Path(scaler_path)
         self.threshold_path = Path(threshold_path)
+        self.manifest_path = Path(manifest_path) if manifest_path is not None else None
+        self.verify_manifest = verify_manifest
+
+        # 0. Cryptographic Artifact Integrity Verification
+        if self.verify_manifest:
+            validate_model_artifacts(
+                model_version=MODEL_VERSION,
+                manifest_path=self.manifest_path,
+                raise_on_error=True,
+            )
 
         # 1. Load Model Config
         if not self.config_path.exists():

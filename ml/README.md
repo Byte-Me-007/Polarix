@@ -228,11 +228,43 @@ While the LSTM Autoencoder reliably detects that a temporal window is anomalous 
 
 ---
 
+### Model Registry & Integrity Management
+
+A cryptographic model registry layer (`ml/models/model_registry.py`) and manifest schema (`ml/models/lstm-ae-v1_manifest.json`) are established to enforce reproducible artifact tracking and integrity verification.
+
+> **Telemetry & Operational Scope Notice:** Model versioning provides deterministic artifact traceability on synthetic telemetry. It does not imply operational certification or real-world Antarctic telemetry validation.
+
+#### 1. Registered Model Version: `lstm-ae-v1`
+- **Station ID**: `MTR` (Maitri)
+- **Supported Sensors**: `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`
+- **Architecture**: Sequence-to-sequence LSTM Autoencoder (window = 30, hidden = 32, latent = 16)
+- **Loss Function**: MSELoss
+- **Training Dataset**: `ml/data/maitri_synthetic_telemetry.csv` (`10k_stationary_diurnal_v1`, seed = 42, 70% pure normal baseline)
+
+#### 2. Registered Artifact Manifest & Checksums
+| Artifact Role | Relative Path | Size (Bytes) | SHA-256 Checksum |
+| :--- | :--- | :--- | :--- |
+| **Model Weights** | `ml/models/lstm-ae-v1.pt` | 50,613 | `7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262` |
+| **Hyperparameters** | `ml/models/lstm-ae-v1_config.json` | 187 | `71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b` |
+| **Sensor Scalers** | `ml/models/lstm-ae-v1_scaler.json` | 657 | `2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224` |
+| **Validation Threshold** | `ml/results/lstm_threshold.json` | 493 | `80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1` |
+
+#### 3. Integrity Verification Workflow
+- **Pre-Execution Validation**: `LSTMAutoencoderInference` performs strict cryptographic SHA-256 and byte-size verification against `lstm-ae-v1_manifest.json` before instantiating PyTorch tensors or loading scalers.
+- **Tampering & Corruption Protection**: If any artifact file is modified, corrupted, or missing, `validate_model_artifacts()` immediately aborts with `ModelIntegrityError`, preventing silent drift or corrupted inference execution.
+- **Standalone Validation**:
+  ```python
+  from ml.models.model_registry import validate_model_artifacts
+  report = validate_model_artifacts("lstm-ae-v1", raise_on_error=True)
+  ```
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
-- `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
+- `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
 - `ml/inference/`: Production inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), contract demo (`run_maitri_contract_demo.py`), and streaming demo (`run_maitri_inference_demo.py`).
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), anomaly type validation artifacts (`maitri_anomaly_type_validation.json`, `maitri_anomaly_type_metrics.csv`, `maitri_anomaly_type_confusion_matrix.png`), and contract examples (`maitri_inference_contract_example.json`).
+- `ml/tests/`: Pytest test suite (`test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), anomaly type validation artifacts (`maitri_anomaly_type_validation.json`, `maitri_anomaly_type_metrics.csv`, `maitri_anomaly_type_confusion_matrix.png`), registry validation reports (`maitri_model_registry_validation.json`), and contract examples (`maitri_inference_contract_example.json`).
