@@ -1,0 +1,1132 @@
+/* ==========================================================================
+   POLARIS MISSION — Antarctic Scientific Operations System
+   Design System: Warm-Neutral Antarctic Scientific Instrument & Modern Editorial
+   ========================================================================== */
+
+:root {
+  /* Warm-Neutral Palette */
+  --polaris-bg: #f8f6f0;
+  --polaris-bg-subtle: #f2efe7;
+  --polaris-bg-surface: #ffffff;
+  --polaris-bg-elevated: #fcfbf8;
+  --polaris-bg-sunken: #ede9df;
+
+  /* Typography Colors */
+  --polaris-text-primary: #191c20;
+  --polaris-text-secondary: #4b525d;
+  --polaris-text-muted: #727b87;
+  --polaris-text-light: #9aa2ac;
+
+  /* Borders & Technical Rules */
+  --polaris-border: #e2ddd4;
+  --polaris-border-subtle: #ece8df;
+  --polaris-border-strong: #c8c2b5;
+  --polaris-divider: rgba(25, 28, 32, 0.08);
+
+  /* Primary Accent: Restrained Copper / Burnt Amber */
+  --polaris-copper: #b65a1f;
+  --polaris-copper-light: #e07936;
+  --polaris-copper-subtle: rgba(182, 90, 31, 0.08);
+  --polaris-copper-border: rgba(182, 90, 31, 0.25);
+
+  /* Secondary Accent: Muted Sage / Arctic Moss */
+  --polaris-sage: #4f6f52;
+  --polaris-sage-light: #6a8c6d;
+  --polaris-sage-subtle: rgba(79, 111, 82, 0.10);
+  --polaris-sage-border: rgba(79, 111, 82, 0.25);
+
+  /* Status Colors (Restrained, Scientific) */
+  --status-normal: #3f6e4a;
+  --status-normal-bg: rgba(63, 110, 74, 0.08);
+  --status-normal-border: rgba(63, 110, 74, 0.25);
+
+  --status-warning: #b26814;
+  --status-warning-bg: rgba(178, 104, 20, 0.08);
+  --status-warning-border: rgba(178, 104, 20, 0.25);
+
+  --status-critical: #b5382b;
+  --status-critical-bg: rgba(181, 56, 43, 0.08);
+  --status-critical-border: rgba(181, 56, 43, 0.25);
+
+  --status-offline: #5d6672;
+  --status-offline-bg: rgba(93, 102, 114, 0.08);
+  --status-offline-border: rgba(93, 102, 114, 0.25);
+
+  /* Radii & Elevation */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-panel: 0 4px 12px -2px rgba(35, 30, 20, 0.05);
+
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--polaris-bg);
+  color: var(--polaris-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  /* Very subtle technical grid texture */
+  background-image: 
+    radial-gradient(var(--polaris-border-subtle) 0.75px, transparent 0.75px),
+    linear-gradient(to right, rgba(226, 221, 212, 0.25) 1px, transparent 1px);
+  background-size: 24px 24px, 120px 120px;
+  background-position: 0 0, 0 0;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-viewport {
+  flex: 1;
+  max-width: 1680px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 2.25rem 2.5rem 4rem;
+}
+
+/* ==========================================================================
+   Top Mission Bar (Refined Scientific Instrument Bar)
+   ========================================================================== */
+.top-navbar {
+  background: var(--polaris-bg-surface);
+  border-bottom: 1px solid var(--polaris-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(25, 28, 32, 0.03);
+}
+
+.top-navbar-inner {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0.65rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Left Brand */
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.polaris-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.polaris-title {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--polaris-text-primary);
+  text-transform: uppercase;
+}
+
+.polaris-sub {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--polaris-copper);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.technical-stamp {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--polaris-text-muted);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.05em;
+}
+
+/* Center Station Instrument Selector */
+.instrument-station-selector {
+  display: flex;
+  align-items: center;
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.station-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 0.35rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.station-tab-btn:hover {
+  color: var(--polaris-text-primary);
+}
+
+.station-tab-btn.active {
+  background: var(--polaris-bg-surface);
+  color: var(--polaris-copper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-weight: 700;
+}
+
+.station-tab-tag {
+  font-size: 0.65rem;
+  background: rgba(182, 90, 31, 0.12);
+  color: var(--polaris-copper);
+  padding: 0.05rem 0.3rem;
+  border-radius: 2px;
+}
+
+/* Nav Menu Links */
+.nav-links-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+}
+
+.nav-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--polaris-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-xs);
+  transition: all 0.15s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-link-item:hover {
+  color: var(--polaris-text-primary);
+  background: var(--polaris-bg-subtle);
+}
+
+.nav-link-item.active {
+  color: var(--polaris-copper);
+  font-weight: 600;
+  border-bottom-color: var(--polaris-copper);
+}
+
+/* Right Status Bar */
+.nav-right-status {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7125rem;
+  color: var(--polaris-text-secondary);
+}
+
+.nav-status-sep {
+  color: var(--polaris-border-strong);
+}
+
+.satellite-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+}
+
+.status-dot-sm {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--status-normal);
+}
+
+.status-dot-sm.offline {
+  background-color: var(--status-critical);
+}
+
+.time-readout {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.time-label {
+  font-size: 0.58rem;
+  color: var(--polaris-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.time-val {
+  font-weight: 600;
+  color: var(--polaris-text-primary);
+}
+
+/* ==========================================================================
+   Station Identity Header (Editorial Scientific Layout)
+   ========================================================================== */
+.station-editorial-header {
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--polaris-border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.station-title-block h1 {
+  font-size: 2.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--polaris-text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.station-meta-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--polaris-text-secondary);
+}
+
+.meta-pill {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--polaris-copper);
+  background: var(--polaris-copper-subtle);
+  border: 1px solid var(--polaris-copper-border);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-xs);
+}
+
+.meta-coords {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--polaris-text-muted);
+}
+
+.header-operational-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: var(--status-normal-bg);
+  color: var(--status-normal);
+  border: 1px solid var(--status-normal-border);
+}
+
+.header-operational-badge.degraded {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+  border-color: var(--status-warning-border);
+}
+
+.header-operational-badge.critical {
+  background: var(--status-critical-bg);
+  color: var(--status-critical);
+  border-color: var(--status-critical-border);
+}
+
+/* ==========================================================================
+   Primary Flow Layout: Station Readiness + Key System Metrics
+   ========================================================================== */
+.executive-telemetry-row {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 2rem;
+  margin-bottom: 2.75rem;
+}
+
+/* Station Readiness Module */
+.readiness-module {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.section-label-tiny {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--polaris-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.readiness-dial-area {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+}
+
+.readiness-radial-svg {
+  width: 96px;
+  height: 96px;
+  transform: rotate(-90deg);
+  flex-shrink: 0;
+}
+
+.readiness-score-number {
+  font-family: var(--font-mono);
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--polaris-text-primary);
+}
+
+.readiness-score-total {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--polaris-text-muted);
+}
+
+.readiness-status-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-xs);
+  margin-bottom: 0.35rem;
+}
+
+.readiness-breakdown-list {
+  border-top: 1px solid var(--polaris-border-subtle);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.breakdown-name {
+  font-weight: 500;
+  color: var(--polaris-text-secondary);
+}
+
+.breakdown-bar-track {
+  flex: 1;
+  height: 3px;
+  background: var(--polaris-bg-subtle);
+  margin: 0 1rem;
+  border-radius: 1.5px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  height: 100%;
+  border-radius: 1.5px;
+  transition: width 0.5s ease;
+}
+
+.breakdown-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--polaris-text-primary);
+  width: 28px;
+  text-align: right;
+}
+
+/* ==========================================================================
+   Key System Metrics (Hierarchical, Differentiated Weights)
+   ========================================================================== */
+.systems-grid-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1.25rem;
+}
+
+/* Power System (Primary Focal Module) */
+.system-card-power {
+  grid-row: span 2;
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-top: 3px solid var(--polaris-copper);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.system-title-tag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--polaris-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.hero-metric-readout {
+  font-family: var(--font-mono);
+  font-size: 2.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--polaris-text-primary);
+  line-height: 1.1;
+  margin: 0.25rem 0 1rem;
+}
+
+.hero-metric-readout .unit {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--polaris-text-muted);
+  margin-left: 0.25rem;
+}
+
+.generation-breakdown-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-top: 1px solid var(--polaris-border-subtle);
+  padding-top: 1rem;
+  margin-top: auto;
+}
+
+.gen-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+}
+
+.gen-label {
+  color: var(--polaris-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gen-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--polaris-text-primary);
+}
+
+/* Secondary System Modules (Battery, Fuel, Satellite, Alerts) */
+.system-module-secondary {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-medium-readout {
+  font-family: var(--font-mono);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--polaris-text-primary);
+  line-height: 1.1;
+  margin: 0.2rem 0 0.4rem;
+}
+
+.metric-medium-readout .unit {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--polaris-text-muted);
+  margin-left: 0.15rem;
+}
+
+.metric-sub-descriptor {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--polaris-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+}
+
+/* Energy Flow Visualization Indicator */
+.energy-flow-track {
+  height: 4px;
+  background: var(--polaris-bg-subtle);
+  border-radius: 2px;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.energy-flow-fill {
+  height: 100%;
+  background: var(--polaris-sage);
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Environmental Telemetry (The Analytical Observation Instrument)
+   ========================================================================== */
+.analytical-section {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.75rem 2rem;
+  box-shadow: var(--shadow-subtle);
+  margin-bottom: 2.75rem;
+}
+
+.analytical-header-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+}
+
+.analytical-title-group h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--polaris-text-primary);
+}
+
+.analytical-subtitle {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--polaris-copper);
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+}
+
+.metric-selector-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--polaris-bg-subtle);
+  padding: 2px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--polaris-border);
+}
+
+.metric-tab-pill {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--polaris-text-muted);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.metric-tab-pill.active {
+  background: var(--polaris-bg-surface);
+  color: var(--polaris-text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Observation Quadrants Readout Strip */
+.quadrant-readout-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.quadrant-cell {
+  background: var(--polaris-bg-elevated);
+  border: 1px solid var(--polaris-border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.85rem 1rem;
+}
+
+.quadrant-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-muted);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quadrant-value {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--polaris-text-primary);
+  line-height: 1.1;
+}
+
+.quadrant-value .unit {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--polaris-text-muted);
+  margin-left: 0.2rem;
+}
+
+.quadrant-sub {
+  font-size: 0.7125rem;
+  font-family: var(--font-mono);
+  color: var(--polaris-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.echarts-scientific-container {
+  width: 100%;
+  height: 280px;
+}
+
+/* ==========================================================================
+   Active Events & Operational Commands (Split Bottom Row)
+   ========================================================================== */
+.lower-operations-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2.75rem;
+}
+
+/* Active Events (Vertical Operational Timeline) */
+.events-timeline-section {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+}
+
+.events-title {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--polaris-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.events-count-stamp {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: var(--polaris-copper-subtle);
+  color: var(--polaris-copper);
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-xs);
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline-list::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 5px;
+  width: 2px;
+  background: var(--polaris-border);
+}
+
+.timeline-event-item {
+  position: relative;
+  padding-bottom: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.timeline-event-item:hover {
+  transform: translateX(2px);
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--polaris-bg-surface);
+  border: 2px solid var(--polaris-text-muted);
+  box-sizing: border-box;
+}
+
+.timeline-marker.critical {
+  border-color: var(--status-critical);
+  background: var(--status-critical);
+}
+
+.timeline-marker.warning {
+  border-color: var(--status-warning);
+  background: var(--status-warning);
+}
+
+.timeline-marker.info {
+  border-color: var(--polaris-sage);
+  background: var(--polaris-sage);
+}
+
+.timeline-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--polaris-text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.event-severity-tag {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.event-severity-tag.critical {
+  color: var(--status-critical);
+}
+
+.event-severity-tag.warning {
+  color: var(--status-warning);
+}
+
+.event-severity-tag.info {
+  color: var(--polaris-sage);
+}
+
+.timeline-event-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--polaris-text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.timeline-event-message {
+  font-size: 0.75rem;
+  color: var(--polaris-text-secondary);
+  line-height: 1.4;
+}
+
+/* Operational Commands / Quick Actions */
+.commands-module {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+}
+
+.command-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.command-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  color: var(--polaris-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.command-btn:hover {
+  background: var(--polaris-bg-surface);
+  border-color: var(--polaris-border-strong);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.command-btn.primary-command {
+  background: var(--polaris-copper);
+  border-color: var(--polaris-copper);
+  color: #ffffff;
+}
+
+.command-btn.primary-command:hover {
+  background: var(--polaris-copper-light);
+  border-color: var(--polaris-copper-light);
+}
+
+.command-subtext {
+  font-size: 0.6875rem;
+  color: var(--polaris-text-muted);
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+
+.command-btn.primary-command .command-subtext {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   Simulation Control (Demonstration Environment)
+   Understated, clearly labeled as simulation state
+   ========================================================================== */
+.simulation-dock {
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.simulation-identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.simulation-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--polaris-text-primary);
+}
+
+.simulation-subtext {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  color: var(--polaris-text-muted);
+}
+
+.simulation-buttons-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sim-btn {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--polaris-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sim-btn:hover {
+  background: #ffffff;
+  color: var(--polaris-text-primary);
+  border-color: var(--polaris-border-strong);
+}
+
+.sim-btn.active {
+  background: var(--polaris-text-primary);
+  color: #ffffff;
+  border-color: var(--polaris-text-primary);
+}
+
+.sim-btn.active.critical {
+  background: var(--status-critical);
+  border-color: var(--status-critical);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Secondary Pages & Placeholder Views
+   ========================================================================== */
+.polaris-module-view {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 3rem 2.5rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  box-shadow: var(--shadow-subtle);
+  text-align: center;
+}
+
+.polaris-module-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--polaris-copper);
+  background: var(--polaris-copper-subtle);
+  border: 1px solid var(--polaris-copper-border);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-xs);
+  margin-bottom: 1rem;
+}
+
+.polaris-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--polaris-copper);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+.polaris-return-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .executive-telemetry-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .systems-grid-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .system-card-power {
+    grid-row: span 1;
+  }
+
+  .lower-operations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quadrant-readout-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .simulation-dock {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 860px) {
+  .top-navbar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .nav-brand-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .main-viewport {
+    padding: 1.5rem 1rem;
+  }
+
+  .station-editorial-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .systems-grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .quadrant-readout-strip {
+    grid-template-columns: 1fr;
+  }
+}
