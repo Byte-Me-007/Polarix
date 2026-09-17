@@ -427,14 +427,52 @@ In operational streaming architectures, sensors and network transmitters frequen
 
 ---
 
+### Maitri ML Inference Observability
+
+An inference observability and structured audit diagnostic layer is implemented in `ml/inference/inference_diagnostics.py` and integrated directly into `ml/inference/maitri_ml_service.py`. This layer makes the streaming inference execution measurable, auditable, and debuggable without altering any ML predictions, scoring decisions, or model weights.
+
+> **Diagnostics & Performance Notice:** Evaluated on synthetic Maitri telemetry (`MTR`). Timings represent local runtime measurements under offline execution and do NOT constitute production SLA or hardware benchmark claims.
+
+#### 1. What is Measured & Tracked
+Every call to `process_telemetry()` automatically generates an `InferenceDiagnosticRecord` capturing:
+- **Operation Status**: Categorical execution outcome (`inference_status`).
+- **Telemetry Identifiers**: `timestamp`, `station_id`, `sensor_id`.
+- **Inference Outcomes**: `anomaly_status`, `anomaly_type`, and exact numeric `anomaly_score`.
+- **Execution Parameters**: Active frozen `threshold` (`0.017674`) and `model_version` (`lstm-ae-v1`).
+- **State Diagnostics**: Active sensor rolling buffer length (`buffer_length`, bounded $0 \le n \le 30$).
+- **Processing Latency**: High-precision monotonic execution duration (`processing_time_ms`) measured via `time.perf_counter()`.
+- **Error Diagnostics**: Contextual `error_message` for rejected or invalid requests.
+
+#### 2. Diagnostic Status Vocabulary
+- **`SUCCESS`**: Scored inference executed successfully (producing `NORMAL` or `ANOMALY` status).
+- **`INSUFFICIENT_DATA`**: Telemetry valid, but sensor history is warming up ($< 30$ observations).
+- **`MISSING_DATA`**: Telemetry missing (`value = null`), non-finite (`NaN`, `+inf`, `-inf`), or non-GOOD quality.
+- **`REJECTED_DUPLICATE`**: Duplicate timestamp rejected via `DuplicateTelemetryError`.
+- **`REJECTED_STALE`**: Out-of-order timestamp rejected via `StaleTelemetryError`.
+- **`REJECTED_INVALID`**: Schema validation failed, unsupported station (non-`MTR`), or unsupported sensor.
+- **`ERROR`**: Unexpected execution exception during inference.
+
+#### 3. Bounded Diagnostic History
+- `MaitriMLService` stores recent diagnostic records in a bounded deque (default capacity: 100 records), preventing memory leaks.
+- Exposes query methods:
+  - `service.get_last_diagnostic()`: Retrieves the most recent record.
+  - `service.get_recent_diagnostics(limit=...)`: Returns a defensive copy list of recent records.
+  - `service.clear_diagnostics()`: Clears the diagnostic buffer.
+
+#### 4. Complete Independence from ML Decisions
+- Adding diagnostics has zero effect on model weights, reconstruction errors, thresholds, or anomaly classifications.
+- All diagnostic records serialize deterministically to standard JSON without non-finite floats or external logging dependencies.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), calibration analysis (`analyze_lstm_calibration.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
+- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference diagnostics (`inference_diagnostics.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), observability validation script (`validate_maitri_observability.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+- `ml/tests/`: Pytest test suite (`test_maitri_observability.py`, `test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), observability report (`maitri_observability_validation.json`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
 
 
 

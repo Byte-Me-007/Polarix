@@ -17,9 +17,12 @@ Design Principles:
 
 from __future__ import annotations
 
+import collections
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Deque, Dict, List, Optional, Union
 
 # Ensure repository root is in sys.path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -38,6 +41,9 @@ from ml.inference.inference_contract import (
     TelemetryInput,
     UnsupportedSensorError,
     UnsupportedStationError,
+)
+from ml.inference.inference_diagnostics import (
+    InferenceDiagnosticRecord,
 )
 from ml.inference.lstm_inference import (
     DEFAULT_CONFIG_PATH,
@@ -69,6 +75,7 @@ class MaitriMLService:
         manifest_path: Optional[Union[str, Path]] = None,
         verify_manifest: bool = True,
         device: str = "cpu",
+        max_diagnostics_history: int = 100,
     ) -> None:
         """
         Initialize the Maitri ML Service.
@@ -89,10 +96,16 @@ class MaitriMLService:
             Whether to enforce SHA-256 checksum verification on startup.
         device : str
             PyTorch compute device ('cpu' or 'cuda').
+        max_diagnostics_history : int
+            Maximum number of recent inference diagnostic records to retain in memory (default: 100).
         """
         self.station_id = "MTR"
         self.supported_sensors = sorted(list(SUPPORTED_SENSORS))
         self.model_version = DEFAULT_MODEL_VERSION
+        self._max_diagnostics_history = max(1, int(max_diagnostics_history))
+        self._diagnostics: Deque[InferenceDiagnosticRecord] = collections.deque(
+            maxlen=self._max_diagnostics_history
+        )
 
         # Instantiate the underlying validated inference engine
         self._engine = LSTMAutoencoderInference(
@@ -114,6 +127,10 @@ class MaitriMLService:
     def sequence_length(self) -> int:
         """Get the required window length for scored inference (30 observations)."""
         return self._engine.config.seq_len
+
+    def _record_diagnostic(self, record: InferenceDiagnosticRecord) -> None:
+        """Safely append a diagnostic record to the bounded history deque."""
+        self._diagnostics.append(record)
 
     def process_telemetry(
         self,
@@ -140,27 +157,149 @@ class MaitriMLService:
         DuplicateTelemetryError: If identical timestamp arrives twice for the same sensor.
         StaleTelemetryError: If out-of-order telemetry with older timestamp arrives.
         """
-        if isinstance(telemetry, dict):
-            telemetry_input = TelemetryInput.from_dict(telemetry)
-        elif isinstance(telemetry, TelemetryInput):
-            telemetry_input = telemetry
-        else:
-            raise InvalidContractError(
-                f"Expected TelemetryInput or dict, got {type(telemetry).__name__}"
-            )
+        t0 = time.perf_counter()
+        raw_station: Optional[str] = None
+        raw_sensor: Optional[str] = None
+        raw_timestamp: str = datetime.now(timezone.utc).isoformat()
 
-        # Validate station and sensor constraints explicitly
-        if telemetry_input.station_id not in SUPPORTED_STATIONS:
-            raise UnsupportedStationError(
-                f"Unsupported station '{telemetry_input.station_id}'. Supported stations: {sorted(SUPPORTED_STATIONS)}"
-            )
-        if telemetry_input.sensor_id not in SUPPORTED_SENSORS:
-            raise UnsupportedSensorError(
-                f"Unsupported sensor '{telemetry_input.sensor_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
-            )
+        try:
+            if isinstance(telemetry, dict):
+                raw_station = telemetry.get("station_id")
+                raw_sensor = telemetry.get("sensor_id")
+                if "timestamp" in telemetry and isinstance(telemetry["timestamp"], str):
+                    raw_timestamp = telemetry["timestamp"]
+                telemetry_input = TelemetryInput.from_dict(telemetry)
+            elif isinstance(telemetry, TelemetryInput):
+                raw_station = telemetry.station_id
+                raw_sensor = telemetry.sensor_id
+                raw_timestamp = telemetry.timestamp
+                telemetry_input = telemetry
+            else:
+                raise InvalidContractError(
+                    f"Expected TelemetryInput or dict, got {type(telemetry).__name__}"
+                )
 
-        # Execute inference pipeline
-        return self._engine.infer_telemetry(telemetry_input)
+            raw_station = telemetry_input.station_id
+            raw_sensor = telemetry_input.sensor_id
+            raw_timestamp = telemetry_input.timestamp
+
+            # Validate station and sensor constraints explicitly
+            if telemetry_input.station_id not in SUPPORTED_STATIONS:
+                raise UnsupportedStationError(
+                    f"Unsupported station '{telemetry_input.station_id}'. Supported stations: {sorted(SUPPORTED_STATIONS)}"
+                )
+            if telemetry_input.sensor_id not in SUPPORTED_SENSORS:
+                raise UnsupportedSensorError(
+                    f"Unsupported sensor '{telemetry_input.sensor_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
+                )
+
+            # Execute inference pipeline
+            output = self._engine.infer_telemetry(telemetry_input)
+            t_elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 4)
+
+            # Determine diagnostic inference status
+            if output.anomaly_status == "INSUFFICIENT_DATA":
+                diag_status = "INSUFFICIENT_DATA"
+            elif output.anomaly_status == "MISSING_DATA":
+                diag_status = "MISSING_DATA"
+            else:
+                diag_status = "SUCCESS"
+
+            current_buf_len = len(self._engine._get_buffer(output.station_id, output.sensor_id))
+
+            diagnostic = InferenceDiagnosticRecord(
+                timestamp=output.timestamp,
+                station_id=output.station_id,
+                sensor_id=output.sensor_id,
+                inference_status=diag_status,
+                anomaly_status=output.anomaly_status,
+                anomaly_type=output.anomaly_type,
+                anomaly_score=output.anomaly_score,
+                threshold=self.threshold,
+                model_version=self.model_version,
+                buffer_length=current_buf_len,
+                processing_time_ms=t_elapsed_ms,
+            )
+            self._record_diagnostic(diagnostic)
+            return output
+
+        except DuplicateTelemetryError as e:
+            t_elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 4)
+            buf_len = (
+                len(self._engine._get_buffer(raw_station, raw_sensor))
+                if raw_station and raw_sensor and raw_station in SUPPORTED_STATIONS and raw_sensor in SUPPORTED_SENSORS
+                else None
+            )
+            self._record_diagnostic(
+                InferenceDiagnosticRecord(
+                    timestamp=raw_timestamp,
+                    station_id=raw_station,
+                    sensor_id=raw_sensor,
+                    inference_status="REJECTED_DUPLICATE",
+                    threshold=self.threshold,
+                    model_version=self.model_version,
+                    buffer_length=buf_len,
+                    processing_time_ms=t_elapsed_ms,
+                    error_message=str(e),
+                )
+            )
+            raise
+
+        except StaleTelemetryError as e:
+            t_elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 4)
+            buf_len = (
+                len(self._engine._get_buffer(raw_station, raw_sensor))
+                if raw_station and raw_sensor and raw_station in SUPPORTED_STATIONS and raw_sensor in SUPPORTED_SENSORS
+                else None
+            )
+            self._record_diagnostic(
+                InferenceDiagnosticRecord(
+                    timestamp=raw_timestamp,
+                    station_id=raw_station,
+                    sensor_id=raw_sensor,
+                    inference_status="REJECTED_STALE",
+                    threshold=self.threshold,
+                    model_version=self.model_version,
+                    buffer_length=buf_len,
+                    processing_time_ms=t_elapsed_ms,
+                    error_message=str(e),
+                )
+            )
+            raise
+
+        except (UnsupportedStationError, UnsupportedSensorError, InvalidContractError, ValueError) as e:
+            t_elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 4)
+            self._record_diagnostic(
+                InferenceDiagnosticRecord(
+                    timestamp=raw_timestamp if isinstance(raw_timestamp, str) and raw_timestamp else datetime.now(timezone.utc).isoformat(),
+                    station_id=raw_station,
+                    sensor_id=raw_sensor,
+                    inference_status="REJECTED_INVALID",
+                    threshold=self.threshold,
+                    model_version=self.model_version,
+                    buffer_length=None,
+                    processing_time_ms=t_elapsed_ms,
+                    error_message=str(e),
+                )
+            )
+            raise
+
+        except Exception as e:
+            t_elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 4)
+            self._record_diagnostic(
+                InferenceDiagnosticRecord(
+                    timestamp=raw_timestamp if isinstance(raw_timestamp, str) and raw_timestamp else datetime.now(timezone.utc).isoformat(),
+                    station_id=raw_station,
+                    sensor_id=raw_sensor,
+                    inference_status="ERROR",
+                    threshold=self.threshold,
+                    model_version=self.model_version,
+                    buffer_length=None,
+                    processing_time_ms=t_elapsed_ms,
+                    error_message=str(e),
+                )
+            )
+            raise
 
     def process_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -208,6 +347,31 @@ class MaitriMLService:
             )
         return len(self._engine._get_buffer(self.station_id, sensor_id))
 
+    def get_last_diagnostic(self) -> Optional[InferenceDiagnosticRecord]:
+        """
+        Get the most recent diagnostic audit record.
+        """
+        if not self._diagnostics:
+            return None
+        return self._diagnostics[-1]
+
+    def get_recent_diagnostics(
+        self, limit: Optional[int] = None
+    ) -> List[InferenceDiagnosticRecord]:
+        """
+        Get a defensive copy list of recent diagnostic records up to limit.
+        """
+        records = list(self._diagnostics)
+        if limit is not None and limit > 0:
+            return records[-limit:]
+        return records
+
+    def clear_diagnostics(self) -> None:
+        """
+        Clear the diagnostic audit history.
+        """
+        self._diagnostics.clear()
+
     def get_service_info(self) -> Dict[str, Any]:
         """
         Return diagnostic metadata and status information about the ML service.
@@ -224,5 +388,7 @@ class MaitriMLService:
             "sequence_length": self.sequence_length,
             "reconstruction_threshold": self.threshold,
             "active_buffer_lengths": buffer_lengths,
+            "diagnostics_count": len(self._diagnostics),
+            "diagnostics_history_limit": self._max_diagnostics_history,
             "status": "READY",
         }
