@@ -352,13 +352,47 @@ print(output.anomaly_type)    # "SPIKE", "DRIFT", "STUCK_VALUE", "NORMAL", "UNKN
 
 ---
 
+---
+
+### Maitri LSTM Calibration Analysis
+
+A comprehensive threshold calibration analysis was conducted in `ml/training/analyze_lstm_calibration.py` to evaluate the operating characteristics and trade-offs of the frozen reconstruction threshold (`0.017674`) across multiple candidate operating points.
+
+> **Dataset Notice & Calibration Disclaimer:** All calibration analyses are performed on synthetic Maitri telemetry (`MTR`). Calibration on synthetic signals demonstrates mathematical operating trade-offs and does NOT constitute real Antarctic validation, operational certification, or high-reliability guarantees.
+
+#### 1. Methodological Principles
+- **Validation-Only Selection**: Candidate operating points are tuned/selected strictly on the Validation split (1,181 sequences).
+- **Frozen Test Evaluation**: Operating points are evaluated on the untouched Test split (1,182 sequences) without feedback or threshold adjustment.
+- **Label Leakage Prevention**: Ground-truth anomaly labels are strictly excluded during production scoring and used only for offline evaluation.
+- **Dropout Exclusion**: `DROPOUT` instances are handled via the missing-data contract ingestion rule (`quality != 'GOOD'`) and excluded from numeric LSTM reconstruction-error calculations.
+
+#### 2. Evaluated Operating Points
+
+| Operating Point | Threshold (MSE) | Selection Criterion | Test Precision | Test Recall | Test F1 | Test FPR |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`CURRENT_FROZEN`** | **0.017674** | Validation F1-optimal (Step 4 frozen baseline) | **0.2612** | **0.5260** | **0.3490** | **0.4815** |
+| **`VAL_MAX_F1`** | 0.017240 | Validation grid search maximizing F1 | 0.2602 | 0.5294 | 0.3489 | 0.4871 |
+| **`HIGH_RECALL_85`** | 0.000690 | Target Validation Recall $\ge 85\%$ | 0.2445 | 1.0000 | 0.3929 | 1.0000 |
+| **`LOWER_FPR_20`** | 0.687772 | Constrain Validation FPR $\le 20\%$ | 0.0955 | 0.0519 | 0.0673 | 0.1590 |
+| **`PERCENTILE_90_NORMAL`** | 1.972147 | 90th percentile of normal validation errors | 0.0132 | 0.0035 | 0.0055 | 0.0840 |
+| **`PERCENTILE_95_NORMAL`** | 2.963099 | 95th percentile of normal validation errors | 0.0000 | 0.0000 | 0.0000 | 0.0090 |
+| **`PERCENTILE_99_NORMAL`** | 3.622379 | 99th percentile of normal validation errors | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+
+#### 3. Core Trade-off Findings & Limitations
+- **Precision / Recall Trade-off**: The current production threshold (`0.017674`) represents the best balance for detecting subtle temporal anomalies (`SPIKE`: 100% recall, `DRIFT`: 84.67% recall) with moderate F1 ($0.3490$), but incurs a $48.15\%$ false positive rate on normal diurnal cycles.
+- **Extreme False-Positive Suppression Risks**: Raising the threshold to percentile-based levels (e.g. 95th percentile $= 2.963$) successfully reduces false positive rate to $0.90\%$, but causes anomaly recall to collapse to $0.00\%$ because reconstruction errors for subtle drifts ($0.02 - 0.20$) lie below normal signal peak variations.
+- **Anomaly-Specific Sensitivity**: Single-threshold reconstruction loss cannot reliably isolate mid-range flatlines (`STUCK_VALUE`) without complementary statistical features (e.g., local variance).
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
-- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
+- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), calibration analysis (`analyze_lstm_calibration.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
 - `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+- `ml/tests/`: Pytest test suite (`test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), calibration plots (`lstm_threshold_precision_recall_f1.png`, `lstm_reconstruction_error_distribution.png`, `lstm_normal_error_percentiles.png`, `lstm_threshold_confusion_comparison.png`), end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+
 
 

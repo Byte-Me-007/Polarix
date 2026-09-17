@@ -1,0 +1,470 @@
+{
+  "model_version": "lstm-ae-v1",
+  "current_threshold": 0.017674,
+  "analysis_timestamp": "2026-09-17T19:55:08.985114+00:00",
+  "station_id": "MTR",
+  "validation_sample_count": 1181,
+  "test_sample_count": 1182,
+  "normal_validation_statistics": {
+    "count": 889,
+    "mean": 0.483605,
+    "median": 0.014797,
+    "std": 0.924171,
+    "min": 0.00069,
+    "max": 3.919686,
+    "percentile_90": 1.972147,
+    "percentile_95": 2.963099,
+    "percentile_97_5": 3.382546,
+    "percentile_99": 3.622379,
+    "percentile_99_5": 3.847196
+  },
+  "operating_points": {
+    "CURRENT_FROZEN": {
+      "threshold": 0.017674,
+      "description": "Persisted production threshold from Step 4 validation search",
+      "validation_metrics": {
+        "TP": 173,
+        "TN": 483,
+        "FP": 406,
+        "FN": 119,
+        "total": 1181,
+        "accuracy": 0.5555,
+        "precision": 0.2988,
+        "recall": 0.5925,
+        "f1": 0.3972,
+        "fpr": 0.4567,
+        "fnr": 0.4075
+      },
+      "test_metrics": {
+        "TP": 152,
+        "TN": 463,
+        "FP": 430,
+        "FN": 137,
+        "total": 1182,
+        "accuracy": 0.5203,
+        "precision": 0.2612,
+        "recall": 0.526,
+        "f1": 0.349,
+        "fpr": 0.4815,
+        "fnr": 0.474
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 127,
+          "missed_anomalies": 23,
+          "recall": 0.8467
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 463,
+          "false_alarms": 430,
+          "false_positive_rate": 0.4815
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "missed_anomalies": 0,
+          "recall": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 6,
+          "missed_anomalies": 114,
+          "recall": 0.05
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "VAL_MAX_F1": {
+      "threshold": 0.01724,
+      "description": "Threshold maximizing validation F1-score on validation grid",
+      "validation_metrics": {
+        "TP": 174,
+        "TN": 480,
+        "FP": 409,
+        "FN": 118,
+        "total": 1181,
+        "accuracy": 0.5538,
+        "precision": 0.2985,
+        "recall": 0.5959,
+        "f1": 0.3977,
+        "fpr": 0.4601,
+        "fnr": 0.4041
+      },
+      "test_metrics": {
+        "TP": 153,
+        "TN": 458,
+        "FP": 435,
+        "FN": 136,
+        "total": 1182,
+        "accuracy": 0.5169,
+        "precision": 0.2602,
+        "recall": 0.5294,
+        "f1": 0.3489,
+        "fpr": 0.4871,
+        "fnr": 0.4706
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 128,
+          "missed_anomalies": 22,
+          "recall": 0.8533
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 458,
+          "false_alarms": 435,
+          "false_positive_rate": 0.4871
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "missed_anomalies": 0,
+          "recall": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 6,
+          "missed_anomalies": 114,
+          "recall": 0.05
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "HIGH_RECALL_85": {
+      "threshold": 0.00069,
+      "description": "Threshold targeting validation recall >= 85%",
+      "validation_metrics": {
+        "TP": 292,
+        "TN": 1,
+        "FP": 888,
+        "FN": 0,
+        "total": 1181,
+        "accuracy": 0.2481,
+        "precision": 0.2475,
+        "recall": 1.0,
+        "f1": 0.3967,
+        "fpr": 0.9989,
+        "fnr": 0.0
+      },
+      "test_metrics": {
+        "TP": 289,
+        "TN": 0,
+        "FP": 893,
+        "FN": 0,
+        "total": 1182,
+        "accuracy": 0.2445,
+        "precision": 0.2445,
+        "recall": 1.0,
+        "f1": 0.3929,
+        "fpr": 1.0,
+        "fnr": 0.0
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 150,
+          "missed_anomalies": 0,
+          "recall": 1.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 0,
+          "false_alarms": 893,
+          "false_positive_rate": 1.0
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "missed_anomalies": 0,
+          "recall": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 120,
+          "missed_anomalies": 0,
+          "recall": 1.0
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "LOWER_FPR_20": {
+      "threshold": 0.687772,
+      "description": "Threshold constraining validation FPR <= 20%",
+      "validation_metrics": {
+        "TP": 26,
+        "TN": 725,
+        "FP": 164,
+        "FN": 266,
+        "total": 1181,
+        "accuracy": 0.6359,
+        "precision": 0.1368,
+        "recall": 0.089,
+        "f1": 0.1079,
+        "fpr": 0.1845,
+        "fnr": 0.911
+      },
+      "test_metrics": {
+        "TP": 15,
+        "TN": 751,
+        "FP": 142,
+        "FN": 274,
+        "total": 1182,
+        "accuracy": 0.6481,
+        "precision": 0.0955,
+        "recall": 0.0519,
+        "f1": 0.0673,
+        "fpr": 0.159,
+        "fnr": 0.9481
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 0,
+          "missed_anomalies": 150,
+          "recall": 0.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 751,
+          "false_alarms": 142,
+          "false_positive_rate": 0.159
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 15,
+          "missed_anomalies": 4,
+          "recall": 0.7895
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 0,
+          "missed_anomalies": 120,
+          "recall": 0.0
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "PERCENTILE_90_NORMAL": {
+      "threshold": 1.972147,
+      "description": "90th percentile of normal validation reconstruction errors",
+      "validation_metrics": {
+        "TP": 7,
+        "TN": 800,
+        "FP": 89,
+        "FN": 285,
+        "total": 1181,
+        "accuracy": 0.6833,
+        "precision": 0.0729,
+        "recall": 0.024,
+        "f1": 0.0361,
+        "fpr": 0.1001,
+        "fnr": 0.976
+      },
+      "test_metrics": {
+        "TP": 1,
+        "TN": 818,
+        "FP": 75,
+        "FN": 288,
+        "total": 1182,
+        "accuracy": 0.6929,
+        "precision": 0.0132,
+        "recall": 0.0035,
+        "f1": 0.0055,
+        "fpr": 0.084,
+        "fnr": 0.9965
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 0,
+          "missed_anomalies": 150,
+          "recall": 0.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 818,
+          "false_alarms": 75,
+          "false_positive_rate": 0.084
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 1,
+          "missed_anomalies": 18,
+          "recall": 0.0526
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 0,
+          "missed_anomalies": 120,
+          "recall": 0.0
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "PERCENTILE_95_NORMAL": {
+      "threshold": 2.963099,
+      "description": "95th percentile of normal validation reconstruction errors",
+      "validation_metrics": {
+        "TP": 1,
+        "TN": 844,
+        "FP": 45,
+        "FN": 291,
+        "total": 1181,
+        "accuracy": 0.7155,
+        "precision": 0.0217,
+        "recall": 0.0034,
+        "f1": 0.0059,
+        "fpr": 0.0506,
+        "fnr": 0.9966
+      },
+      "test_metrics": {
+        "TP": 0,
+        "TN": 885,
+        "FP": 8,
+        "FN": 289,
+        "total": 1182,
+        "accuracy": 0.7487,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.009,
+        "fnr": 1.0
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 0,
+          "missed_anomalies": 150,
+          "recall": 0.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 885,
+          "false_alarms": 8,
+          "false_positive_rate": 0.009
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 0,
+          "missed_anomalies": 19,
+          "recall": 0.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 0,
+          "missed_anomalies": 120,
+          "recall": 0.0
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    },
+    "PERCENTILE_99_NORMAL": {
+      "threshold": 3.622379,
+      "description": "99th percentile of normal validation reconstruction errors",
+      "validation_metrics": {
+        "TP": 0,
+        "TN": 880,
+        "FP": 9,
+        "FN": 292,
+        "total": 1181,
+        "accuracy": 0.7451,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0101,
+        "fnr": 1.0
+      },
+      "test_metrics": {
+        "TP": 0,
+        "TN": 893,
+        "FP": 0,
+        "FN": 289,
+        "total": 1182,
+        "accuracy": 0.7555,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "fnr": 1.0
+      },
+      "test_per_anomaly_type": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 0,
+          "missed_anomalies": 150,
+          "recall": 0.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "correct_normal": 893,
+          "false_alarms": 0,
+          "false_positive_rate": 0.0
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 0,
+          "missed_anomalies": 19,
+          "recall": 0.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 0,
+          "missed_anomalies": 120,
+          "recall": 0.0
+        },
+        "DROPOUT": {
+          "total_instances": 28,
+          "handled_by": "Ingestion quality / missing data contract rule (quality != 'GOOD')",
+          "lstm_reconstruction_recall": "N/A (Dropout is handled before LSTM scoring)"
+        }
+      }
+    }
+  },
+  "methodology": {
+    "selection_split": "Validation split (1,181 sequences) exclusively used to select candidate operating points",
+    "evaluation_split": "Test split (1,182 sequences) kept frozen during threshold derivation",
+    "label_leakage_prevention": "Test labels never accessed during threshold search or percentile computation",
+    "dropout_handling": "DROPOUT is routed to MISSING_DATA at contract ingestion and excluded from numeric LSTM reconstruction metrics"
+  },
+  "limitations_and_tradeoffs": {
+    "high_recall_operating_point": "Low thresholds (<0.02) capture spikes and drifts with recall >50%, but incur high false positive rates (~48%) due to normal diurnal signal variations.",
+    "low_fpr_operating_point": "High thresholds (>0.60 or normal percentiles >=95th) reduce false alarms to <5%, but cause anomaly recall to collapse (<10%) as subtle drifts and stuck flatlines are missed.",
+    "data_nature": "All telemetry records analyzed are synthetically generated. No real Antarctic deployment, operational reliability, or clinical perfection is claimed."
+  },
+  "saved_artifacts": {
+    "operating_points_csv": "/Users/rexjohnabraham/Documents/Polarix_C/ml/results/maitri_lstm_operating_points.csv",
+    "plots": [
+      "/Users/rexjohnabraham/Documents/Polarix_C/ml/results/lstm_threshold_precision_recall_f1.png",
+      "/Users/rexjohnabraham/Documents/Polarix_C/ml/results/lstm_reconstruction_error_distribution.png",
+      "/Users/rexjohnabraham/Documents/Polarix_C/ml/results/lstm_normal_error_percentiles.png",
+      "/Users/rexjohnabraham/Documents/Polarix_C/ml/results/lstm_threshold_confusion_comparison.png"
+    ]
+  }
+}
