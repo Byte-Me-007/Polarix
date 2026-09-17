@@ -337,7 +337,7 @@ def test_13_compatibility_with_lstm_autoencoder_inference(inference_engine):
 
 
 def test_14_normal_output(inference_engine):
-    """Verify stream reaching 30 normal points produces NORMAL status."""
+    """Verify stream reaching 30 normal points produces NORMAL status and anomaly_type=NORMAL."""
     inference_engine.reset_history("MTR", "TEMP_001")
 
     out = None
@@ -355,12 +355,13 @@ def test_14_normal_output(inference_engine):
         out = inference_engine.infer_telemetry(inp)
 
     assert out.anomaly_status == "NORMAL"
+    assert out.anomaly_type == "NORMAL"
     assert isinstance(out.anomaly_score, float)
     assert out.anomaly_score <= inference_engine.threshold
 
 
 def test_15_anomaly_output(inference_engine):
-    """Verify anomalous sequence produces ANOMALY status."""
+    """Verify anomalous sequence produces ANOMALY status and valid anomaly_type."""
     inference_engine.reset_history("MTR", "TEMP_001")
 
     # 29 baseline normal points
@@ -391,12 +392,14 @@ def test_15_anomaly_output(inference_engine):
     out = inference_engine.infer_telemetry(spike_inp)
 
     assert out.anomaly_status == "ANOMALY"
+    assert out.anomaly_type in {"SPIKE", "DRIFT", "STUCK_VALUE", "UNKNOWN"}
+    assert out.anomaly_type == "SPIKE"
     assert isinstance(out.anomaly_score, float)
     assert out.anomaly_score > inference_engine.threshold
 
 
 def test_16_insufficient_data_output(inference_engine):
-    """Verify first 29 points return INSUFFICIENT_DATA."""
+    """Verify first 29 points return INSUFFICIENT_DATA and anomaly_type=None."""
     inference_engine.reset_history("MTR", "PRESS_001")
 
     for i in range(29):
@@ -412,10 +415,11 @@ def test_16_insufficient_data_output(inference_engine):
         out = inference_engine.infer_telemetry(inp)
         assert out.anomaly_status == "INSUFFICIENT_DATA"
         assert out.anomaly_score is None
+        assert out.anomaly_type is None
 
 
 def test_17_missing_data_output(inference_engine):
-    """Verify null value or bad quality returns MISSING_DATA."""
+    """Verify null value or bad quality returns MISSING_DATA and anomaly_type=None."""
     inference_engine.reset_history("MTR", "HUM_001")
 
     # Null value
@@ -432,6 +436,7 @@ def test_17_missing_data_output(inference_engine):
     )
     assert out_null.anomaly_status == "MISSING_DATA"
     assert out_null.anomaly_score is None
+    assert out_null.anomaly_type is None
 
     # Bad quality flag
     out_bad = inference_engine.infer_telemetry(
@@ -447,3 +452,4 @@ def test_17_missing_data_output(inference_engine):
     )
     assert out_bad.anomaly_status == "MISSING_DATA"
     assert out_bad.anomaly_score is None
+    assert out_bad.anomaly_type is None

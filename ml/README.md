@@ -179,6 +179,7 @@ A stable, typed interface is defined in `ml/inference/inference_contract.py` for
   "source": "SIMULATOR",
   "anomaly_score": 0.0215,
   "anomaly_status": "ANOMALY",
+  "anomaly_type": "SPIKE",
   "model_version": "lstm-ae-v1"
 }
 ```
@@ -187,11 +188,11 @@ A stable, typed interface is defined in `ml/inference/inference_contract.py` for
 - **Supported Station**: `MTR` (Maitri only). Non-Maitri stations raise `UnsupportedStationError`.
 - **Supported Sensors**: `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`. Unsupported sensors raise `UnsupportedSensorError`.
 
-#### 4. Operational Inference Statuses
-- **`INSUFFICIENT_DATA`**: The sliding history window has fewer than 30 consecutive observations. `anomaly_score` is `null`.
-- **`NORMAL`**: 30-step window reconstruction error $\le 0.017674$. `anomaly_score` contains the raw MSE reconstruction error.
-- **`ANOMALY`**: 30-step window reconstruction error $> 0.017674$. `anomaly_score` contains the raw MSE reconstruction error.
-- **`MISSING_DATA`**: Incoming telemetry has `value = null`, `NaN`, or `quality != "GOOD"`. `anomaly_score` is `null`, and the sensor's rolling buffer is reset to avoid contaminated windows.
+#### 4. Operational Inference Statuses & Anomaly Types
+- **`INSUFFICIENT_DATA`**: The sliding history window has fewer than 30 consecutive observations (`anomaly_score = null`, `anomaly_type = null`).
+- **`NORMAL`**: 30-step window reconstruction error $\le 0.017674$ (`anomaly_score` MSE, `anomaly_type = "NORMAL"`).
+- **`ANOMALY`**: 30-step window reconstruction error $> 0.017674$ (`anomaly_score` MSE, `anomaly_type` evaluated via `AnomalyTypeClassifier`).
+- **`MISSING_DATA`**: Incoming telemetry has `value = null`, `NaN`, or `quality != "GOOD"` (`anomaly_score = null`, `anomaly_type = null`).
 
 #### 5. Reconstruction Error Scoring
 - `anomaly_score` represents the exact Mean Squared Error (MSE) between the normalized input sequence and the autoencoder reconstruction.
@@ -199,11 +200,39 @@ A stable, typed interface is defined in `ml/inference/inference_contract.py` for
 
 ---
 
+### Anomaly Type Classification Layer
+
+While the LSTM Autoencoder reliably detects that a temporal window is anomalous via reconstruction loss, reconstruction error alone does not differentiate between distinct physical failure modes. The `AnomalyTypeClassifier` (`ml/inference/anomaly_type_classifier.py`) provides an interpretable, deterministic rule layer operating directly on the 30-step telemetry window.
+
+> **Telemetry Notice:** Evaluated purely on synthetic Maitri telemetry (`MTR`). Does not claim real Antarctic operational validation or clinical perfection.
+
+#### 1. Supported Anomaly Class Definitions
+- **`SPIKE`**: Short-lived, high-magnitude jump or abrupt step change ($\ge 3.5\times$ jump ratio / isolated pulse relative to noise baseline).
+- **`DRIFT`**: Gradual, sustained directional shift across the 30-step window (linear trend $|r| \ge 0.70$, directional consistency ratio $\ge 0.45$, without dominating single-step spikes).
+- **`STUCK_VALUE`**: Frozen/constant telemetry with near-zero local standard deviation ($\le 10^{-4}$) or $\ge 8$ consecutive identical/near-identical observations.
+- **`NORMAL`**: Stationary baseline telemetry within standard noise envelopes.
+- **`UNKNOWN`**: Explicit category assigned when an anomalous window does not match singular archetype criteria with high confidence.
+- **`DROPOUT`**: Telemetry missingness (`null`, `NaN`, non-GOOD quality) is preserved as `MISSING_DATA` and excluded from numeric anomaly type classification.
+
+#### 2. Calibration & Validation Methodology
+- **Leakage Prevention**: Classification rules rely solely on mathematical signal properties and training-normal noise distributions. No ground truth labels or test partition data are used to tune classifier thresholds.
+- **Validation Evaluation**: Evaluated across 1,327 test windows in `ml/results/maitri_anomaly_type_validation.json`:
+  - `SPIKE`: 19/19 detected (100% recall)
+  - `DRIFT`: 27 true positives, with subtle/early ramps falling into UNKNOWN or SPIKE
+  - `STUCK_VALUE`: Evaluated against primary detector output
+  - `UNKNOWN`: 15.6% assignment rate on ambiguous multi-pattern fluctuations
+
+#### 3. Limitations
+- Single-point spikes embedded within drifting series can be classified as SPIKE due to high first-difference dominance.
+- Mid-range stuck values that do not trigger the primary LSTM reconstruction threshold remain classified as NORMAL unless paired with explicit variance features.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
-- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and model comparison (`compare_models.py`).
-- `ml/inference/`: Production inference service (`lstm_inference.py`), typed integration contracts (`inference_contract.py`), contract demo (`run_maitri_contract_demo.py`), and streaming demo (`run_maitri_inference_demo.py`).
+- `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
+- `ml/inference/`: Production inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), contract demo (`run_maitri_contract_demo.py`), and streaming demo (`run_maitri_inference_demo.py`).
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), visualization figures, and contract examples (`maitri_inference_contract_example.json`).
+- `ml/tests/`: Pytest test suite (`test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), anomaly type validation artifacts (`maitri_anomaly_type_validation.json`, `maitri_anomaly_type_metrics.csv`, `maitri_anomaly_type_confusion_matrix.png`), and contract examples (`maitri_inference_contract_example.json`).

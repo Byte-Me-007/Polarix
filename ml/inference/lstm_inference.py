@@ -30,14 +30,15 @@ if str(REPO_ROOT) not in sys.path:
 import numpy as np
 import torch
 
+from ml.inference.anomaly_type_classifier import AnomalyTypeClassifier
 from ml.inference.inference_contract import (
     DEFAULT_MODEL_VERSION,
     SUPPORTED_SENSORS,
     SUPPORTED_STATIONS,
     VALID_STATUSES,
     InvalidContractError,
-    TelemetryInput,
     TelemetryInferenceOutput,
+    TelemetryInput,
     UnsupportedSensorError,
     UnsupportedStationError,
 )
@@ -104,6 +105,9 @@ class LSTMAutoencoderInference:
         # 5. Stateful Rolling Buffers keyed by (station_id, sensor_id)
         self._buffers: Dict[Tuple[str, str], Deque[float]] = {}
 
+        # 6. Anomaly Type Classifier
+        self.type_classifier = AnomalyTypeClassifier(min_window_len=self.config.seq_len)
+
     def _get_buffer(self, station_id: str, sensor_id: str) -> Deque[float]:
         key = (station_id, sensor_id)
         if key not in self._buffers:
@@ -168,6 +172,7 @@ class LSTMAutoencoderInference:
                 source=input_obj.source,
                 anomaly_score=None,
                 anomaly_status="MISSING_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
@@ -186,12 +191,20 @@ class LSTMAutoencoderInference:
                 source=input_obj.source,
                 anomaly_score=None,
                 anomaly_status="INSUFFICIENT_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
         # Full Sequence Available
         window_arr = np.array(buffer, dtype=np.float32)
         score, status = self._score_window_array(input_obj.sensor_id, window_arr)
+        if status == "ANOMALY":
+            anomaly_type = self.type_classifier.classify(
+                window_arr, sensor_id=input_obj.sensor_id, is_known_anomaly=True
+            )
+        else:
+            anomaly_type = "NORMAL"
+
         return TelemetryInferenceOutput(
             station_id=input_obj.station_id,
             sensor_id=input_obj.sensor_id,
@@ -202,6 +215,7 @@ class LSTMAutoencoderInference:
             source=input_obj.source,
             anomaly_score=score,
             anomaly_status=status,
+            anomaly_type=anomaly_type,
             model_version=self.model_version,
         )
 
@@ -263,6 +277,7 @@ class LSTMAutoencoderInference:
                 source=source,
                 anomaly_score=None,
                 anomaly_status="INSUFFICIENT_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
@@ -278,10 +293,18 @@ class LSTMAutoencoderInference:
                 source=source,
                 anomaly_score=None,
                 anomaly_status="MISSING_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
         score, status = self._score_window_array(sensor_id, arr)
+        if status == "ANOMALY":
+            anomaly_type = self.type_classifier.classify(
+                arr, sensor_id=sensor_id, is_known_anomaly=True
+            )
+        else:
+            anomaly_type = "NORMAL"
+
         return TelemetryInferenceOutput(
             station_id=station_id,
             sensor_id=sensor_id,
@@ -292,6 +315,7 @@ class LSTMAutoencoderInference:
             source=source,
             anomaly_score=score,
             anomaly_status=status,
+            anomaly_type=anomaly_type,
             model_version=self.model_version,
         )
 

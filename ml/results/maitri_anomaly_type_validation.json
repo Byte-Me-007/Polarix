@@ -1,0 +1,141 @@
+{
+  "dataset": "ml/data/maitri_synthetic_telemetry.csv",
+  "station_id": "MTR",
+  "model_version": "lstm-ae-v1",
+  "lstm_threshold": 0.017674,
+  "splits": {
+    "val": {
+      "total_evaluated": 1326,
+      "dropout_missing_count": 174,
+      "unknown_count": 193,
+      "unknown_rate": 0.1456,
+      "class_metrics": {
+        "NORMAL": {
+          "total_instances": 1034,
+          "true_positives": 602,
+          "precision": 0.835,
+          "recall": 0.5822,
+          "f1_score": 0.686
+        },
+        "SPIKE": {
+          "total_instances": 22,
+          "true_positives": 22,
+          "precision": 0.0681,
+          "recall": 1.0,
+          "f1_score": 0.1275
+        },
+        "DRIFT": {
+          "total_instances": 150,
+          "true_positives": 68,
+          "precision": 0.9855,
+          "recall": 0.4533,
+          "f1_score": 0.621
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "true_positives": 13,
+          "precision": 0.65,
+          "recall": 0.1083,
+          "f1_score": 0.1857
+        }
+      },
+      "confusion_matrix": {
+        "NORMAL": {
+          "NORMAL": 602,
+          "SPIKE": 291,
+          "DRIFT": 1,
+          "STUCK_VALUE": 7,
+          "UNKNOWN": 133
+        },
+        "SPIKE": {
+          "NORMAL": 0,
+          "SPIKE": 22,
+          "DRIFT": 0,
+          "STUCK_VALUE": 0,
+          "UNKNOWN": 0
+        },
+        "DRIFT": {
+          "NORMAL": 18,
+          "SPIKE": 10,
+          "DRIFT": 68,
+          "STUCK_VALUE": 0,
+          "UNKNOWN": 54
+        },
+        "STUCK_VALUE": {
+          "NORMAL": 101,
+          "SPIKE": 0,
+          "DRIFT": 0,
+          "STUCK_VALUE": 13,
+          "UNKNOWN": 6
+        }
+      }
+    },
+    "test": {
+      "total_evaluated": 1327,
+      "dropout_missing_count": 173,
+      "unknown_count": 207,
+      "unknown_rate": 0.156,
+      "class_metrics": {
+        "NORMAL": {
+          "total_instances": 1038,
+          "true_positives": 579,
+          "precision": 0.8087,
+          "recall": 0.5578,
+          "f1_score": 0.6602
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "true_positives": 19,
+          "precision": 0.0528,
+          "recall": 1.0,
+          "f1_score": 0.1003
+        },
+        "DRIFT": {
+          "total_instances": 150,
+          "true_positives": 27,
+          "precision": 1.0,
+          "recall": 0.18,
+          "f1_score": 0.3051
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "true_positives": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "NORMAL": {
+          "NORMAL": 579,
+          "SPIKE": 292,
+          "DRIFT": 0,
+          "STUCK_VALUE": 17,
+          "UNKNOWN": 150
+        },
+        "SPIKE": {
+          "NORMAL": 0,
+          "SPIKE": 19,
+          "DRIFT": 0,
+          "STUCK_VALUE": 0,
+          "UNKNOWN": 0
+        },
+        "DRIFT": {
+          "NORMAL": 23,
+          "SPIKE": 49,
+          "DRIFT": 27,
+          "STUCK_VALUE": 0,
+          "UNKNOWN": 51
+        },
+        "STUCK_VALUE": {
+          "NORMAL": 114,
+          "SPIKE": 0,
+          "DRIFT": 0,
+          "STUCK_VALUE": 0,
+          "UNKNOWN": 6
+        }
+      }
+    }
+  },
+  "note": "Descriptive evaluation on synthetic telemetry; no real Antarctic data claimed."
+}
