@@ -5,11 +5,11 @@ import { StationModel } from './StationModel';
 import { SensorMarker } from './SensorMarker';
 import { SpatialHeatmap } from './SpatialHeatmap';
 
-// Elevated overview framing — complete station footprint visible (all 6 zones).
-// Camera at [16,60,20] provides a clean 45° isometric overview with ~20% margin on all sides.
-// Target at station centroid [2,2,-8] ensures even spatial framing.
-const DEFAULT_CAMERA_POS = [16, 60, 20];
-const DEFAULT_TARGET = [2, 2, -8];
+// Elevated overview framing — full scaled station footprint visible (all 6 zones).
+// New station footprint: X -44..+52, Z -64..+20  → center ≈ (4, 0, -22)
+// Camera at [22, 95, 36] frames ~80% of viewport. FOV 50 keeps edges uncropped.
+const DEFAULT_CAMERA_POS = [22, 95, 36];
+const DEFAULT_TARGET = [4, 2, -22];
 
 export const DigitalTwinScene = ({
   station,
@@ -47,25 +47,25 @@ export const DigitalTwinScene = ({
 
   return (
     <Canvas
-      camera={{ position: DEFAULT_CAMERA_POS, fov: 52 }}
+      camera={{ position: DEFAULT_CAMERA_POS, fov: 50 }}
       shadows
       style={{ width: '100%', height: '100%', background: '#f8f6f0' }}
     >
       {/* Soft Antarctic Daylight Lighting (Warm neutral, no neon/blue) */}
       <ambientLight intensity={0.78} color="#fffcf5" />
       <directionalLight
-        position={[45, 65, 35]}
+        position={[60, 80, 50]}
         intensity={1.4}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-55}
-        shadow-camera-right={55}
-        shadow-camera-top={55}
-        shadow-camera-bottom={-55}
+        shadow-camera-left={-100}
+        shadow-camera-right={100}
+        shadow-camera-top={100}
+        shadow-camera-bottom={-100}
         color="#fff9ec"
       />
       {/* Secondary fill light for soft dimensional shadows */}
-      <directionalLight position={[-40, 30, -35]} intensity={0.45} color="#e8e3d8" />
+      <directionalLight position={[-55, 40, -50]} intensity={0.45} color="#e8e3d8" />
 
       {/* OrbitControls with smooth damping and reasonable constraints */}
       <OrbitControls
@@ -73,8 +73,8 @@ export const DigitalTwinScene = ({
         target={DEFAULT_TARGET}
         enableDamping
         dampingFactor={0.06}
-        minDistance={8}
-        maxDistance={120}
+        minDistance={12}
+        maxDistance={200}
         maxPolarAngle={Math.PI / 2 - 0.04} // Ground level floor limit
       />
 
