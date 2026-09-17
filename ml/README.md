@@ -465,14 +465,44 @@ Every call to `process_telemetry()` automatically generates an `InferenceDiagnos
 
 ---
 
+### Maitri ML Inference Performance Validation
+
+A deterministic, offline inference latency and throughput benchmark harness is implemented in `ml/inference/benchmark_maitri_inference.py` and validated via `ml/inference/validate_maitri_performance.py` and `ml/tests/test_maitri_performance.py`.
+
+> **Performance Disclaimer:** Measurements are strictly offline runtime characterizations on synthetic telemetry (`MTR`). Latency distributions depend on execution environment/hardware and do NOT constitute real-time production SLAs, hardware certifications, or claims on real Antarctic telemetry. All model architectures, weights, scalers, and decision thresholds remain strictly frozen.
+
+#### 1. What is Measured
+- **Startup Latency (`startup_initialization_ms`)**: Measured independently with `time.perf_counter()`, capturing weight loading, SHA-256 manifest verification, and scaler initialization (~3.0 ms).
+- **Steady-State Ingestion Latency**: Evaluated after controlled warm-up (20 iterations) over 200 measured operations per scenario.
+- **Statistical Percentiles**: Calculates `min`, `mean`, `median` (P50), `P90`, `P95`, `P99`, `max`, and `std` in milliseconds.
+
+#### 2. Evaluated Scenarios
+1. **`WARM_NORMAL`**: Steady-state scored inference on stationary normal telemetry with full 30-step historical sequence.
+2. **`ANOMALY`**: Scored inference and rule-based physical classification on synthetic anomaly sequences (`SPIKE`, `DRIFT`).
+3. **`MISSING_DATA`**: Fast-path handling of null, `NaN`, and bad-quality telemetry records with rolling history reset.
+4. **`INSUFFICIENT_DATA`**: Warm-up sequence handling for sensor histories with $< 30$ valid observations.
+5. **`MULTI_SENSOR`**: Interleaved streaming telemetry across all five Maitri sensors (`TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`).
+
+#### 3. Benchmark Summary (`ml/results/maitri_inference_performance.json`)
+
+| Scenario | Sample Count | Min (ms) | Median / P50 (ms) | Mean (ms) | P95 (ms) | P99 (ms) | Max (ms) | Std (ms) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`WARM_NORMAL`** | 200 | 0.3564 | 0.3705 | 0.3743 | 0.3895 | 0.4940 | 0.6111 | 0.0242 |
+| **`ANOMALY`** | 200 | 0.4005 | 0.4141 | 0.4184 | 0.4364 | 0.5112 | 0.6546 | 0.0230 |
+| **`MISSING_DATA`** | 200 | 0.0025 | 0.0028 | 0.0029 | 0.0035 | 0.0041 | 0.0109 | 0.0006 |
+| **`INSUFFICIENT_DATA`** | 200 | 0.0029 | 0.0030 | 0.0031 | 0.0032 | 0.0038 | 0.0058 | 0.0002 |
+| **`MULTI_SENSOR`** | 200 | 0.4068 | 0.4338 | 0.4325 | 0.4567 | 0.5292 | 0.6095 | 0.0234 |
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), calibration analysis (`analyze_lstm_calibration.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference diagnostics (`inference_diagnostics.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), observability validation script (`validate_maitri_observability.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
+- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference diagnostics (`inference_diagnostics.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), performance benchmark (`benchmark_maitri_inference.py`), performance validation harness (`validate_maitri_performance.py`), observability validation script (`validate_maitri_observability.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_maitri_observability.py`, `test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), observability report (`maitri_observability_validation.json`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+- `ml/tests/`: Pytest test suite (`test_maitri_performance.py`, `test_maitri_observability.py`, `test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), performance reports (`maitri_inference_performance.json`, `maitri_inference_performance.csv`), observability report (`maitri_observability_validation.json`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
 
 
 

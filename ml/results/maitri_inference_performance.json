@@ -1,0 +1,82 @@
+{
+  "benchmark_metadata": {
+    "module": "ml.inference.benchmark_maitri_inference",
+    "benchmark_timestamp": "2026-09-17T20:11:03.865629+00:00",
+    "station_id": "MTR",
+    "model_version": "lstm-ae-v1",
+    "threshold": 0.017674,
+    "python_version": "3.11.15",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "warmup_count_per_scenario": 20,
+    "measured_iterations_per_scenario": 200,
+    "random_seed": 42,
+    "benchmark_type": "synthetic_offline_benchmark_only",
+    "disclaimer": "Synthetic offline benchmark measurements only. Results are machine- and environment-dependent and do not constitute production SLAs, real-time edge hardware certifications, or claims on real Antarctic station telemetry. Model architecture, scalers, weights, and decision thresholds remain strictly frozen."
+  },
+  "startup_initialization": {
+    "startup_initialization_ms": 3.0057,
+    "description": "Model weight loading, manifest SHA-256 verification, scaler loading, and inference engine initialization."
+  },
+  "scenarios": {
+    "WARM_NORMAL": {
+      "sample_count": 200,
+      "min_latency_ms": 0.3689,
+      "max_latency_ms": 0.6076,
+      "mean_latency_ms": 0.3961,
+      "median_latency_ms": 0.3906,
+      "p50_latency_ms": 0.3906,
+      "p90_latency_ms": 0.4069,
+      "p95_latency_ms": 0.4177,
+      "p99_latency_ms": 0.495,
+      "std_latency_ms": 0.0258
+    },
+    "ANOMALY": {
+      "sample_count": 200,
+      "min_latency_ms": 0.4047,
+      "max_latency_ms": 1.2058,
+      "mean_latency_ms": 0.4389,
+      "median_latency_ms": 0.4303,
+      "p50_latency_ms": 0.4303,
+      "p90_latency_ms": 0.447,
+      "p95_latency_ms": 0.4615,
+      "p99_latency_ms": 0.514,
+      "std_latency_ms": 0.0609
+    },
+    "MISSING_DATA": {
+      "sample_count": 200,
+      "min_latency_ms": 0.0024,
+      "max_latency_ms": 0.0138,
+      "mean_latency_ms": 0.0029,
+      "median_latency_ms": 0.0028,
+      "p50_latency_ms": 0.0028,
+      "p90_latency_ms": 0.0032,
+      "p95_latency_ms": 0.0035,
+      "p99_latency_ms": 0.005,
+      "std_latency_ms": 0.0009
+    },
+    "INSUFFICIENT_DATA": {
+      "sample_count": 200,
+      "min_latency_ms": 0.0029,
+      "max_latency_ms": 0.0149,
+      "mean_latency_ms": 0.0033,
+      "median_latency_ms": 0.0031,
+      "p50_latency_ms": 0.0031,
+      "p90_latency_ms": 0.0038,
+      "p95_latency_ms": 0.0039,
+      "p99_latency_ms": 0.0078,
+      "std_latency_ms": 0.001
+    },
+    "MULTI_SENSOR": {
+      "sample_count": 200,
+      "min_latency_ms": 0.4039,
+      "max_latency_ms": 0.5002,
+      "mean_latency_ms": 0.432,
+      "median_latency_ms": 0.4274,
+      "p50_latency_ms": 0.4274,
+      "p90_latency_ms": 0.4461,
+      "p95_latency_ms": 0.4481,
+      "p99_latency_ms": 0.487,
+      "std_latency_ms": 0.0133
+    }
+  }
+}
