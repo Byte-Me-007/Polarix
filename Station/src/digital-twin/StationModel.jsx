@@ -16,8 +16,71 @@ import { StationZone } from './StationZone';
 //   ENERGY ↔ STORAGE (x gap):  +13 → +22 = 9 units   → Corridor at x=+17.5
 //   ENERGY ↔ COMMS (z gap):    -39 → -47 = 8 units   → Corridor at z=-43
 
-export const StationModel = ({ station, showLabels = true }) => {
+export const ZONE_STATUS_CONFIG = {
+  CRITICAL: {
+    hex: '#e03131',
+    rgb: '224, 49, 49',
+    name: 'CRITICAL',
+    floorOpacity: 0.65,
+    glowOpacity: 0.95
+  },
+  WARNING: {
+    hex: '#f59f00',
+    rgb: '245, 159, 0',
+    name: 'WARNING',
+    floorOpacity: 0.55,
+    glowOpacity: 0.88
+  },
+  NORMAL: {
+    hex: '#2b8a3e',
+    rgb: '43, 138, 62',
+    name: 'NORMAL',
+    floorOpacity: 0.35,
+    glowOpacity: 0.60
+  },
+  OFFLINE: {
+    hex: '#868e96',
+    rgb: '134, 142, 150',
+    name: 'OFFLINE',
+    floorOpacity: 0.22,
+    glowOpacity: 0.35
+  }
+};
+
+export const StationModel = ({
+  station,
+  sensors = [],
+  showLabels = true,
+  showHeatmap = false,
+  selectedZone = null
+}) => {
   const zones = station?.digitalTwin?.zones || [];
+
+  // Compute dominant health status per zone from sensors
+  const zoneHealth = React.useMemo(() => {
+    const map = {};
+    zones.forEach((z) => {
+      const code = z.code || z.id;
+      const zoneSensors = sensors.filter((s) => s.zone === code);
+      let maxSev = -1;
+      let dominant = 'NORMAL';
+      zoneSensors.forEach((s) => {
+        const stat = (s.status || 'NORMAL').toUpperCase();
+        let sev = 0;
+        if (stat === 'CRITICAL') sev = 3;
+        else if (stat === 'WARNING') sev = 2;
+        else if (stat === 'OFFLINE') sev = 1;
+        else sev = 0;
+
+        if (sev > maxSev) {
+          maxSev = sev;
+          dominant = stat;
+        }
+      });
+      map[code] = dominant;
+    });
+    return map;
+  }, [sensors, zones]);
 
   return (
     <group name="station-model-root">
@@ -39,13 +102,24 @@ export const StationModel = ({ station, showLabels = true }) => {
       {/* ------------------------------------------------------------- */}
       {/* 2. SPATIAL STATION FACILITIES (6 Required Modules)            */}
       {/* ------------------------------------------------------------- */}
-      {zones.map((zone) => (
-        <StationZone
-          key={zone.id}
-          zone={zone}
-          showLabels={showLabels}
-        />
-      ))}
+      {zones.map((zone) => {
+        const code = zone.code || zone.id;
+        const status = zoneHealth[code] || 'NORMAL';
+        const meta = ZONE_STATUS_CONFIG[status] || ZONE_STATUS_CONFIG.NORMAL;
+        const isSelectedZone = Boolean(selectedZone && (code === selectedZone));
+        return (
+          <StationZone
+            key={zone.id}
+            zone={zone}
+            showLabels={showLabels}
+            showHeatmap={showHeatmap}
+            zoneStatus={status}
+            statusMeta={meta}
+            isSelectedZone={isSelectedZone}
+            hasSelectedZone={Boolean(selectedZone)}
+          />
+        );
+      })}
 
       {/* ------------------------------------------------------------- */}
       {/* 3. ENCLOSED CONNECTING CORRIDORS                              */}

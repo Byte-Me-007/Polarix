@@ -7,11 +7,17 @@ import { SensorDetailsPanel } from '../digital-twin/SensorDetailsPanel';
 export const DigitalTwin = () => {
   const { config, sensors } = useStationTelemetry();
 
-  const [selectedSensor, setSelectedSensor] = useState(null);
+  const [selectedSensorId, setSelectedSensorId] = useState(null);
   const [showSensors, setShowSensors] = useState(true);
   const [showLabels, setShowLabels] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
+
+  // Dynamically resolve selected sensor to react to telemetry updates & scenario changes
+  const selectedSensor = React.useMemo(() => {
+    if (!selectedSensorId) return null;
+    return sensors.find((s) => s.id === selectedSensorId) || null;
+  }, [selectedSensorId, sensors]);
 
   const stationTitle = config.displayName || `${config.stationId || 'MAITRI'} Research Station`;
   const stationCode = config.shortCode || config.id || 'MTR';
@@ -61,8 +67,14 @@ export const DigitalTwin = () => {
               onClick={() => setShowHeatmap(!showHeatmap)}
               title="Toggle 3D spatial sensor condition heatmap"
             >
-              HEATMAP: {showHeatmap ? 'ON' : 'OFF'}
+              HEATMAP MODE: {showHeatmap ? 'ON' : 'OFF'}
             </button>
+
+            {showHeatmap && (
+              <span className="twin-inspection-badge" title="Roof transparency active for internal spatial condition inspection">
+                INSPECTION MODE
+              </span>
+            )}
 
             <button
               type="button"
@@ -88,7 +100,7 @@ export const DigitalTwin = () => {
             station={config}
             sensors={sensors}
             selectedSensor={selectedSensor}
-            onSelectSensor={setSelectedSensor}
+            onSelectSensor={(sensor) => setSelectedSensorId(sensor ? sensor.id : null)}
             showSensors={showSensors}
             showLabels={showLabels}
             showHeatmap={showHeatmap}
@@ -108,7 +120,7 @@ export const DigitalTwin = () => {
         {selectedSensor && (
           <SensorDetailsPanel
             sensor={selectedSensor}
-            onClose={() => setSelectedSensor(null)}
+            onClose={() => setSelectedSensorId(null)}
           />
         )}
       </section>

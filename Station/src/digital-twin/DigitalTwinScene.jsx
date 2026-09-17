@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { StationModel } from './StationModel';
-import { SensorMarker } from './SensorMarker';
+import { SensorMarker, computeDisplayPos } from './SensorMarker';
 import { SpatialHeatmap } from './SpatialHeatmap';
 
 // Elevated overview framing — full scaled station footprint visible (all 6 zones).
@@ -22,6 +22,7 @@ export const DigitalTwinScene = ({
   resetTrigger = 0
 }) => {
   const controlsRef = useRef();
+  const zones = station?.digitalTwin?.zones || [];
 
   // Reset camera view whenever resetTrigger increments
   useEffect(() => {
@@ -33,17 +34,18 @@ export const DigitalTwinScene = ({
     }
   }, [resetTrigger]);
 
-  // Smooth camera target focus when a sensor is selected
+  // Smooth camera target focus when a sensor is selected (focus on its visible display point)
   useEffect(() => {
     if (controlsRef.current && selectedSensor) {
+      const disp = computeDisplayPos(selectedSensor, zones);
       controlsRef.current.target.set(
-        selectedSensor.x || 0,
-        (selectedSensor.y || 0) + 1.2,
-        selectedSensor.z || 0
+        disp.x,
+        disp.y + 0.5,
+        disp.z
       );
       controlsRef.current.update();
     }
-  }, [selectedSensor]);
+  }, [selectedSensor?.id]);
 
   return (
     <Canvas
@@ -81,14 +83,17 @@ export const DigitalTwinScene = ({
       {/* Main Connected Modular Station Footprint */}
       <StationModel 
         station={station} 
+        sensors={sensors}
         showLabels={showLabels} 
+        showHeatmap={showHeatmap}
+        selectedZone={selectedSensor?.zone}
       />
 
       {/* Spatial Sensor Condition Heatmap Overlay */}
       {showHeatmap && (
         <SpatialHeatmap 
           sensors={sensors} 
-          zones={station?.digitalTwin?.zones || []} 
+          zones={zones} 
         />
       )}
 
@@ -98,6 +103,7 @@ export const DigitalTwinScene = ({
           <SensorMarker
             key={sensor.id}
             sensor={sensor}
+            zones={zones}
             isSelected={selectedSensor?.id === sensor.id}
             onSelect={onSelectSensor}
           />
