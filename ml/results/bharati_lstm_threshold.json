@@ -1,0 +1,20 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "threshold": 0.013215307652775843,
+  "selection_metric": "Validation F1-Score",
+  "selection_method": "Grid search over reconstruction error quantiles & linear space on validation split",
+  "tie_breaker_rule": "1. Higher Recall, 2. Lower False Positive Rate, 3. Lower Threshold",
+  "validation_TP": 184,
+  "validation_TN": 449,
+  "validation_FP": 440,
+  "validation_FN": 108,
+  "validation_accuracy": 0.536,
+  "validation_precision": 0.2949,
+  "validation_recall": 0.6301,
+  "validation_f1": 0.4017,
+  "validation_false_positive_rate": 0.4949,
+  "selected_at_step": "Step 26 - Bharati LSTM Threshold Selection and Evaluation",
+  "synthetic_disclaimer": "Threshold calibrated strictly on synthetic Bharati telemetry validation partition. Not field tuned."
+}

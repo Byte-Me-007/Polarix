@@ -1,0 +1,101 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "synthetic_disclaimer": "All candidate searches and evaluations conducted strictly on synthetic Bharati telemetry.",
+  "selection_criterion": "Maximize Validation F1-Score",
+  "tie_breaker_rule": "1. Higher Recall, 2. Lower False Positive Rate, 3. Lower Threshold",
+  "selected_threshold": 0.013215307652775843,
+  "candidate_count": 600,
+  "validation_metrics_at_selected_threshold": {
+    "TP": 184,
+    "TN": 449,
+    "FP": 440,
+    "FN": 108,
+    "accuracy": 0.536,
+    "precision": 0.2949,
+    "recall": 0.6301,
+    "f1": 0.4017,
+    "false_positive_rate": 0.4949
+  },
+  "alternative_operating_points": {
+    "high_recall_operating_point": {
+      "description": "High sensitivity operating point (Recall >= 90%)",
+      "threshold": 0.0007695466047152,
+      "metrics": {
+        "TP": 292,
+        "TN": 0,
+        "FP": 889,
+        "FN": 0,
+        "precision": 0.2472,
+        "recall": 1.0,
+        "f1": 0.3965,
+        "false_positive_rate": 1.0
+      }
+    },
+    "low_fpr_operating_point": {
+      "description": "Conservative low false-alarm operating point (FPR <= 10%)",
+      "threshold": 1.8749269270357587,
+      "metrics": {
+        "TP": 7,
+        "TN": 802,
+        "FP": 87,
+        "FN": 285,
+        "precision": 0.0745,
+        "recall": 0.024,
+        "f1": 0.0363,
+        "false_positive_rate": 0.0979
+      }
+    },
+    "normal_reconstruction_percentiles": {
+      "P90_normal": {
+        "threshold": 1.8707104682922364,
+        "metrics": {
+          "TP": 7,
+          "TN": 800,
+          "FP": 89,
+          "FN": 285,
+          "total": 1181,
+          "accuracy": 0.6833,
+          "precision": 0.0729,
+          "recall": 0.024,
+          "f1": 0.0361,
+          "false_positive_rate": 0.1001,
+          "threshold": 1.8707
+        }
+      },
+      "P95_normal": {
+        "threshold": 2.711592626571655,
+        "metrics": {
+          "TP": 1,
+          "TN": 844,
+          "FP": 45,
+          "FN": 291,
+          "total": 1181,
+          "accuracy": 0.7155,
+          "precision": 0.0217,
+          "recall": 0.0034,
+          "f1": 0.0059,
+          "false_positive_rate": 0.0506,
+          "threshold": 2.7116
+        }
+      },
+      "P99_normal": {
+        "threshold": 3.5791735363006594,
+        "metrics": {
+          "TP": 0,
+          "TN": 880,
+          "FP": 9,
+          "FN": 292,
+          "total": 1181,
+          "accuracy": 0.7451,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.0101,
+          "threshold": 3.5792
+        }
+      }
+    }
+  }
+}

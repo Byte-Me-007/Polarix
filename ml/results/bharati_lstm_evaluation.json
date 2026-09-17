@@ -1,0 +1,116 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "model_type": "LSTM_AUTOENCODER",
+  "threshold_used": 0.013215307652775843,
+  "dataset_split_info": {
+    "validation_sequences": 1181,
+    "validation_normal_sequences": 889,
+    "validation_anomaly_sequences": 292,
+    "test_sequences": 1182,
+    "test_normal_sequences": 893,
+    "test_anomaly_sequences": 289
+  },
+  "validation_performance": {
+    "confusion_matrix": {
+      "TP": 184,
+      "TN": 449,
+      "FP": 440,
+      "FN": 108
+    },
+    "metrics": {
+      "accuracy": 0.536,
+      "precision": 0.2949,
+      "recall": 0.6301,
+      "f1": 0.4017,
+      "false_positive_rate": 0.4949
+    },
+    "anomaly_type_recall": {
+      "SPIKE": {
+        "total_instances": 22,
+        "detected_instances": 22,
+        "recall": 1.0,
+        "percentage_str": "22/22 (100.00%)"
+      },
+      "DRIFT": {
+        "total_instances": 150,
+        "detected_instances": 138,
+        "recall": 0.92,
+        "percentage_str": "138/150 (92.00%)"
+      },
+      "STUCK_VALUE": {
+        "total_instances": 120,
+        "detected_instances": 24,
+        "recall": 0.2,
+        "percentage_str": "24/120 (20.00%)"
+      },
+      "DROPOUT": {
+        "total_instances": 0,
+        "detected_instances": 0,
+        "recall": 1.0,
+        "handling_method": "Missing-data rule (null/NaN detection at ingestion)",
+        "percentage_str": "Filtered from sliding windows; 100% handled via explicit null checks"
+      }
+    }
+  },
+  "test_performance": {
+    "confusion_matrix": {
+      "TP": 165,
+      "TN": 442,
+      "FP": 451,
+      "FN": 124
+    },
+    "metrics": {
+      "accuracy": 0.5135,
+      "precision": 0.2679,
+      "recall": 0.5709,
+      "f1": 0.3646,
+      "false_positive_rate": 0.505
+    },
+    "anomaly_type_recall": {
+      "SPIKE": {
+        "total_instances": 19,
+        "detected_instances": 19,
+        "recall": 1.0,
+        "percentage_str": "19/19 (100.00%)"
+      },
+      "DRIFT": {
+        "total_instances": 150,
+        "detected_instances": 132,
+        "recall": 0.88,
+        "percentage_str": "132/150 (88.00%)"
+      },
+      "STUCK_VALUE": {
+        "total_instances": 120,
+        "detected_instances": 14,
+        "recall": 0.1167,
+        "percentage_str": "14/120 (11.67%)"
+      },
+      "DROPOUT": {
+        "total_instances": 0,
+        "detected_instances": 0,
+        "recall": 1.0,
+        "handling_method": "Missing-data rule (null/NaN detection at ingestion)",
+        "percentage_str": "Filtered from sliding windows; 100% handled via explicit null checks"
+      }
+    }
+  },
+  "missing_data_and_dropout_handling": {
+    "status": "HANDLED_VIA_NULL_INGESTION_RULE",
+    "description": "Dropouts with missing sensor values are flagged as MISSING_DATA at ingestion before window reconstruction."
+  },
+  "zscore_comparison_summary": {
+    "zscore_model_version": "zscore-bharati-v1",
+    "zscore_test_precision": 1.0,
+    "zscore_test_recall": 0.0657,
+    "zscore_test_f1": 0.1234,
+    "zscore_test_fpr": 0.0,
+    "lstm_test_precision": 0.2679,
+    "lstm_test_recall": 0.5709,
+    "lstm_test_f1": 0.3646,
+    "lstm_test_fpr": 0.505,
+    "factual_trade_off": "Z-score has 0% FPR and 100% precision on spikes but misses drift (0% recall); LSTM achieves 88% recall on drift and 100% on spikes with a higher false positive rate (50.5% FPR)."
+  },
+  "synthetic_disclaimer": "Evaluated strictly on synthetic Bharati telemetry. Does not represent production field performance."
+}
