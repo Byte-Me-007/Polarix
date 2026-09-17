@@ -1,0 +1,99 @@
+{
+  "project": "Polarix",
+  "problem_statement_id": "SIH26060",
+  "station_id": "MTR",
+  "station_name": "Maitri",
+  "owner": "Person C (ML Specialist)",
+  "signoff_status": "MAITRI ML ENGINEERING HANDOFF COMPLETE",
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.017674,
+  "data_status": "Validation uses synthetic telemetry exclusively. No real-world Antarctic telemetry was used or claimed.",
+  "validation_timestamp": "2026-09-18T02:04:00Z",
+  "validation_checks": {
+    "handoff_validation": "9/9 checks PASSED (ml/results/validate_maitri_handoff.py)",
+    "backend_contract_validation": "12/12 checks PASSED (ml/inference/validate_maitri_backend_contract.py)",
+    "performance_validation": "27/27 checks PASSED (ml/inference/validate_maitri_performance.py)",
+    "observability_validation": "12/12 checks PASSED (ml/inference/validate_maitri_observability.py)",
+    "reliability_validation": "10/10 checks PASSED (ml/inference/validate_maitri_inference_reliability.py)",
+    "overall_validation_result": "ALL_PASSED"
+  },
+  "test_suite": {
+    "total_tests_passed": 198,
+    "total_test_modules": 14,
+    "status": "100% PASSED",
+    "command": ".venv/bin/python -m pytest ml/tests -q"
+  },
+  "artifact_integrity": {
+    "status": "VALID",
+    "verified_count": "4/4",
+    "manifest": "ml/models/lstm-ae-v1_manifest.json",
+    "artifacts": [
+      {
+        "role": "model",
+        "file": "ml/models/lstm-ae-v1.pt",
+        "sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+        "size_bytes": 50613
+      },
+      {
+        "role": "config",
+        "file": "ml/models/lstm-ae-v1_config.json",
+        "sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+        "size_bytes": 187
+      },
+      {
+        "role": "scaler",
+        "file": "ml/models/lstm-ae-v1_scaler.json",
+        "sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+        "size_bytes": 657
+      },
+      {
+        "role": "threshold",
+        "file": "ml/results/lstm_threshold.json",
+        "sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+        "size_bytes": 493
+      }
+    ]
+  },
+  "handoff_package": {
+    "manifest": "ml/results/maitri_ml_handoff_manifest.json",
+    "specification": "ml/results/maitri_ml_handoff.md",
+    "validation_runner": "ml/results/validate_maitri_handoff.py",
+    "validation_report": "ml/results/maitri_ml_handoff_validation.json",
+    "test_suite": "ml/tests/test_maitri_handoff.py"
+  },
+  "known_limitations": {
+    "synthetic_data_only": "All evaluation and modeling remain based on synthetic telemetry. No real Antarctic telemetry is assumed or used.",
+    "no_field_claims": "No claim of real-world Antarctic telemetry validation, field deployment readiness, production SLAs, or certified reliability is made.",
+    "false_positive_tradeoff": "The frozen threshold (0.017674) prioritizes spike (100%) and drift (84.67%) recall over false-alarm suppression, resulting in a 48.15% FPR on normal synthetic diurnal fluctuations on the test split.",
+    "stuck_value_detection": "STUCK_VALUE anomalies are not reliably detected by the single-threshold LSTM reconstruction loss alone (5% test recall; short stuck-value scenario evaluated as NORMAL in end-to-end test)."
+  },
+  "scope_boundary": {
+    "person_c_owned": [
+      "Synthetic ML dataset",
+      "Z-score baseline detector",
+      "LSTM Autoencoder model and scalers",
+      "Validation thresholding and calibration",
+      "Anomaly type heuristic classification",
+      "Model registry and SHA-256 integrity verification",
+      "ML inference service and typed contracts",
+      "Backend integration contract adapters",
+      "ML testing, benchmarking, reliability hardening, and observability"
+    ],
+    "person_a_backend_boundary": [
+      "FastAPI web routes and API endpoints",
+      "MQTT telemetry broker ingestion",
+      "WebSocket broadcasting",
+      "SQLite / database models and persistence",
+      "Simulator runner and scenario orchestration"
+    ],
+    "person_b_frontend_boundary": [
+      "React UI and dashboard components",
+      "3D Digital Twin rendering",
+      "ECharts charting and visual widgets",
+      "Client-side rule engine"
+    ]
+  },
+  "git_branch": "Rex",
+  "git_commit": "11847b47f03a8332d450461cd18f61a7f16e73e6",
+  "next_station_status": "Bharati has NOT been started by Person C. Maitri is the completed Person C station scope."
+}
