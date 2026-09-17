@@ -1,18 +1,18 @@
 {
-  "true_positives": 55,
-  "true_negatives": 4511,
-  "false_positives": 25,
-  "false_negatives": 409,
-  "total_samples": 5000,
-  "accuracy": 0.9132,
-  "precision": 0.6875,
-  "recall": 0.1185,
-  "f1_score": 0.2022,
+  "true_positives": 82,
+  "true_negatives": 9303,
+  "false_positives": 59,
+  "false_negatives": 556,
+  "total_samples": 10000,
+  "accuracy": 0.9385,
+  "precision": 0.5816,
+  "recall": 0.1285,
+  "f1_score": 0.2105,
   "confusion_matrix": {
-    "TN": 4511,
-    "FP": 25,
-    "FN": 409,
-    "TP": 55
+    "TN": 9303,
+    "FP": 59,
+    "FN": 556,
+    "TP": 82
   },
   "model": "Rolling Z-Score Baseline",
   "model_version": "zscore-v1",
@@ -23,15 +23,15 @@
     "threshold": 3.0
   },
   "breakdown_by_status": {
-    "NORMAL": 4920,
-    "ANOMALY": 40,
-    "MISSING_DATA": 40
+    "NORMAL": 9859,
+    "ANOMALY": 84,
+    "MISSING_DATA": 57
   },
   "breakdown_by_actual_anomaly_type": {
-    "NORMAL": 4536,
-    "DRIFT": 225,
-    "STUCK_VALUE": 175,
-    "DROPOUT": 40,
-    "SPIKE": 24
+    "NORMAL": 9362,
+    "DRIFT": 300,
+    "STUCK_VALUE": 240,
+    "DROPOUT": 57,
+    "SPIKE": 41
   }
 }

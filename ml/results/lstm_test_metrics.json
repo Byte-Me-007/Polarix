@@ -1,21 +1,36 @@
 {
-  "TP": 0,
-  "TN": 0,
-  "FP": 605,
-  "FN": 0,
-  "total": 605,
-  "accuracy": 0.0,
-  "precision": 0.0,
-  "recall": 0.0,
-  "f1": 0.0,
-  "threshold_used": 0.18453036128394557,
+  "TP": 152,
+  "TN": 463,
+  "FP": 430,
+  "FN": 137,
+  "total": 1182,
+  "accuracy": 0.5203045685279187,
+  "precision": 0.2611683848797251,
+  "recall": 0.5259515570934256,
+  "f1": 0.34902411021814006,
+  "threshold_used": 0.01767403447212987,
   "model_version": "lstm-ae-v1",
-  "test_sample_count": 605,
+  "test_sample_count": 1182,
   "per_anomaly_type": {
+    "DRIFT": {
+      "total_instances": 150,
+      "detected_anomalies": 127,
+      "detection_rate": 0.8467
+    },
     "NORMAL": {
-      "total_instances": 605,
-      "false_alarms": 605,
-      "false_positive_rate": 1.0
+      "total_instances": 893,
+      "false_alarms": 430,
+      "false_positive_rate": 0.4815
+    },
+    "SPIKE": {
+      "total_instances": 19,
+      "detected_anomalies": 19,
+      "detection_rate": 1.0
+    },
+    "STUCK_VALUE": {
+      "total_instances": 120,
+      "detected_anomalies": 6,
+      "detection_rate": 0.05
     }
   }
 }

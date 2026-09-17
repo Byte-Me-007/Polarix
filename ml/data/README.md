@@ -70,32 +70,24 @@ This dataset contains purely **synthetic** multi-sensor telemetry engineered for
 
 ---
 
+## Split Architecture & Stationary Multi-Cycle Diurnal Design
+To ensure fair out-of-sample benchmarking without temporal distribution shifts:
+- **Stationary Diurnal Cycles**: Diurnal periods are configured so that multiple full sinusoidal cycles occur across the series (period = 288 samples). This ensures that Training, Validation, and Test partitions all experience equivalent normal baseline distributions (means and variances).
+- **Training Partition (0% - 70%)**: Pure normal operational telemetry (7,000 samples total) for baseline fitting and unsupervised autoencoder sequence training.
+- **Validation Partition (70% - 85%)**: Balanced partition containing normal telemetry and representative injected anomalies (`SPIKE`, `DRIFT`, `DROPOUT`, `STUCK_VALUE`) for threshold calibration.
+- **Test Partition (85% - 100%)**: Untouched benchmark partition containing normal telemetry and independent injected anomalies (`SPIKE`, `DRIFT`, `DROPOUT`, `STUCK_VALUE`) for out-of-sample evaluation.
+
+---
+
 ## Reproducibility & Generation
 
 The dataset generator uses NumPy's modern `Generator` seeded deterministically.
 
 ### Generate via CLI:
 ```bash
-# Default: 1000 points per sensor (5000 total rows)
+# Default: 2000 points per sensor (10,000 total rows)
 .venv/bin/python ml/data/generate_maitri_dataset.py
 
-# Custom seed and row count:
-.venv/bin/python ml/data/generate_maitri_dataset.py --seed 42 --points-per-sensor 1500 --output ml/data/maitri_synthetic_telemetry.csv
+# Custom configuration:
+.venv/bin/python ml/data/generate_maitri_dataset.py --seed 42 --points-per-sensor 2000 --output ml/data/maitri_synthetic_telemetry.csv
 ```
-
-### CLI Arguments:
-- `--seed`: Integer random seed for full determinism (default: `42`).
-- `--points-per-sensor`: Records per sensor (default: `1000`).
-- `--rows`: Total row count across all 5 sensors.
-- `--output`: Destination CSV file path (default: `ml/data/maitri_synthetic_telemetry.csv`).
-- `--start-time`: ISO-8601 start timestamp (default: `2026-03-01T00:00:00Z`).
-- `--interval-seconds`: Sample step in seconds (default: `60`).
-
----
-
-## Downstream Usage in Polarix ML
-This dataset will serve as the standardized benchmark for Person C's subsequent ML workflows:
-- **Z-Score Statistical Baseline**: Evaluate anomaly detection speed and threshold sensitivity on univariate signals.
-- **LSTM Autoencoder**: Train sequence-to-sequence reconstruction models on normal windows, evaluate reconstruction error against injected anomalies.
-- **Threshold Optimization**: Calibrate threshold curves for optimal Precision, Recall, and F1-score.
-- **Confusion Matrix & Benchmarks**: Formally compare detection latency and false alarm rates.

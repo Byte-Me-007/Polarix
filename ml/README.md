@@ -15,11 +15,21 @@ This module is dedicated to machine learning, telemetry anomaly detection, model
 
 ---
 
+### Dataset Architecture & Generalization Fix (Step 5 Audit)
+During the Step 5 audit of the model evaluation pipeline:
+- **Root Cause Discovered**: The previous synthetic dataset generation mapped 1,000 timestamps across an incomplete fraction of a 24-hour diurnal cycle (period = 1,440 steps), meaning the 70% Train split covered only daytime peaks, while the 15% Test split covered nighttime troughs. Additionally, anomalies had been injected into Train and Val, leaving 0 anomalies in the Test partition.
+- **Scientific Fix Applied**:
+  1. Updated `ml/data/generate_maitri_dataset.py` with multi-cycle stationary diurnal periodicity (`day_period = 288`), ensuring normal means and standard deviations are statistically consistent across Train, Validation, and Test splits.
+  2. Balanced anomaly injection: Training split (0-70%) is kept as 100% pure normal baseline data, while Validation (70-85%) and Test (85-100%) partitions receive balanced, independent distributions of all anomaly types (`SPIKE`, `DRIFT`, `DROPOUT`, `STUCK_VALUE`).
+  3. Total dataset size: 10,000 rows (2,000 per sensor across 5 sensors).
+
+---
+
 ### Implemented Baselines & Models
 
 #### 1. Maitri Synthetic Telemetry Pipeline
 - **Generator**: `ml/data/generate_maitri_dataset.py`
-- **Output**: `ml/data/maitri_synthetic_telemetry.csv` (5,000 rows across 5 sensors)
+- **Output**: `ml/data/maitri_synthetic_telemetry.csv` (10,000 rows across 5 sensors)
 - **Supported Anomaly Types**: `NORMAL`, `SPIKE`, `DRIFT`, `DROPOUT`, `STUCK_VALUE`
 - **Sensors**: `TEMP_001` (°C), `PRESS_001` (hPa), `HUM_001` (%), `VIB_001` (mm/s), `POWER_001` (kW)
 
@@ -29,53 +39,41 @@ This module is dedicated to machine learning, telemetry anomaly detection, model
 - **Methodology**:
   - Independent per-sensor trailing rolling mean and standard deviation.
   - **Leakage Prevention**: Only historical observations up to time $t$ are used; ground truth labels are strictly excluded during scoring.
-  - **Dropout Handling**: Missing telemetry (`NaN`) is explicitly identified and classified as `MISSING_DATA` without numerical distortion or interpolation.
+  - **Dropout Handling**: Missing telemetry (`NaN`) is explicitly identified and classified as `MISSING_DATA`.
   - **Prediction Statuses**: `NORMAL`, `ANOMALY`, `MISSING_DATA`.
-  - **Anomaly Score**: Deterministic absolute Z-score $|z|$.
-  - **Initial Baseline Threshold**: Configurable threshold (default: `3.0`). *Note: This is an initial heuristic baseline threshold and has NOT yet been formally optimized.*
-- **Evaluation Artifacts**:
-  - Predictions: `ml/results/zscore_predictions.csv`
-  - Metrics: `ml/results/zscore_metrics.json`
-  - Visualization: `ml/results/zscore_confusion_matrix.png`
+  - **Performance**:
+    - Accuracy: 93.85%
+    - Precision: 0.5816
+    - Recall: 0.1285
+    - F1-Score: 0.2105
 
 #### 3. Maitri LSTM Autoencoder (`lstm-ae-v1`)
 - **Model Definition**: `ml/training/lstm_autoencoder.py`
 - **Sequence Preparation**: `ml/training/prepare_sequences.py`
 - **Training Pipeline**: `ml/training/train_lstm_autoencoder.py`
-- **Purpose**: Sequence-to-sequence deep learning anomaly detector capturing temporal dependencies, multi-step patterns, and subtle contextual deviations.
 - **Architecture**:
-  - Input dimension: 1 (univariate per sensor)
   - Sequence length: 30 time steps
-  - Encoder LSTM: 32 hidden units
-  - Latent Bottleneck: 16 units
-  - Decoder LSTM: 32 hidden units
-  - Output projection: Linear layer reconstructing 30 time steps
-- **Training Methodology & Leakage Prevention**:
-  - **Chronological Split**: 70% Train, 15% Validation, 15% Test.
-  - **Normal-Only Training**: Autoencoder is trained strictly on 100% normal sequences (`is_anomaly == 0`).
-  - **Sensor-Specific Normalization**: Mean and standard deviation are calculated strictly from NORMAL training records and saved in `ml/models/lstm-ae-v1_scaler.json`.
-  - **Dropout Handling**: Sequences containing missing (`NaN`) values are omitted from model training.
-  - **Reconstruction Error**: Computed as per-sample Mean Squared Error $\text{MSE} = \frac{1}{L} \sum_{t=1}^L (x_t - \hat{x}_t)^2$.
+  - Encoder LSTM: 32 hidden units, Latent Bottleneck: 16 units
+  - Decoder LSTM: 32 hidden units, Linear Output projection
+- **Training**:
+  - Trained on 6,855 pure normal sequences.
+  - Converged with final Training Loss = 0.014019, Best Validation Loss = 0.416389.
 
 #### 4. Validation Threshold Selection & Test Evaluation (`lstm-ae-v1`)
 - **Module**: `ml/training/select_lstm_threshold.py`
-- **Methodology**:
-  - **Validation-Only Tuning**: Optimal threshold selected strictly across validation reconstruction errors via dense quantile and linear candidate grid search.
-  - **Optimization Criterion**: Maximize validation F1-score with deterministic tie-breaking (1. higher recall, 2. higher precision, 3. lower threshold).
-  - **Selected Threshold**: `0.184530` (Validation F1 = 0.5650, Recall = 0.9314, Precision = 0.4055).
-  - **Frozen Test Evaluation**: The exact selected threshold is applied to the untouched test split (15% chronological partition).
-- **Artifacts Saved**:
-  - Threshold Search Grid: `ml/results/lstm_threshold_search.csv`
-  - Validation Threshold Config: `ml/results/lstm_threshold.json`
-  - Test Metrics Summary: `ml/results/lstm_test_metrics.json`
-  - Detailed Test Predictions: `ml/results/lstm_test_predictions.csv`
-  - Distribution Plot: `ml/results/lstm_threshold_evaluation.png`
-
----
-
-### Planned Future ML Work
-- **Benchmarking & Model Comparison**: Head-to-head comparison between `zscore-v1` and `lstm-ae-v1`.
-- **Inference Interface**: Unified real-time/batch inference service.
+- **Threshold Selection**:
+  - Optimized strictly on 1,181 Validation sequences to maximize F1-score.
+  - **Selected Threshold**: `0.017674` (Validation F1 = 0.3972, Recall = 0.5925, Precision = 0.2988).
+- **Frozen Test Evaluation (1,182 Test Sequences)**:
+  - **Precision**: 0.2612
+  - **Recall**: 0.5260
+  - **F1-Score**: 0.3490
+  - **Accuracy**: 52.03%
+  - **Per-Anomaly-Type Breakdown**:
+    - `SPIKE`: 19/19 detected (100.0% recall)
+    - `DRIFT`: 127/150 detected (84.67% recall)
+    - `STUCK_VALUE`: 6/120 detected (5.0% recall)
+    - `NORMAL`: 463/893 correct (FPR = 48.15%)
 
 ---
 

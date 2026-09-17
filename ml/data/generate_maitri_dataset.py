@@ -26,6 +26,7 @@ import pandas as pd
 
 STATION_ID = "MTR"
 DATA_SOURCE = "SYNTHETIC_ML_DATASET"
+DEFAULT_DAY_PERIOD = 288  # Stationary diurnal period in samples
 
 
 @dataclass(frozen=True)
@@ -98,20 +99,19 @@ def generate_normal_telemetry(
     config: MaitriSensorConfig,
     n_points: int,
     rng: np.random.Generator,
-    sample_interval_sec: int = 60,
+    day_period: int = DEFAULT_DAY_PERIOD,
 ) -> np.ndarray:
     """
     Generate smooth, structured normal telemetry for a given sensor config.
 
     Combines:
-    - Diurnal sinusoidal variation (simulating daily thermal/operational cycles)
+    - Diurnal sinusoidal variation across multiple complete cycles
     - Autoregressive smooth drift (AR(1) process for physical inertia)
     - Gaussian sensor measurement noise
     """
     time_steps = np.arange(n_points)
-    day_period = (24 * 3600) / sample_interval_sec
 
-    # Diurnal cycle
+    # Diurnal cycle with complete periodic coverage
     diurnal = config.diurnal_amplitude * np.sin(2 * np.pi * time_steps / day_period)
 
     # Autoregressive smooth variation (AR(1))
@@ -210,37 +210,64 @@ def generate_sensor_series(
     rng: np.random.Generator,
     start_timestamp: pd.Timestamp,
     sample_interval_sec: int = 60,
+    day_period: int = DEFAULT_DAY_PERIOD,
     inject_anomalies: bool = True,
 ) -> pd.DataFrame:
-    """Generate complete telemetry time-series for a single sensor."""
-    values = generate_normal_telemetry(config, n_points, rng, sample_interval_sec)
+    """
+    Generate complete telemetry time-series for a single sensor.
+
+    Anomalies are injected in Validation (70-85%) and Test (85-100%) partitions,
+    keeping Training (0-70%) as pure normal baseline operations.
+    """
+    values = generate_normal_telemetry(config, n_points, rng, day_period=day_period)
     anomaly_types: List[str] = ["NORMAL"] * n_points
     is_anomaly = np.zeros(n_points, dtype=int)
     qualities: List[str] = ["GOOD"] * n_points
 
-    if inject_anomalies and n_points >= 200:
-        # Structured anomaly placement across time windows
-        # 1. Spike at ~15% into the series
-        spike_start = int(n_points * 0.15)
-        spike_dur = int(rng.integers(3, 8))
+    if inject_anomalies and n_points >= 400:
+        # 1. Validation Partition Anomalies (70% - 85% of time series)
+        # Val Spike at ~72%
+        val_spike_start = int(n_points * 0.72)
+        val_spike_dur = int(rng.integers(3, 7))
         spike_mag = config.diurnal_amplitude * 2.5 + config.noise_std * 6.0
-        inject_spike(values, anomaly_types, is_anomaly, qualities, spike_start, spike_dur, spike_mag, positive=True)
+        inject_spike(values, anomaly_types, is_anomaly, qualities, val_spike_start, val_spike_dur, spike_mag, positive=True)
 
-        # 2. Drift at ~35% into the series
-        drift_start = int(n_points * 0.35)
-        drift_dur = int(min(45, max(15, n_points * 0.08)))
-        drift_rate = (config.diurnal_amplitude * 1.5) / drift_dur
-        inject_drift(values, anomaly_types, is_anomaly, qualities, drift_start, drift_dur, drift_rate)
+        # Val Drift at ~75%
+        val_drift_start = int(n_points * 0.75)
+        val_drift_dur = int(min(35, max(15, n_points * 0.015)))
+        drift_rate = (config.diurnal_amplitude * 1.5) / val_drift_dur
+        inject_drift(values, anomaly_types, is_anomaly, qualities, val_drift_start, val_drift_dur, drift_rate)
 
-        # 3. Dropout at ~60% into the series
-        dropout_start = int(n_points * 0.60)
-        dropout_dur = int(rng.integers(5, 12))
-        inject_dropout(values, anomaly_types, is_anomaly, qualities, dropout_start, dropout_dur)
+        # Val Dropout at ~79%
+        val_dropout_start = int(n_points * 0.79)
+        val_dropout_dur = int(rng.integers(4, 9))
+        inject_dropout(values, anomaly_types, is_anomaly, qualities, val_dropout_start, val_dropout_dur)
 
-        # 4. Stuck value at ~80% into the series
-        stuck_start = int(n_points * 0.80)
-        stuck_dur = int(min(35, max(12, n_points * 0.06)))
-        inject_stuck_value(values, anomaly_types, is_anomaly, qualities, stuck_start, stuck_dur)
+        # Val Stuck Value at ~82%
+        val_stuck_start = int(n_points * 0.82)
+        val_stuck_dur = int(min(25, max(12, n_points * 0.012)))
+        inject_stuck_value(values, anomaly_types, is_anomaly, qualities, val_stuck_start, val_stuck_dur)
+
+        # 2. Test Partition Anomalies (85% - 100% of time series)
+        # Test Spike at ~87%
+        test_spike_start = int(n_points * 0.87)
+        test_spike_dur = int(rng.integers(3, 7))
+        inject_spike(values, anomaly_types, is_anomaly, qualities, test_spike_start, test_spike_dur, spike_mag, positive=False)
+
+        # Test Drift at ~90%
+        test_drift_start = int(n_points * 0.90)
+        test_drift_dur = int(min(35, max(15, n_points * 0.015)))
+        inject_drift(values, anomaly_types, is_anomaly, qualities, test_drift_start, test_drift_dur, -drift_rate)
+
+        # Test Dropout at ~94%
+        test_dropout_start = int(n_points * 0.94)
+        test_dropout_dur = int(rng.integers(4, 9))
+        inject_dropout(values, anomaly_types, is_anomaly, qualities, test_dropout_start, test_dropout_dur)
+
+        # Test Stuck Value at ~97%
+        test_stuck_start = int(n_points * 0.97)
+        test_stuck_dur = int(min(25, max(12, n_points * 0.012)))
+        inject_stuck_value(values, anomaly_types, is_anomaly, qualities, test_stuck_start, test_stuck_dur)
 
     timestamps = [
         (start_timestamp + pd.Timedelta(seconds=i * sample_interval_sec)).isoformat()
@@ -265,9 +292,10 @@ def generate_sensor_series(
 
 def generate_maitri_dataset(
     seed: int = 42,
-    points_per_sensor: int = 1000,
+    points_per_sensor: int = 2000,
     start_time: str = "2026-03-01T00:00:00Z",
     sample_interval_sec: int = 60,
+    day_period: int = DEFAULT_DAY_PERIOD,
     inject_anomalies: bool = True,
 ) -> pd.DataFrame:
     """
@@ -278,11 +306,13 @@ def generate_maitri_dataset(
     seed : int
         Random seed for full reproducibility.
     points_per_sensor : int
-        Number of timestamps per sensor (total rows = points_per_sensor * len(sensors)).
+        Number of timestamps per sensor (default: 2000, total rows = 10,000 across 5 sensors).
     start_time : str
         ISO-8601 start timestamp.
     sample_interval_sec : int
         Sampling interval in seconds (default: 60s).
+    day_period : int
+        Stationary diurnal cycle period in samples.
     inject_anomalies : bool
         Whether to inject synthetic anomaly windows.
 
@@ -303,6 +333,7 @@ def generate_maitri_dataset(
             rng=sensor_rng,
             start_timestamp=start_dt,
             sample_interval_sec=sample_interval_sec,
+            day_period=day_period,
             inject_anomalies=inject_anomalies,
         )
         sensor_dfs.append(df_sensor)
@@ -327,8 +358,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--points-per-sensor",
         type=int,
-        default=1000,
-        help="Number of sequential records per sensor (default: 1000, total rows = 5000).",
+        default=2000,
+        help="Number of sequential records per sensor (default: 2000, total rows = 10000).",
     )
     parser.add_argument(
         "--rows",
@@ -354,6 +385,12 @@ def parse_args() -> argparse.Namespace:
         default=60,
         help="Interval between successive samples in seconds (default: 60).",
     )
+    parser.add_argument(
+        "--day-period",
+        type=int,
+        default=DEFAULT_DAY_PERIOD,
+        help=f"Diurnal period in samples (default: {DEFAULT_DAY_PERIOD}).",
+    )
     return parser.parse_args()
 
 
@@ -373,6 +410,7 @@ def main() -> None:
         points_per_sensor=points_per_sensor,
         start_time=args.start_time,
         sample_interval_sec=args.interval_seconds,
+        day_period=args.day_period,
         inject_anomalies=True,
     )
 
