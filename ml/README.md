@@ -495,14 +495,73 @@ A deterministic, offline inference latency and throughput benchmark harness is i
 
 ---
 
+### Maitri ML Backend Integration Contract
+
+A standardized JSON ingestion and emission contract adapter is established in `ml/inference/maitri_backend_contract.py` and validated via `ml/inference/validate_maitri_backend_contract.py` and `ml/tests/test_maitri_backend_contract.py`. This layer guarantees seamless data exchange between Person A's backend (FastAPI/MQTT/WebSockets) and Person C's ML anomaly detection service.
+
+> **Ownership & Scope Notice:** Person A owns FastAPI endpoints, WebSocket broadcasting, MQTT ingestion, and database storage. Person C owns the ML-side contract adaptation and validation. This module defines and proves contract compatibility without implementing backend web infrastructure.
+
+#### 1. Ingestion Contract (Backend → ML Service)
+Backend ingestion accepts standardized JSON telemetry dictionaries conforming to:
+```json
+{
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "timestamp": "2026-09-17T10:30:00Z",
+  "value": -34.5,
+  "unit": "C",
+  "quality": "GOOD",
+  "source": "SIMULATOR"
+}
+```
+
+#### 2. Emission Contract (ML Service → Backend)
+The ML pipeline emits structured, JSON-serializable dictionaries:
+```json
+{
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "timestamp": "2026-09-17T10:30:00Z",
+  "value": -34.5,
+  "unit": "C",
+  "quality": "GOOD",
+  "source": "SIMULATOR",
+  "anomaly_score": 0.002824,
+  "anomaly_status": "NORMAL",
+  "anomaly_type": "NORMAL",
+  "model_version": "lstm-ae-v1"
+}
+```
+
+#### 3. Adapter Flow & Responsibilities
+```text
+Backend JSON Dict / String
+        ↓
+  adapt_backend_input() → TelemetryInput (Schema & Station/Sensor Validation)
+        ↓
+  MaitriMLService.process_telemetry() (30-Step LSTM-AE Inference)
+        ↓
+  TelemetryInferenceOutput (Typed Contract & Diagnostics)
+        ↓
+  adapt_backend_output() → Backend JSON Response (Sanitized, Finite Floats)
+```
+
+#### 4. Backend Compatibility Guarantees
+- **Station & Sensor Enforcement**: Strictly validates `station_id == "MTR"` and sensor IDs against the 5 supported Maitri telemetry streams (`TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`).
+- **Metadata Preservation**: Pass-through preservation of original `unit`, `quality`, `source`, and `timestamp` fields.
+- **Finite Float Safety**: Enforces that all output numbers (`value`, `anomaly_score`) are valid finite numbers or `null`, eliminating invalid JSON token errors (no `NaN` or `Infinity`).
+- **Standard Vocabulary**: Status vocabulary is strictly `NORMAL`, `ANOMALY`, `INSUFFICIENT_DATA`, or `MISSING_DATA`.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), calibration analysis (`analyze_lstm_calibration.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference diagnostics (`inference_diagnostics.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), performance benchmark (`benchmark_maitri_inference.py`), performance validation harness (`validate_maitri_performance.py`), observability validation script (`validate_maitri_observability.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
+- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), backend integration contract (`maitri_backend_contract.py`), inference diagnostics (`inference_diagnostics.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), backend contract validation (`validate_maitri_backend_contract.py`), performance benchmark (`benchmark_maitri_inference.py`), performance validation harness (`validate_maitri_performance.py`), observability validation script (`validate_maitri_observability.py`), reliability validation script (`validate_maitri_inference_reliability.py`), pipeline validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_maitri_performance.py`, `test_maitri_observability.py`, `test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), performance reports (`maitri_inference_performance.json`, `maitri_inference_performance.csv`), observability report (`maitri_observability_validation.json`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+- `ml/tests/`: Pytest test suite (`test_maitri_backend_contract.py`, `test_maitri_performance.py`, `test_maitri_observability.py`, `test_maitri_inference_reliability.py`, `test_lstm_calibration_analysis.py`, `test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), calibration reports (`maitri_lstm_calibration_analysis.json`, `maitri_lstm_operating_points.csv`), backend contract report (`maitri_backend_contract_validation.json`), performance reports (`maitri_inference_performance.json`, `maitri_inference_performance.csv`), observability report (`maitri_observability_validation.json`), reliability report (`maitri_inference_reliability.json`), calibration plots, end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
 
 
 
