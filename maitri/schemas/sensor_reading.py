@@ -18,3 +18,8 @@ class SensorReadingResponse(SensorReadingBase):
     recorded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SensorIngestRequest(BaseModel):
+    payload: str
+
