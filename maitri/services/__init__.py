@@ -11,6 +11,7 @@ from maitri.services.sensor_service import (
     create_sensor_reading,
     list_sensor_readings,
 )
+from maitri.services.websocket_manager import ConnectionManager, manager
 
 __all__ = [
     "create_device",
@@ -20,5 +21,8 @@ __all__ = [
     "create_sensor_reading",
     "list_sensor_readings",
     "parse_sensor_message",
+    "ConnectionManager",
+    "manager",
 ]
+
 

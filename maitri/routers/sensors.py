@@ -12,6 +12,7 @@ from maitri.services.sensor_service import (
     create_sensor_reading,
     list_sensor_readings,
 )
+from maitri.services.websocket_manager import manager
 
 router = APIRouter(prefix="/sensor-readings", tags=["sensor-readings"])
 
@@ -26,7 +27,7 @@ def record_sensor_reading(
 
 
 @router.post("/ingest", response_model=SensorReadingResponse)
-def ingest_sensor_reading(
+async def ingest_sensor_reading(
     request: SensorIngestRequest, db: Session = Depends(get_db)
 ):
     try:
@@ -36,7 +37,20 @@ def ingest_sensor_reading(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
         ) from exc
-    return create_sensor_reading(db, parsed_reading)
+    stored_reading = create_sensor_reading(db, parsed_reading)
+    await manager.broadcast_json(
+        {
+            "type": "sensor_reading",
+            "data": {
+                "device_id": stored_reading.device_id,
+                "metric": stored_reading.metric,
+                "value": stored_reading.value,
+                "unit": stored_reading.unit,
+            },
+        }
+    )
+    return stored_reading
+
 
 
 @router.get("/", response_model=list[SensorReadingResponse])

@@ -1,5 +1,6 @@
 """Maitri Routers Package."""
 
-from maitri.routers import devices, health, sensors
+from maitri.routers import devices, health, sensors, websocket
 
-__all__ = ["devices", "health", "sensors"]
+__all__ = ["devices", "health", "sensors", "websocket"]
+
