@@ -1,0 +1,71 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "frozen_threshold": 0.013215307652775843,
+  "sequence_length": 30,
+  "supported_sensors": [
+    "BRT_HUM_001",
+    "BRT_POWER_001",
+    "BRT_PRESS_001",
+    "BRT_TEMP_001",
+    "BRT_VIB_001"
+  ],
+  "synthetic_disclaimer": "Inference service validated strictly on synthetic telemetry schemas and test vectors. No real Antarctic telemetry used.",
+  "sample_cases": {
+    "insufficient_data": {
+      "station_id": "BRT",
+      "sensor_id": "BRT_TEMP_001",
+      "timestamp": "2026-03-01T00:00:00Z",
+      "value": -12.0,
+      "unit": "\u00b0C",
+      "quality": "GOOD",
+      "source": "SIMULATOR",
+      "anomaly_score": null,
+      "anomaly_status": "INSUFFICIENT_DATA",
+      "model_version": "lstm-ae-bharati-v1"
+    },
+    "normal_inference": {
+      "station_id": "BRT",
+      "sensor_id": "BRT_TEMP_001",
+      "timestamp": "2026-03-01T00:29:00Z",
+      "value": -12.0,
+      "unit": "\u00b0C",
+      "quality": "GOOD",
+      "source": "SIMULATOR",
+      "anomaly_score": 0.0010159513913094997,
+      "anomaly_status": "NORMAL",
+      "model_version": "lstm-ae-bharati-v1"
+    },
+    "anomaly_inference": {
+      "station_id": "BRT",
+      "sensor_id": "BRT_TEMP_001",
+      "timestamp": "2026-03-01T00:30:00Z",
+      "value": 50.0,
+      "unit": "\u00b0C",
+      "quality": "GOOD",
+      "source": "SIMULATOR",
+      "anomaly_score": 19.702434539794922,
+      "anomaly_status": "ANOMALY",
+      "model_version": "lstm-ae-bharati-v1"
+    },
+    "missing_data": {
+      "station_id": "BRT",
+      "sensor_id": "BRT_TEMP_001",
+      "timestamp": "2026-03-01T00:31:00Z",
+      "value": null,
+      "unit": "\u00b0C",
+      "quality": "MISSING",
+      "source": "SIMULATOR",
+      "anomaly_score": null,
+      "anomaly_status": "MISSING_DATA",
+      "model_version": "lstm-ae-bharati-v1"
+    },
+    "buffer_length_after_missing": 0
+  },
+  "validation_rejection_examples": {
+    "unsupported_station": "Unsupported station 'INVALID'. Supported stations: ['BRT']",
+    "unsupported_sensor": "Unsupported sensor 'UNKNOWN_001' for station 'BRT'. Supported sensors: ['BRT_HUM_001', 'BRT_POWER_001', 'BRT_PRESS_001', 'BRT_TEMP_001', 'BRT_VIB_001']"
+  },
+  "verification_status": "PASS"
+}
