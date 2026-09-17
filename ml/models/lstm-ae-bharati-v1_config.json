@@ -1,0 +1,11 @@
+{
+  "station_id": "BRT",
+  "input_size": 1,
+  "seq_len": 30,
+  "encoder_hidden_size": 32,
+  "latent_size": 16,
+  "decoder_hidden_size": 32,
+  "num_layers": 1,
+  "dropout": 0.0,
+  "model_version": "lstm-ae-bharati-v1"
+}

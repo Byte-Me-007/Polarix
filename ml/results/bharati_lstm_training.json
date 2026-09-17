@@ -1,0 +1,65 @@
+{
+  "project": "Polarix",
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "model_type": "LSTM_AUTOENCODER",
+  "training_data": {
+    "source_dataset": "ml/data/bharati_synthetic_telemetry.csv",
+    "synthetic_disclaimer": "All training performed strictly on synthetic telemetry. No real Antarctic telemetry used.",
+    "total_dataset_rows": 10000,
+    "sensor_count": 5,
+    "normal_training_records": 7000,
+    "train_sequences_count": 6855,
+    "val_sequences_count": 1181,
+    "test_sequences_count": 1182,
+    "normal_only_training": true
+  },
+  "hyperparameters": {
+    "seq_len": 30,
+    "input_size": 1,
+    "encoder_hidden_size": 32,
+    "latent_size": 16,
+    "decoder_hidden_size": 32,
+    "num_layers": 1,
+    "dropout": 0.0,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "loss_function": "MSELoss",
+    "seed": 42,
+    "max_epochs": 30,
+    "early_stopping_patience": 7
+  },
+  "training_results": {
+    "epochs_completed": 30,
+    "best_epoch": 30,
+    "best_val_loss": 0.40556035572339627,
+    "final_train_loss": 0.012275420947178362,
+    "final_val_loss": 0.40556035572339627,
+    "train_val_loss_observation": "Validation loss reflects mixed normal and injected anomaly sequences in the validation split.",
+    "total_trainable_parameters": 11441,
+    "threshold_status": "THRESHOLD_NOT_SELECTED_YET"
+  },
+  "artifacts": {
+    "model": {
+      "file": "ml/models/lstm-ae-bharati-v1.pt",
+      "sha256": "412b6cb782c533db6d6024b86f2cfe709e1485f888099b429d4c8a2a8bf6111a",
+      "size_bytes": 50757
+    },
+    "config": {
+      "file": "ml/models/lstm-ae-bharati-v1_config.json",
+      "sha256": "16614a022b6508863d8476eb65d9e695cd0ceed118c142be8e740bbdf9ab3ad7",
+      "size_bytes": 218
+    },
+    "scaler": {
+      "file": "ml/models/lstm-ae-bharati-v1_scaler.json",
+      "sha256": "b9c1d1077912743c0bd0f7046e7a9c52fd646f2e4a9c7f85773629939ef70899",
+      "size_bytes": 691
+    }
+  },
+  "file_references": {
+    "history_file": "ml/results/bharati_lstm_training_history.json",
+    "errors_file": "ml/results/bharati_lstm_reconstruction_errors.csv"
+  }
+}
