@@ -67,7 +67,7 @@ def run_inference_demo(
                 "input_value": float(row["value"]),
                 "quality": "GOOD",
                 "ground_truth_anomaly": int(row["is_anomaly"]),
-                "result": res,
+                "result": res.to_dict(),
             }
         )
         if (idx + 1) in [1, 15, 29, 30, 31, 32]:
@@ -89,7 +89,7 @@ def run_inference_demo(
             "input_value": None,
             "quality": "MISSING",
             "ground_truth_anomaly": 1,
-            "result": res_missing,
+            "result": res_missing.to_dict(),
         }
     )
     print(f"  Step 33 | Val:    None | Status: {res_missing['anomaly_status']:17s} | Score: {res_missing['anomaly_score']}")
@@ -119,7 +119,7 @@ def run_inference_demo(
                 "quality": "GOOD",
                 "ground_truth_anomaly": 1,
                 "ground_truth_type": "SPIKE",
-                "result": res_spike,
+                "result": res_spike.to_dict(),
             }
         )
         score_val = f"{res_spike['anomaly_score']:.6f}" if res_spike['anomaly_score'] is not None else "None"

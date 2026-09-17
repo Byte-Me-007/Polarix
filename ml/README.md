@@ -148,11 +148,62 @@ A head-to-head comparison was conducted between the Rolling Z-Score baseline (`z
 
 ---
 
+### ML Integration Contract
+
+A stable, typed interface is defined in `ml/inference/inference_contract.py` for Person A (Backend) to stream telemetry into the ML inference engine without coupling to internal PyTorch mechanics.
+
+> **Backend Independence**: The ML inference contract relies strictly on standard library dataclasses and JSON structures. It does not depend on FastAPI, MQTT, or backend databases and is fully prepared for backend integration.
+
+#### 1. Input Contract Schema (`TelemetryInput`)
+```json
+{
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "timestamp": "2026-09-17T10:30:00Z",
+  "value": -34.5,
+  "unit": "C",
+  "quality": "GOOD",
+  "source": "SIMULATOR"
+}
+```
+
+#### 2. Output Contract Schema (`TelemetryInferenceOutput`)
+```json
+{
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "timestamp": "2026-09-17T10:30:00Z",
+  "value": -34.5,
+  "unit": "C",
+  "quality": "GOOD",
+  "source": "SIMULATOR",
+  "anomaly_score": 0.0215,
+  "anomaly_status": "ANOMALY",
+  "model_version": "lstm-ae-v1"
+}
+```
+
+#### 3. Supported Scope & Validation
+- **Supported Station**: `MTR` (Maitri only). Non-Maitri stations raise `UnsupportedStationError`.
+- **Supported Sensors**: `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`. Unsupported sensors raise `UnsupportedSensorError`.
+
+#### 4. Operational Inference Statuses
+- **`INSUFFICIENT_DATA`**: The sliding history window has fewer than 30 consecutive observations. `anomaly_score` is `null`.
+- **`NORMAL`**: 30-step window reconstruction error $\le 0.017674$. `anomaly_score` contains the raw MSE reconstruction error.
+- **`ANOMALY`**: 30-step window reconstruction error $> 0.017674$. `anomaly_score` contains the raw MSE reconstruction error.
+- **`MISSING_DATA`**: Incoming telemetry has `value = null`, `NaN`, or `quality != "GOOD"`. `anomaly_score` is `null`, and the sensor's rolling buffer is reset to avoid contaminated windows.
+
+#### 5. Reconstruction Error Scoring
+- `anomaly_score` represents the exact Mean Squared Error (MSE) between the normalized input sequence and the autoencoder reconstruction.
+- Scores are raw reconstruction errors, NOT probabilities or percentages, preserving physical interpretability against the validated threshold (`0.017674`).
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and model comparison (`compare_models.py`).
-- `ml/inference/`: Production inference service (`lstm_inference.py`) and streaming demo (`run_maitri_inference_demo.py`).
+- `ml/inference/`: Production inference service (`lstm_inference.py`), typed integration contracts (`inference_contract.py`), contract demo (`run_maitri_contract_demo.py`), and streaming demo (`run_maitri_inference_demo.py`).
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite.
-- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), and visualization figures (`maitri_model_f1_comparison.png`, `maitri_model_confusion_matrices.png`, `maitri_anomaly_type_detection.png`).
+- `ml/tests/`: Pytest test suite (`test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`, `maitri_model_comparison.csv`), visualization figures, and contract examples (`maitri_inference_contract_example.json`).

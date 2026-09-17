@@ -113,7 +113,9 @@ def test_sensor_history_isolation(inference_engine):
 
 
 def test_station_history_isolation(inference_engine):
-    """Verify streams for different stations never mix."""
+    """Verify streams for unsupported stations are rejected and isolated."""
+    from ml.inference.inference_contract import UnsupportedStationError
+
     inference_engine.reset_history()
 
     for i in range(29):
@@ -124,13 +126,13 @@ def test_station_history_isolation(inference_engine):
             value=0.85,
         )
 
-    res_other = inference_engine.infer_observation(
-        station_id="OTHER_STATION",
-        sensor_id="VIB_001",
-        timestamp="2026-03-01T00:00:00Z",
-        value=0.85,
-    )
-    assert res_other["anomaly_status"] == "INSUFFICIENT_DATA"
+    with pytest.raises(UnsupportedStationError):
+        inference_engine.infer_observation(
+            station_id="OTHER_STATION",
+            sensor_id="VIB_001",
+            timestamp="2026-03-01T00:00:00Z",
+            value=0.85,
+        )
 
 
 def test_missing_data_and_bad_quality(inference_engine):

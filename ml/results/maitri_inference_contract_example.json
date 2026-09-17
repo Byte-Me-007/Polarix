@@ -1,0 +1,108 @@
+{
+  "description": "Representative Polarix ML Inference Contract Outputs for Maitri Station",
+  "station_id": "MTR",
+  "supported_sensors": [
+    "TEMP_001",
+    "PRESS_001",
+    "HUM_001",
+    "VIB_001",
+    "POWER_001"
+  ],
+  "model_version": "lstm-ae-v1",
+  "reconstruction_threshold": 0.017674,
+  "note": "Synthetic telemetry only; no real Antarctic data is claimed or used.",
+  "examples": {
+    "INSUFFICIENT_DATA": {
+      "input": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-09-17T10:01:00Z",
+        "value": -34.5,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR"
+      },
+      "output": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-09-17T10:01:00Z",
+        "value": -34.5,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    "NORMAL": {
+      "input": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:29:00+00:00",
+        "value": -12.300630089468145,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR"
+      },
+      "output": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:29:00+00:00",
+        "value": -12.300630089468145,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR",
+        "anomaly_score": 0.002824,
+        "anomaly_status": "NORMAL",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    "ANOMALY": {
+      "input": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-02T00:00:00+00:00",
+        "value": -1.5228548758087117,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR"
+      },
+      "output": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-02T00:00:00+00:00",
+        "value": -1.5228548758087117,
+        "unit": "C",
+        "quality": "GOOD",
+        "source": "SIMULATOR",
+        "anomaly_score": 0.530778,
+        "anomaly_status": "ANOMALY",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    "MISSING_DATA": {
+      "input": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-09-17T10:35:00Z",
+        "value": null,
+        "unit": "C",
+        "quality": "BAD",
+        "source": "SIMULATOR"
+      },
+      "output": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-09-17T10:35:00Z",
+        "value": null,
+        "unit": "C",
+        "quality": "BAD",
+        "source": "SIMULATOR",
+        "anomaly_score": null,
+        "anomaly_status": "MISSING_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    }
+  }
+}

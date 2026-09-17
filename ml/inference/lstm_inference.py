@@ -3,6 +3,7 @@ Production-Oriented ML Inference Layer for Polarix Maitri LSTM Autoencoder (SIH2
 
 Features:
 - Single-point and sliding window inference interface for backend integration.
+- Strictly validated typed data contracts (TelemetryInput -> TelemetryInferenceOutput).
 - Independent, isolated rolling history buffers per (station_id, sensor_id).
 - Strict handling of streaming states:
   - INSUFFICIENT_DATA: History has < 30 observations.
@@ -10,6 +11,7 @@ Features:
   - NORMAL / ANOMALY: Evaluated against frozen persisted threshold.
 - Loads pre-trained model weights, configuration, scalers, and validation threshold once.
 - Strictly deterministic, zero online retraining.
+- Free of any FastAPI or external web framework dependency.
 """
 
 from __future__ import annotations
@@ -28,6 +30,17 @@ if str(REPO_ROOT) not in sys.path:
 import numpy as np
 import torch
 
+from ml.inference.inference_contract import (
+    DEFAULT_MODEL_VERSION,
+    SUPPORTED_SENSORS,
+    SUPPORTED_STATIONS,
+    VALID_STATUSES,
+    InvalidContractError,
+    TelemetryInput,
+    TelemetryInferenceOutput,
+    UnsupportedSensorError,
+    UnsupportedStationError,
+)
 from ml.training.lstm_autoencoder import (
     MODEL_VERSION,
     LSTMAutoencoder,
@@ -39,8 +52,6 @@ DEFAULT_MODEL_PATH = "ml/models/lstm-ae-v1.pt"
 DEFAULT_CONFIG_PATH = "ml/models/lstm-ae-v1_config.json"
 DEFAULT_SCALER_PATH = "ml/models/lstm-ae-v1_scaler.json"
 DEFAULT_THRESHOLD_PATH = "ml/results/lstm_threshold.json"
-
-VALID_STATUSES = ["NORMAL", "ANOMALY", "INSUFFICIENT_DATA", "MISSING_DATA"]
 
 
 class LSTMAutoencoderInference:
@@ -114,6 +125,86 @@ class LSTMAutoencoderInference:
         else:
             self._buffers.clear()
 
+    def infer_telemetry(
+        self, telemetry: Union[TelemetryInput, Dict[str, Any]]
+    ) -> TelemetryInferenceOutput:
+        """
+        Process a structured TelemetryInput observation and return a typed TelemetryInferenceOutput contract.
+        """
+        if isinstance(telemetry, dict):
+            input_obj = TelemetryInput.from_dict(telemetry)
+        elif isinstance(telemetry, TelemetryInput):
+            input_obj = telemetry
+        else:
+            raise InvalidContractError(
+                f"Expected TelemetryInput or dict, got {type(telemetry).__name__}"
+            )
+
+        if input_obj.station_id not in SUPPORTED_STATIONS:
+            raise UnsupportedStationError(
+                f"Unsupported station '{input_obj.station_id}'. Supported stations: {sorted(SUPPORTED_STATIONS)}"
+            )
+        if input_obj.sensor_id not in SUPPORTED_SENSORS:
+            raise UnsupportedSensorError(
+                f"Unsupported sensor '{input_obj.sensor_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
+            )
+
+        buffer = self._get_buffer(input_obj.station_id, input_obj.sensor_id)
+
+        # Handle Missing or Bad-Quality Telemetry
+        if (
+            input_obj.value is None
+            or (isinstance(input_obj.value, (int, float)) and np.isnan(input_obj.value))
+            or input_obj.quality != "GOOD"
+        ):
+            buffer.clear()
+            return TelemetryInferenceOutput(
+                station_id=input_obj.station_id,
+                sensor_id=input_obj.sensor_id,
+                timestamp=input_obj.timestamp,
+                value=input_obj.value,
+                unit=input_obj.unit,
+                quality=input_obj.quality,
+                source=input_obj.source,
+                anomaly_score=None,
+                anomaly_status="MISSING_DATA",
+                model_version=self.model_version,
+            )
+
+        float_val = float(input_obj.value)
+        buffer.append(float_val)
+
+        # Handle Insufficient Observations (< seq_len)
+        if len(buffer) < self.config.seq_len:
+            return TelemetryInferenceOutput(
+                station_id=input_obj.station_id,
+                sensor_id=input_obj.sensor_id,
+                timestamp=input_obj.timestamp,
+                value=input_obj.value,
+                unit=input_obj.unit,
+                quality=input_obj.quality,
+                source=input_obj.source,
+                anomaly_score=None,
+                anomaly_status="INSUFFICIENT_DATA",
+                model_version=self.model_version,
+            )
+
+        # Full Sequence Available
+        window_arr = np.array(buffer, dtype=np.float32)
+        score, status = self._score_window_array(input_obj.sensor_id, window_arr)
+        return TelemetryInferenceOutput(
+            station_id=input_obj.station_id,
+            sensor_id=input_obj.sensor_id,
+            timestamp=input_obj.timestamp,
+            value=input_obj.value,
+            unit=input_obj.unit,
+            quality=input_obj.quality,
+            source=input_obj.source,
+            anomaly_score=score,
+            anomaly_status=status,
+            model_version=self.model_version,
+        )
+
     def infer_observation(
         self,
         station_id: str,
@@ -121,63 +212,23 @@ class LSTMAutoencoderInference:
         timestamp: str,
         value: Optional[float],
         quality: str = "GOOD",
-    ) -> Dict[str, Any]:
+        unit: Optional[str] = None,
+        source: Optional[str] = "SIMULATOR",
+    ) -> TelemetryInferenceOutput:
         """
-        Stream a single telemetry record and return real-time anomaly inference.
-
-        Parameters:
-        -----------
-        station_id : str
-            e.g. 'MTR'
-        sensor_id : str
-            e.g. 'TEMP_001'
-        timestamp : str
-            ISO-8601 formatted timestamp
-        value : Optional[float]
-            Observed sensor measurement value or None
-        quality : str
-            Telemetry quality flag ('GOOD', 'BAD', 'MISSING', etc.)
-
-        Returns:
-        --------
-        Dict[str, Any]: Standardized anomaly response contract.
+        Stream a single telemetry record and return real-time anomaly inference contract.
+        Backwards-compatible convenience wrapper around infer_telemetry.
         """
-        buffer = self._get_buffer(station_id, sensor_id)
-
-        # Handle Missing or Bad-Quality Telemetry
-        if (
-            value is None
-            or (isinstance(value, (int, float)) and np.isnan(value))
-            or quality != "GOOD"
-        ):
-            # Clear buffer on corrupted/missing observation to prevent contaminated sequence construction
-            buffer.clear()
-            return {
-                "station_id": station_id,
-                "sensor_id": sensor_id,
-                "timestamp": timestamp,
-                "anomaly_score": None,
-                "anomaly_status": "MISSING_DATA",
-                "model_version": self.model_version,
-            }
-
-        float_val = float(value)
-        buffer.append(float_val)
-
-        # Handle Insufficient Observations (< seq_len)
-        if len(buffer) < self.config.seq_len:
-            return {
-                "station_id": station_id,
-                "sensor_id": sensor_id,
-                "timestamp": timestamp,
-                "anomaly_score": None,
-                "anomaly_status": "INSUFFICIENT_DATA",
-                "model_version": self.model_version,
-            }
-
-        # Full Sequence Available (len == seq_len)
-        window_arr = np.array(buffer, dtype=np.float32)
-        return self._evaluate_window(station_id, sensor_id, timestamp, window_arr)
+        telemetry = TelemetryInput(
+            station_id=station_id,
+            sensor_id=sensor_id,
+            timestamp=timestamp,
+            value=value,
+            unit=unit,
+            quality=quality,
+            source=source,
+        )
+        return self.infer_telemetry(telemetry)
 
     def infer_window(
         self,
@@ -185,58 +236,73 @@ class LSTMAutoencoderInference:
         sensor_id: str,
         timestamp: str,
         window_values: List[float],
-    ) -> Dict[str, Any]:
+        unit: Optional[str] = None,
+        quality: str = "GOOD",
+        source: Optional[str] = "SIMULATOR",
+    ) -> TelemetryInferenceOutput:
         """
         Stateless inference on an explicit sequence of observations.
-
-        Parameters:
-        -----------
-        station_id : str
-            e.g. 'MTR'
-        sensor_id : str
-            e.g. 'TEMP_001'
-        timestamp : str
-            Timestamp corresponding to the end of the window.
-        window_values : List[float]
-            List of numerical observations.
-
-        Returns:
-        --------
-        Dict[str, Any]: Standardized anomaly response contract.
         """
+        if station_id not in SUPPORTED_STATIONS:
+            raise UnsupportedStationError(
+                f"Unsupported station '{station_id}'. Supported stations: {sorted(SUPPORTED_STATIONS)}"
+            )
+        if sensor_id not in SUPPORTED_SENSORS:
+            raise UnsupportedSensorError(
+                f"Unsupported sensor '{sensor_id}'. Supported sensors: {sorted(SUPPORTED_SENSORS)}"
+            )
+
         if len(window_values) != self.config.seq_len:
-            return {
-                "station_id": station_id,
-                "sensor_id": sensor_id,
-                "timestamp": timestamp,
-                "anomaly_score": None,
-                "anomaly_status": "INSUFFICIENT_DATA",
-                "model_version": self.model_version,
-            }
+            return TelemetryInferenceOutput(
+                station_id=station_id,
+                sensor_id=sensor_id,
+                timestamp=timestamp,
+                value=window_values[-1] if window_values else None,
+                unit=unit,
+                quality=quality,
+                source=source,
+                anomaly_score=None,
+                anomaly_status="INSUFFICIENT_DATA",
+                model_version=self.model_version,
+            )
 
         arr = np.array(window_values, dtype=np.float32)
         if np.isnan(arr).any():
-            return {
-                "station_id": station_id,
-                "sensor_id": sensor_id,
-                "timestamp": timestamp,
-                "anomaly_score": None,
-                "anomaly_status": "MISSING_DATA",
-                "model_version": self.model_version,
-            }
+            return TelemetryInferenceOutput(
+                station_id=station_id,
+                sensor_id=sensor_id,
+                timestamp=timestamp,
+                value=window_values[-1] if window_values else None,
+                unit=unit,
+                quality=quality,
+                source=source,
+                anomaly_score=None,
+                anomaly_status="MISSING_DATA",
+                model_version=self.model_version,
+            )
 
-        return self._evaluate_window(station_id, sensor_id, timestamp, arr)
+        score, status = self._score_window_array(sensor_id, arr)
+        return TelemetryInferenceOutput(
+            station_id=station_id,
+            sensor_id=sensor_id,
+            timestamp=timestamp,
+            value=float(window_values[-1]),
+            unit=unit,
+            quality=quality,
+            source=source,
+            anomaly_score=score,
+            anomaly_status=status,
+            model_version=self.model_version,
+        )
 
-    def _evaluate_window(
+    def _score_window_array(
         self,
-        station_id: str,
         sensor_id: str,
-        timestamp: str,
         window_arr: np.ndarray,
-    ) -> Dict[str, Any]:
-        """Normalize, execute model forward pass, and score against threshold."""
+    ) -> Tuple[float, str]:
+        """Normalize window, execute model forward pass, and score against threshold."""
         if sensor_id not in self.scalers:
-            raise KeyError(f"No fitted scaler found for sensor '{sensor_id}'.")
+            raise UnsupportedSensorError(f"No fitted scaler found for sensor '{sensor_id}'.")
 
         scaler = self.scalers[sensor_id]
         norm_window = scaler.transform(window_arr)
@@ -256,12 +322,4 @@ class LSTMAutoencoderInference:
 
         score = round(float(mse), 6)
         status = "ANOMALY" if score > self.threshold else "NORMAL"
-
-        return {
-            "station_id": station_id,
-            "sensor_id": sensor_id,
-            "timestamp": timestamp,
-            "anomaly_score": score,
-            "anomaly_status": status,
-            "model_version": self.model_version,
-        }
+        return score, status
