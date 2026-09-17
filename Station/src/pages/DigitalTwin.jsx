@@ -10,6 +10,7 @@ export const DigitalTwin = () => {
   const [selectedSensor, setSelectedSensor] = useState(null);
   const [showSensors, setShowSensors] = useState(true);
   const [showLabels, setShowLabels] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
 
   const stationTitle = config.displayName || `${config.stationId || 'MAITRI'} Research Station`;
@@ -56,6 +57,15 @@ export const DigitalTwin = () => {
 
             <button
               type="button"
+              className={`twin-tool-btn ${showHeatmap ? 'active' : ''}`}
+              onClick={() => setShowHeatmap(!showHeatmap)}
+              title="Toggle 3D spatial sensor condition heatmap"
+            >
+              HEATMAP: {showHeatmap ? 'ON' : 'OFF'}
+            </button>
+
+            <button
+              type="button"
               className={`twin-tool-btn ${showSensors ? 'active' : ''}`}
               onClick={() => setShowSensors(!showSensors)}
               title="Toggle 3D sensor markers visibility"
@@ -81,11 +91,12 @@ export const DigitalTwin = () => {
             onSelectSensor={setSelectedSensor}
             showSensors={showSensors}
             showLabels={showLabels}
+            showHeatmap={showHeatmap}
             resetTrigger={resetTrigger}
           />
 
-          {/* Status Color Legend with Dynamic Counts */}
-          <TwinLegend sensors={sensors} />
+          {/* Status Color Legend with Dynamic Counts & Heatmap Mode */}
+          <TwinLegend sensors={sensors} isHeatmapActive={showHeatmap} />
 
           {/* Camera Navigation Tip */}
           <div className="twin-nav-hint">

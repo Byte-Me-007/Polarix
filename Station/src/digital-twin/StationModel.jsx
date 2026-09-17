@@ -19,9 +19,9 @@ export const StationModel = ({ station, showLabels = true }) => {
         />
       </mesh>
 
-      {/* Subtle Coordinate Survey Grid on Snow Surface */}
+      {/* Subtle Coordinate Survey Grid on Snow Surface (Soft, non-dominant) */}
       <gridHelper 
-        args={[140, 40, '#d8d1c5', '#ece7df']} 
+        args={[100, 32, '#e2dcce', '#ede8df']} 
         position={[0, 0.01, -8]} 
       />
 

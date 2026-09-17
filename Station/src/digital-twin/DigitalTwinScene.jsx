@@ -3,10 +3,13 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { StationModel } from './StationModel';
 import { SensorMarker } from './SensorMarker';
+import { SpatialHeatmap } from './SpatialHeatmap';
 
-// Elevated axonometric isometric overview framing the complete connected modular station footprint
-const DEFAULT_CAMERA_POS = [68, 58, 62];
-const DEFAULT_TARGET = [2.5, 3.0, -10.5];
+// Elevated overview framing — complete station footprint visible (all 6 zones).
+// Camera at [16,60,20] provides a clean 45° isometric overview with ~20% margin on all sides.
+// Target at station centroid [2,2,-8] ensures even spatial framing.
+const DEFAULT_CAMERA_POS = [16, 60, 20];
+const DEFAULT_TARGET = [2, 2, -8];
 
 export const DigitalTwinScene = ({
   station,
@@ -15,6 +18,7 @@ export const DigitalTwinScene = ({
   onSelectSensor,
   showSensors = true,
   showLabels = true,
+  showHeatmap = false,
   resetTrigger = 0
 }) => {
   const controlsRef = useRef();
@@ -43,7 +47,7 @@ export const DigitalTwinScene = ({
 
   return (
     <Canvas
-      camera={{ position: DEFAULT_CAMERA_POS, fov: 42 }}
+      camera={{ position: DEFAULT_CAMERA_POS, fov: 52 }}
       shadows
       style={{ width: '100%', height: '100%', background: '#f8f6f0' }}
     >
@@ -69,9 +73,9 @@ export const DigitalTwinScene = ({
         target={DEFAULT_TARGET}
         enableDamping
         dampingFactor={0.06}
-        minDistance={15}
-        maxDistance={160}
-        maxPolarAngle={Math.PI / 2 - 0.05} // Ground level floor limit
+        minDistance={8}
+        maxDistance={120}
+        maxPolarAngle={Math.PI / 2 - 0.04} // Ground level floor limit
       />
 
       {/* Main Connected Modular Station Footprint */}
@@ -79,6 +83,14 @@ export const DigitalTwinScene = ({
         station={station} 
         showLabels={showLabels} 
       />
+
+      {/* Spatial Sensor Condition Heatmap Overlay */}
+      {showHeatmap && (
+        <SpatialHeatmap 
+          sensors={sensors} 
+          zones={station?.digitalTwin?.zones || []} 
+        />
+      )}
 
       {/* Configuration-Driven 3D Sensor Markers across all facilities */}
       {showSensors &&
