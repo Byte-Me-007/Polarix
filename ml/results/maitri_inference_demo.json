@@ -1,0 +1,487 @@
+{
+  "demonstration": "Maitri LSTM Autoencoder Streaming Inference Demo",
+  "model_version": "lstm-ae-v1",
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "threshold": 0.017674,
+  "note": "Synthetic demonstration telemetry only; does NOT represent live Antarctic data.",
+  "demo_events": [
+    {
+      "step": 1,
+      "input_value": -15.063273137179491,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:00:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 2,
+      "input_value": -15.096974339312904,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:01:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 3,
+      "input_value": -14.767248869099047,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:02:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 4,
+      "input_value": -14.601576546141748,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:03:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 5,
+      "input_value": -14.929575658775004,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:04:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 6,
+      "input_value": -14.6006391562948,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:05:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 7,
+      "input_value": -14.651097462865351,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:06:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 8,
+      "input_value": -14.718233853339456,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:07:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 9,
+      "input_value": -14.291168326274018,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:08:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 10,
+      "input_value": -14.347551581519529,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:09:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 11,
+      "input_value": -14.417407120805631,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:10:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 12,
+      "input_value": -13.811159801692314,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:11:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 13,
+      "input_value": -13.86098149531072,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:12:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 14,
+      "input_value": -13.744910131414771,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:13:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 15,
+      "input_value": -13.380982062735082,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:14:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 16,
+      "input_value": -13.573948619321886,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:15:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 17,
+      "input_value": -13.469722195514343,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:16:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 18,
+      "input_value": -13.560127300414338,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:17:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 19,
+      "input_value": -13.205087561515992,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:18:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 20,
+      "input_value": -13.13408540540239,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:19:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 21,
+      "input_value": -13.12692224239411,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:20:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 22,
+      "input_value": -13.216559333126888,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:21:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 23,
+      "input_value": -12.876541945257136,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:22:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 24,
+      "input_value": -12.834163108134314,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:23:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 25,
+      "input_value": -12.96794963992904,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:24:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 26,
+      "input_value": -12.936095861304889,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:25:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 27,
+      "input_value": -12.51280491130987,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:26:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 28,
+      "input_value": -12.837768434239136,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:27:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 29,
+      "input_value": -12.324328080680612,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:28:00+00:00",
+        "anomaly_score": null,
+        "anomaly_status": "INSUFFICIENT_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 30,
+      "input_value": -12.300630089468145,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:29:00+00:00",
+        "anomaly_score": 0.002824,
+        "anomaly_status": "NORMAL",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 31,
+      "input_value": -11.766345783470245,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:30:00+00:00",
+        "anomaly_score": 0.003749,
+        "anomaly_status": "NORMAL",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 32,
+      "input_value": -11.993628265472736,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 0,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:31:00+00:00",
+        "anomaly_score": 0.003439,
+        "anomaly_status": "NORMAL",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 33,
+      "input_value": null,
+      "quality": "MISSING",
+      "ground_truth_anomaly": 1,
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-01T00:33:00Z",
+        "anomaly_score": null,
+        "anomaly_status": "MISSING_DATA",
+        "model_version": "lstm-ae-v1"
+      }
+    },
+    {
+      "step": 34,
+      "input_value": -1.5228548758087117,
+      "quality": "GOOD",
+      "ground_truth_anomaly": 1,
+      "ground_truth_type": "SPIKE",
+      "result": {
+        "station_id": "MTR",
+        "sensor_id": "TEMP_001",
+        "timestamp": "2026-03-02T00:00:00+00:00",
+        "anomaly_score": 0.530778,
+        "anomaly_status": "ANOMALY",
+        "model_version": "lstm-ae-v1"
+      }
+    }
+  ]
+}

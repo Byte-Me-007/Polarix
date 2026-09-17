@@ -75,13 +75,40 @@ During the Step 5 audit of the model evaluation pipeline:
     - `STUCK_VALUE`: 6/120 detected (5.0% recall)
     - `NORMAL`: 463/893 correct (FPR = 48.15%)
 
+#### 5. Real-Time Streaming ML Inference Layer (`LSTMAutoencoderInference`)
+- **Module**: `ml/inference/lstm_inference.py`
+- **Demo Script**: `ml/inference/run_maitri_inference_demo.py`
+- **Purpose**: Exposes a clean, deterministic Python interface ready for Person A's backend telemetry stream integration.
+- **Model & Artifacts Loaded**:
+  - Model weights: `ml/models/lstm-ae-v1.pt`
+  - Model configuration: `ml/models/lstm-ae-v1_config.json`
+  - Persisted scalers: `ml/models/lstm-ae-v1_scaler.json`
+  - Persisted threshold: `ml/results/lstm_threshold.json` (`threshold = 0.017674`)
+- **Window Handling**:
+  - Maintains isolated 30-step sliding history buffers per `(station_id, sensor_id)`.
+  - First 29 observations return `"INSUFFICIENT_DATA"` with `anomaly_score = null`.
+  - The 30th and subsequent observations compute the MSE reconstruction error and evaluate against the frozen validation threshold (`0.017674`).
+- **Missing / Bad Quality Data Handling**:
+  - Telemetry with `value = None`, `np.isnan(value)`, or `quality != "GOOD"` immediately returns `"MISSING_DATA"` with `anomaly_score = null` and resets the rolling window to prevent sequence corruption.
+- **Result Contract**:
+```json
+{
+  "station_id": "MTR",
+  "sensor_id": "TEMP_001",
+  "timestamp": "2026-03-01T00:29:00Z",
+  "anomaly_score": 0.002824,
+  "anomaly_status": "NORMAL",
+  "model_version": "lstm-ae-v1"
+}
+```
+
 ---
 
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, and configs.
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), and evaluation scripts.
-- `ml/inference/`: Inference engine and scoring pipelines.
+- `ml/inference/`: Production inference service (`lstm_inference.py`) and streaming demo (`run_maitri_inference_demo.py`).
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
 - `ml/tests/`: Pytest test suite.
-- `ml/results/`: Evaluation predictions, metrics JSON, confusion matrix plots, threshold search data, and reconstruction errors.
+- `ml/results/`: Evaluation predictions, metrics JSON, confusion matrix plots, threshold search data, reconstruction errors, and inference demo results (`maitri_inference_demo.json`).
