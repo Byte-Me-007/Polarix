@@ -1676,3 +1676,227 @@ body {
   }
 }
 
+/* ==========================================================================
+   3D DIGITAL TWIN SPATIAL MONITORING
+   ========================================================================== */
+.digital-twin-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.twin-header-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--polaris-border);
+}
+
+.twin-title-group h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--polaris-text-primary);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+.twin-subtitle {
+  font-size: 0.8125rem;
+  color: var(--polaris-text-secondary);
+}
+
+.twin-viewport-card {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-subtle);
+  overflow: hidden;
+  display: flex;
+}
+
+.twin-canvas-wrapper {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+/* Floating Toolbar inside 3D Viewport */
+.twin-toolbar-overlay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--polaris-border);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-xs);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.twin-tool-btn {
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.35rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--polaris-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.twin-tool-btn:hover {
+  background: #ffffff;
+  color: var(--polaris-text-primary);
+  border-color: var(--polaris-border-strong);
+}
+
+.twin-tool-btn.active {
+  background: var(--polaris-copper);
+  color: #ffffff;
+  border-color: var(--polaris-copper);
+}
+
+/* Legend Panel */
+.twin-legend-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--polaris-border);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-xs);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.twin-legend-title {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--polaris-text-muted);
+}
+
+.twin-legend-items {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.twin-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--polaris-text-secondary);
+}
+
+.twin-legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Sensor Details Side Panel / Drawer */
+.twin-detail-drawer {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  width: 360px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px -4px rgba(25, 28, 32, 0.12);
+  display: flex;
+  flex-direction: column;
+  animation: drawer-slide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+@keyframes drawer-slide {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.twin-drawer-header {
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--polaris-border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: var(--polaris-bg-subtle);
+}
+
+.twin-drawer-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.twin-drawer-footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Navigation hint */
+.twin-nav-hint {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--polaris-text-muted);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--polaris-border);
+  pointer-events: none;
+}
+
+/* Responsive Digital Twin */
+@media (max-width: 900px) {
+  .twin-viewport-card {
+    height: 520px;
+    flex-direction: column;
+  }
+
+  .twin-detail-drawer {
+    position: relative;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid var(--polaris-border);
+    border-radius: 0;
+  }
+}
+
+

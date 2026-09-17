@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 
 export const Sensors = () => {
+  const navigate = useNavigate();
   const { config, sensors: rawSensors } = useStationTelemetry();
 
   // Filters
@@ -410,17 +412,18 @@ export const Sensors = () => {
               </div>
             </div>
 
-            {/* Modal Footer with Digital Twin Preparation */}
+            {/* Modal Footer with Digital Twin Action */}
             <div className="sensor-modal-footer">
               <span style={{ fontSize: '0.6875rem', fontFamily: 'var(--font-mono)', color: 'var(--polaris-text-muted)' }}>
-                Digital Twin 3D spatial mapping scheduled for Phase 2.
+                Inspect live spatial coordinate datum in 3D Digital Twin.
               </span>
 
               <button
                 type="button"
                 className="digital-twin-action-btn"
-                disabled
-                title="Three.js Digital Twin module integration is coming in Phase 2"
+                onClick={() => navigate('/digital-twin')}
+                style={{ cursor: 'pointer', opacity: 1, color: '#ffffff', background: 'var(--polaris-copper)', borderColor: 'var(--polaris-copper)' }}
+                title="Navigate to 3D Digital Twin Viewport"
               >
                 VIEW IN DIGITAL TWIN →
               </button>

@@ -4,6 +4,7 @@ import { StationProvider } from './context/StationContext';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './pages/Dashboard';
 import { Sensors } from './pages/Sensors';
+import { DigitalTwin } from './pages/DigitalTwin';
 import { ModulePlaceholder } from './pages/ModulePlaceholder';
 import './styles/dashboard.css';
 
@@ -15,7 +16,7 @@ export function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/digital-twin" element={<ModulePlaceholder />} />
+            <Route path="/digital-twin" element={<DigitalTwin />} />
             <Route path="/alerts" element={<ModulePlaceholder />} />
             <Route path="/energy" element={<ModulePlaceholder />} />
             <Route path="/logistics" element={<ModulePlaceholder />} />
