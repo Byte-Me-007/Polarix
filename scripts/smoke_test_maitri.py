@@ -1,12 +1,14 @@
 import json
 import sys
 import httpx
+from websockets.sync.client import connect as ws_connect
 
 BASE_URL = "http://127.0.0.1:8000"
+WS_URL = "ws://127.0.0.1:8000/ws/sensor-readings"
 
 
 def run_smoke_test():
-    print(f"Starting Maitri Smoke Test against {BASE_URL}...\n")
+    print(f"Starting Maitri Smoke Test against {BASE_URL} and {WS_URL}...\n")
     with httpx.Client(base_url=BASE_URL, timeout=10.0) as client:
         # 1. Health check
         print("1. Checking GET /health ...")
@@ -30,7 +32,7 @@ def run_smoke_test():
             "status": "active",
         }
         res_device = client.post("/devices/", json=device_payload)
-        if res_device.status_code == 201 or res_device.status_code == 200:
+        if res_device.status_code in (200, 201):
             print(f"[OK] Device created: {res_device.json()}\n")
         elif res_device.status_code == 400:
             print(f"[INFO] Device 'smoke-device-001' already exists (status 400), continuing...\n")
@@ -64,7 +66,22 @@ def run_smoke_test():
         print(f"[OK] Retrieved {len(readings)} reading(s) for smoke-device-001.")
         print(f"Latest reading: {readings[-1] if readings else 'None'}\n")
 
-    print("ALL SMOKE TESTS PASSED SUCCESSFULLY!")
+    # 5. WebSocket verification
+    print(f"5. Verifying WebSocket connection at {WS_URL} ...")
+    try:
+        with ws_connect(WS_URL, open_timeout=10.0, close_timeout=10.0) as ws:
+            ws.send("ping")
+            raw_response = ws.recv()
+            ws_response = json.loads(raw_response) if isinstance(raw_response, str) else raw_response
+            if ws_response.get("type") != "ack" or ws_response.get("message") != "connected":
+                print(f"[FAIL] Unexpected WebSocket response: {ws_response}")
+                sys.exit(1)
+            print(f"[OK] WebSocket response acknowledged: {ws_response}\n")
+    except Exception as exc:
+        print(f"[FAIL] WebSocket test failed: {exc}")
+        sys.exit(1)
+
+    print("ALL SMOKE TESTS (HTTP + WEBSOCKET) PASSED SUCCESSFULLY!")
 
 
 if __name__ == "__main__":

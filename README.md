@@ -36,6 +36,9 @@
 
 ## Maitri Smoke Test
 
+The smoke test verifies the HTTP API endpoints (`/health`, `/devices/`, `/sensor-readings/ingest`, `/sensor-readings/device/{device_id}`) as well as the real-time WebSocket endpoint:
+`ws://127.0.0.1:8000/ws/sensor-readings`
+
 1. **Start server:**
    ```bash
    uvicorn maitri.main:app --reload
@@ -45,4 +48,5 @@
    ```bash
    python scripts/smoke_test_maitri.py
    ```
+
 
