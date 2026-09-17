@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-09-17T20:36:58.975914+00:00",
+  "project": "Polarix",
+  "station_id": "MTR",
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.017674,
+  "readiness_status": "ML interface and handoff are internally validated and ready for team integration.",
+  "overall_status": "PASSED",
+  "checks_total": 8,
+  "checks_passed": 8,
+  "checks_failed": 0,
+  "artifact_integrity": {
+    "status": "VALID",
+    "valid_artifacts_count": 4,
+    "errors": []
+  },
+  "checks": [
+    {
+      "check_name": "readiness_json_exists",
+      "passed": true,
+      "details": "Integration readiness JSON parsed successfully."
+    },
+    {
+      "check_name": "readiness_status_and_model_invariants",
+      "passed": true,
+      "details": "Station=MTR, Version=lstm-ae-v1, Threshold=0.017674."
+    },
+    {
+      "check_name": "supported_sensors_and_vocabulary",
+      "passed": true,
+      "details": "Sensors=True, Statuses=True, Types=True."
+    },
+    {
+      "check_name": "module_and_function_importability",
+      "passed": true,
+      "details": "MaitriMLService and backend adapter functions exist and import cleanly."
+    },
+    {
+      "check_name": "model_artifact_integrity",
+      "passed": true,
+      "details": "Artifacts verified: 4/4 matching SHA-256 manifest."
+    },
+    {
+      "check_name": "integration_checklist_document_exists",
+      "passed": true,
+      "details": "Checklist markdown exists (8080 bytes)."
+    },
+    {
+      "check_name": "synthetic_data_disclosure",
+      "passed": true,
+      "details": "Confirmed synthetic data basis explicitly disclosed without real Antarctic claims."
+    },
+    {
+      "check_name": "ownership_boundaries_and_bharati_status",
+      "passed": true,
+      "details": "Person A/B/C responsibilities documented; Bharati status: 'Not started. Maitri is the completed Person C station scope.'."
+    }
+  ]
+}

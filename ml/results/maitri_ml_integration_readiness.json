@@ -1,0 +1,179 @@
+{
+  "project": "Polarix",
+  "problem_statement_id": "SIH26060",
+  "station_id": "MTR",
+  "station_name": "Maitri",
+  "owner": "Person C (ML Specialist)",
+  "readiness_status": "ML interface and handoff are internally validated and ready for team integration.",
+  "input_contract": {
+    "module": "ml.inference.inference_contract",
+    "class": "TelemetryInput",
+    "fields": {
+      "station_id": {
+        "type": "str",
+        "allowed_values": ["MTR"],
+        "description": "Station code (Maitri only)"
+      },
+      "sensor_id": {
+        "type": "str",
+        "allowed_values": ["TEMP_001", "PRESS_001", "HUM_001", "VIB_001", "POWER_001"],
+        "description": "Supported Maitri sensor ID"
+      },
+      "timestamp": {
+        "type": "str",
+        "format": "ISO 8601",
+        "description": "Observation timestamp in UTC (e.g., '2026-09-17T10:30:00Z')"
+      },
+      "value": {
+        "type": "Optional[float]",
+        "description": "Numeric sensor measurement, or None for missing telemetry"
+      },
+      "unit": {
+        "type": "str",
+        "description": "Physical unit (e.g., 'C', 'hPa', '%', 'mm/s', 'kW')"
+      },
+      "quality": {
+        "type": "str",
+        "allowed_values": ["GOOD", "BAD", "UNCERTAIN", "MISSING"],
+        "default": "GOOD",
+        "description": "Telemetry quality tag"
+      },
+      "source": {
+        "type": "str",
+        "default": "SIMULATOR",
+        "description": "Origin of telemetry (e.g., 'SIMULATOR', 'FIELD', 'TEST')"
+      }
+    }
+  },
+  "output_contract": {
+    "module": "ml.inference.inference_contract",
+    "class": "TelemetryInferenceOutput",
+    "fields": {
+      "station_id": "str ('MTR')",
+      "sensor_id": "str",
+      "timestamp": "str (ISO 8601)",
+      "value": "Optional[float] (strictly finite or null)",
+      "unit": "str",
+      "quality": "str",
+      "source": "str",
+      "anomaly_score": "Optional[float] (MSE reconstruction error or null)",
+      "anomaly_status": "str ('NORMAL', 'ANOMALY', 'INSUFFICIENT_DATA', 'MISSING_DATA')",
+      "anomaly_type": "Optional[str] ('NORMAL', 'SPIKE', 'DRIFT', 'STUCK_VALUE', 'UNKNOWN', or null)",
+      "model_version": "str ('lstm-ae-v1')"
+    }
+  },
+  "inference_entry_point": {
+    "module": "ml.inference.maitri_ml_service",
+    "class": "MaitriMLService",
+    "method": "process_telemetry(telemetry_input: TelemetryInput) -> TelemetryInferenceOutput"
+  },
+  "backend_adapter": {
+    "module": "ml.inference.maitri_backend_contract",
+    "functions": {
+      "process_payload": "process_backend_payload(service: MaitriMLService, payload: Union[Dict[str, Any], str]) -> Dict[str, Any]",
+      "adapt_input": "adapt_backend_input(payload: Union[Dict[str, Any], str]) -> TelemetryInput",
+      "adapt_output": "adapt_backend_output(output: Union[TelemetryInferenceOutput, Dict[str, Any]]) -> Dict[str, Any]"
+    }
+  },
+  "supported_sensors": [
+    "TEMP_001",
+    "PRESS_001",
+    "HUM_001",
+    "VIB_001",
+    "POWER_001"
+  ],
+  "supported_statuses": [
+    "NORMAL",
+    "ANOMALY",
+    "INSUFFICIENT_DATA",
+    "MISSING_DATA"
+  ],
+  "supported_anomaly_types": [
+    "NORMAL",
+    "SPIKE",
+    "DRIFT",
+    "STUCK_VALUE",
+    "UNKNOWN"
+  ],
+  "missing_data_behavior": {
+    "triggers": [
+      "value is None",
+      "quality is not 'GOOD' (e.g. 'BAD', 'UNCERTAIN', 'MISSING')"
+    ],
+    "anomaly_status": "MISSING_DATA",
+    "anomaly_score": null,
+    "anomaly_type": null,
+    "buffer_action": "Flushes the sensor's rolling 30-step deque to prevent data gap distortions in reconstruction error."
+  },
+  "invalid_data_behavior": {
+    "non_finite_values": "Intercepts NaN, +inf, -inf before neural network; safely routes to MISSING_DATA and resets rolling buffer.",
+    "schema_violation": "Raises InvalidContractError if payload structure or datatypes fail contract validation.",
+    "unsupported_station": "Raises UnsupportedStationError if station_id != 'MTR'.",
+    "unsupported_sensor": "Raises UnsupportedSensorError if sensor_id is not in supported_sensors."
+  },
+  "duplicate_behavior": {
+    "exception": "DuplicateTelemetryError",
+    "rule": "Rejected if (station_id, sensor_id, timestamp) matches the most recently processed timestamp for that sensor. Buffer is not duplicated or advanced."
+  },
+  "stale_data_behavior": {
+    "exception": "StaleTelemetryError",
+    "rule": "Rejected if timestamp is older than the most recently recorded timestamp for that sensor. Preserves chronological buffer sequence."
+  },
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.017674,
+  "artifact_integrity": {
+    "manifest": "ml/models/lstm-ae-v1_manifest.json",
+    "verification_method": "ml.models.model_registry.validate_model_artifacts",
+    "verified_count": "4/4 artifacts",
+    "status": "VALID",
+    "artifacts": {
+      "model": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+      "config": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+      "scaler": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+      "threshold": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1"
+    }
+  },
+  "data_basis": "Synthetic telemetry exclusively. No real-world Antarctic telemetry was used or claimed.",
+  "person_a_responsibility": [
+    "FastAPI backend and API route definitions",
+    "MQTT ingestion broker handlers",
+    "Telemetry simulator execution",
+    "Scenario engine orchestration",
+    "REST and WebSocket response emission",
+    "Database models and persistence (SQLite/PostgreSQL)",
+    "Backend telemetry workflow integration"
+  ],
+  "person_b_responsibility": [
+    "React dashboard frontend",
+    "User interface components",
+    "Data visualization and charts (ECharts)",
+    "3D Digital Twin station rendering",
+    "Client-side anomaly alert presentation"
+  ],
+  "person_c_responsibility": [
+    "Machine learning models (Z-score baseline & LSTM Autoencoder)",
+    "ML inference engine and 30-step window state management",
+    "Anomaly score threshold calibration",
+    "Physical anomaly type heuristic classification",
+    "ML validation, benchmarking, observability, and reliability hardening",
+    "Model registry and SHA-256 artifact integrity enforcement",
+    "Backend integration contract adapters"
+  ],
+  "known_limitations": {
+    "synthetic_data_only": "All models, thresholds, and evaluations are based strictly on synthetic telemetry. No real Antarctic telemetry was available or used.",
+    "no_field_claims": "No claim of real-world Antarctic telemetry validation, field deployment readiness, production SLAs, or certified reliability is made.",
+    "false_positive_tradeoff": "The frozen threshold (0.017674) prioritizes spike (100%) and drift (84.67%) recall, incurring a 48.15% FPR on normal diurnal synthetic fluctuations.",
+    "stuck_value_detection": "STUCK_VALUE anomalies are not reliably detected by the single-threshold LSTM reconstruction loss alone (5% test recall; short stuck-value scenario evaluated as NORMAL in end-to-end test)."
+  },
+  "integration_sequence": "Person A telemetry → backend adapter → TelemetryInput → MaitriMLService → LSTM inference → anomaly status → anomaly type → TelemetryInferenceOutput → backend adapter → backend JSON",
+  "validation_summary": {
+    "full_ml_test_suite": "203/203 passed across 15 test modules",
+    "handoff_validation": "9/9 checks passed",
+    "backend_contract_validation": "12/12 checks passed",
+    "performance_validation": "27/27 checks passed",
+    "observability_validation": "12/12 checks passed",
+    "reliability_validation": "10/10 checks passed",
+    "final_signoff_suite": "5/5 checks passed"
+  },
+  "bharati_status": "Not started. Maitri is the completed Person C station scope."
+}
