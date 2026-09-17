@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-09-17T20:31:01.308368+00:00",
+  "project": "Polarix",
+  "station_id": "MTR",
+  "model_version": "lstm-ae-v1",
+  "threshold": 0.017674,
+  "overall_status": "PASSED",
+  "checks_total": 9,
+  "checks_passed": 9,
+  "checks_failed": 0,
+  "artifact_integrity": {
+    "status": "VALID",
+    "valid_artifacts_count": 4,
+    "errors": []
+  },
+  "historical_test_suite_status": {
+    "note": "Previously executed test suite count across all ML modules",
+    "total_tests_passed": 189,
+    "test_modules_count": 13,
+    "overall_status": "ALL_PASSED"
+  },
+  "checks": [
+    {
+      "check_name": "manifest_exists",
+      "passed": true,
+      "details": "Manifest exists and parsed successfully as valid JSON."
+    },
+    {
+      "check_name": "station_and_model_version_invariants",
+      "passed": true,
+      "details": "Station is 'MTR' (expected MTR); Model version is 'lstm-ae-v1' (expected lstm-ae-v1)."
+    },
+    {
+      "check_name": "threshold_and_sensors_invariants",
+      "passed": true,
+      "details": "Threshold: 0.017674 (expected 0.017674); Sensors: ['TEMP_001', 'PRESS_001', 'HUM_001', 'VIB_001', 'POWER_001']."
+    },
+    {
+      "check_name": "contract_vocabulary_consistency",
+      "passed": true,
+      "details": "Statuses matched: True; Anomaly types matched: True."
+    },
+    {
+      "check_name": "handoff_documentation_exists",
+      "passed": true,
+      "details": "Handoff markdown exists (19390 bytes)."
+    },
+    {
+      "check_name": "model_artifact_integrity",
+      "passed": true,
+      "details": "Artifacts verified: 4/4 matching SHA-256 manifest."
+    },
+    {
+      "check_name": "referenced_evaluation_artifacts_exist",
+      "passed": true,
+      "details": "Dataset (True), Scenario Eval (True), Report (True)."
+    },
+    {
+      "check_name": "truthful_metadata_no_ungrounded_claims",
+      "passed": true,
+      "details": "Confirmed manifest clearly marks data as synthetic and disclaims real Antarctic deployment readiness."
+    },
+    {
+      "check_name": "backend_adapter_execution",
+      "passed": true,
+      "details": "Adapter executed successfully with output status: INSUFFICIENT_DATA."
+    }
+  ]
+}

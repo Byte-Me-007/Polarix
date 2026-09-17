@@ -1,0 +1,190 @@
+{
+  "project": "Polarix",
+  "problem_statement_id": "SIH26060",
+  "station_id": "MTR",
+  "station_name": "Maitri",
+  "owner": "Person C (ML Specialist)",
+  "handoff_status": "COMPLETED_VALIDATED",
+  "model_version": "lstm-ae-v1",
+  "model_type": "LSTM_AUTOENCODER",
+  "sequence_length": 30,
+  "threshold": 0.017674,
+  "threshold_selection_method": "Grid search over quantiles & linear space maximizing F1-score on 15% validation split (1,181 sequences)",
+  "supported_sensors": [
+    "TEMP_001",
+    "PRESS_001",
+    "HUM_001",
+    "VIB_001",
+    "POWER_001"
+  ],
+  "supported_statuses": [
+    "NORMAL",
+    "ANOMALY",
+    "INSUFFICIENT_DATA",
+    "MISSING_DATA"
+  ],
+  "supported_anomaly_types": [
+    "NORMAL",
+    "SPIKE",
+    "DRIFT",
+    "STUCK_VALUE",
+    "UNKNOWN"
+  ],
+  "missing_data_behavior": {
+    "triggers": [
+      "value is None / null",
+      "value is non-finite float (NaN, +Infinity, -Infinity)",
+      "quality is not 'GOOD' (e.g., 'BAD', 'UNCERTAIN', 'MISSING')"
+    ],
+    "anomaly_status": "MISSING_DATA",
+    "anomaly_score": null,
+    "anomaly_type": null,
+    "buffer_action": "Clears the active sensor's 30-step rolling window to prevent sequence corruption from data gaps."
+  },
+  "reliability_rejections": {
+    "duplicate_timestamp": {
+      "exception": "DuplicateTelemetryError",
+      "behavior": "Rejected when (station_id, sensor_id, timestamp) matches the most recent record. Buffer is not duplicated or advanced."
+    },
+    "stale_timestamp": {
+      "exception": "StaleTelemetryError",
+      "behavior": "Rejected when incoming timestamp is older than the most recent timestamp for that sensor. Buffer chronological order is preserved."
+    },
+    "unsupported_station": {
+      "exception": "UnsupportedStationError",
+      "behavior": "Rejected when station_id != 'MTR'. Only Maitri is supported in current scope."
+    },
+    "unsupported_sensor": {
+      "exception": "UnsupportedSensorError",
+      "behavior": "Rejected when sensor_id is not in supported_sensors."
+    },
+    "schema_violation": {
+      "exception": "InvalidContractError",
+      "behavior": "Rejected when payload structure or field types fail contract validation."
+    }
+  },
+  "inference_entry_point": {
+    "module": "ml.inference.maitri_ml_service",
+    "class": "MaitriMLService",
+    "method": "process_telemetry(telemetry_input: TelemetryInput) -> TelemetryInferenceOutput"
+  },
+  "backend_adapter": {
+    "module": "ml.inference.maitri_backend_contract",
+    "functions": [
+      "adapt_backend_input(payload: Union[Dict, str]) -> TelemetryInput",
+      "adapt_backend_output(output: Union[TelemetryInferenceOutput, Dict]) -> Dict[str, Any]",
+      "process_backend_payload(service: MaitriMLService, payload: Union[Dict, str]) -> Dict[str, Any]"
+    ]
+  },
+  "model_registry_manifest_reference": "ml/models/lstm-ae-v1_manifest.json",
+  "artifact_integrity_mechanism": {
+    "module": "ml.models.model_registry",
+    "function": "validate_model_artifacts(version='lstm-ae-v1', raise_on_error=True)",
+    "artifacts_tracked": [
+      {
+        "role": "model",
+        "file": "ml/models/lstm-ae-v1.pt",
+        "sha256": "7ff138f30ef85b7d4fcd5c558e7394257f492254a295053b267e2dc07f3f1262",
+        "size_bytes": 50613
+      },
+      {
+        "role": "config",
+        "file": "ml/models/lstm-ae-v1_config.json",
+        "sha256": "71c61e98c364d34ed37505fd97d6e96757904ab016768fcdc8058e0fa8ca720b",
+        "size_bytes": 187
+      },
+      {
+        "role": "scaler",
+        "file": "ml/models/lstm-ae-v1_scaler.json",
+        "sha256": "2371bec3fbcb8664e4f7ab832ffc5a659b1057d1cf8401eeb368134682c60224",
+        "size_bytes": 657
+      },
+      {
+        "role": "threshold",
+        "file": "ml/results/lstm_threshold.json",
+        "sha256": "80c7c2af48a2b7a9d49e7e10c98859b6d2c368c732fb4f273431697e917707c1",
+        "size_bytes": 493
+      }
+    ]
+  },
+  "synthetic_dataset": {
+    "path": "ml/data/maitri_synthetic_telemetry.csv",
+    "version": "10k_stationary_diurnal_v1",
+    "total_records": 10000,
+    "sensors": ["TEMP_001", "PRESS_001", "HUM_001", "VIB_001", "POWER_001"],
+    "records_per_sensor": 2000,
+    "splits": {
+      "train_normal_only": "70% (7,000 records)",
+      "validation": "15% (1,500 records)",
+      "test": "15% (1,500 records)"
+    }
+  },
+  "scenario_evaluation_reference": "ml/results/maitri_ml_evaluation_report.json",
+  "evaluation_report_reference": "ml/results/maitri_ml_evaluation_report.md",
+  "test_summary": {
+    "total_ml_tests_passed": 189,
+    "test_modules_count": 13,
+    "categories_validated": [
+      "unit_models_and_baselines",
+      "inference_contract_and_service",
+      "model_registry_integrity",
+      "calibration_and_thresholding",
+      "reliability_and_edge_cases",
+      "observability_and_diagnostics",
+      "performance_and_latency",
+      "backend_contract_adapters",
+      "scenarios_and_end_to_end_pipeline"
+    ]
+  },
+  "performance_summary": {
+    "source_file": "ml/results/maitri_inference_performance.json",
+    "startup_initialization_ms": 3.0,
+    "steady_state_median_latency_ms": {
+      "warm_normal": 0.3705,
+      "anomaly": 0.4141,
+      "multi_sensor": 0.4338,
+      "missing_data": 0.0028,
+      "insufficient_data": 0.0030
+    }
+  },
+  "observability_summary": {
+    "diagnostic_record_class": "ml.inference.inference_diagnostics.InferenceDiagnosticRecord",
+    "buffer_capacity": 100,
+    "fields_tracked": [
+      "timestamp",
+      "station_id",
+      "sensor_id",
+      "inference_status",
+      "anomaly_status",
+      "anomaly_type",
+      "anomaly_score",
+      "threshold",
+      "model_version",
+      "buffer_length",
+      "processing_time_ms",
+      "error_message"
+    ]
+  },
+  "known_limitations": {
+    "synthetic_data_only": "All models, thresholds, and evaluations are based strictly on synthetic telemetry. No real Antarctic telemetry was available or used.",
+    "no_field_claims": "No claim of real-world Antarctic telemetry validation, field deployment readiness, production SLAs, or certified reliability is made.",
+    "stuck_value_detection": "STUCK_VALUE anomalies are not reliably detected by the single-threshold LSTM reconstruction loss (5% test recall; short stuck-value scenario evaluated as NORMAL). Heuristic variance classification is recommended for future production hardening.",
+    "false_positive_tradeoff": "The frozen threshold (0.017674) prioritizes spike (100%) and drift (84.67%) recall over false-alarm suppression, resulting in a 48.15% FPR on normal synthetic diurnal fluctuations on the test split.",
+    "precision_recall_f1": {
+      "lstm_test_precision": 0.2612,
+      "lstm_test_recall": 0.5260,
+      "lstm_test_f1": 0.3490,
+      "lstm_test_accuracy": 0.5203,
+      "zscore_test_precision": 0.7119,
+      "zscore_test_recall": 0.1325,
+      "zscore_test_f1": 0.2234,
+      "zscore_test_accuracy": 0.8053
+    }
+  },
+  "integration_notes": {
+    "recommended_usage": "Instantiate MaitriMLService once upon backend application startup. Route incoming sensor records via process_backend_payload(service, payload) or service.process_telemetry(adapt_backend_input(payload)).",
+    "data_flow": "Backend telemetry JSON → adapt_backend_input() → TelemetryInput → MaitriMLService.process_telemetry() → LSTM inference → Anomaly status & type → TelemetryInferenceOutput → adapt_backend_output() → Backend JSON response",
+    "statefulness": "MaitriMLService is stateful (maintains per-sensor 30-deque sliding windows). Do not re-instantiate the service on every telemetry packet.",
+    "modifications_forbidden": "Do NOT modify ml/models/ weights, config, scaler, or threshold. Do NOT change station scope from MTR."
+  }
+}
