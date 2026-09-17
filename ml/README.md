@@ -306,12 +306,59 @@ TelemetryInput
 
 ---
 
+---
+
+### Maitri ML Service Boundary
+
+The `MaitriMLService` (`ml/inference/maitri_ml_service.py`) provides a clean, framework-independent service adapter for downstream consumption by Person A's backend or other orchestrators.
+
+> **Service Boundary Scope Notice:** This is an **ML-side service boundary**, NOT the FastAPI backend. It contains zero web/API framework dependencies and operates purely on typed standard-library contracts.
+
+#### 1. Why the Adapter Exists
+- **Decoupling**: Enables the backend to stream telemetry and receive anomaly detection outputs without coupling to internal PyTorch mechanics, sequence reshaping, scaler transforms, or classifier rule details.
+- **Single Point of Orchestration**: Provides a unified, minimal entrypoint (`process_telemetry`) that encapsulates contract validation, artifact verification, sliding buffer management, LSTM inference, and anomaly type categorization.
+
+#### 2. Downstream Consumption Pattern
+```python
+from ml.inference.inference_contract import TelemetryInput
+from ml.inference.maitri_ml_service import MaitriMLService
+
+# 1. Initialize service once on backend startup
+ml_service = MaitriMLService()
+
+# 2. Process incoming telemetry in ingestion worker / MQTT handler
+input_data = TelemetryInput(
+    station_id="MTR",
+    sensor_id="TEMP_001",
+    timestamp="2026-09-18T10:00:00Z",
+    value=-15.2,
+    unit="°C",
+    quality="GOOD",
+)
+output = ml_service.process_telemetry(input_data)
+
+# 3. Consume typed output contract
+print(output.anomaly_status)  # "NORMAL", "ANOMALY", "INSUFFICIENT_DATA", "MISSING_DATA"
+print(output.anomaly_score)   # MSE reconstruction error (float or None)
+print(output.anomaly_type)    # "SPIKE", "DRIFT", "STUCK_VALUE", "NORMAL", "UNKNOWN" (or None)
+```
+
+#### 3. Core Architectural Properties
+- **Framework-Independent**: Pure Python implementation with zero dependency on FastAPI, MQTT, SQLite, WebSockets, or UI frameworks.
+- **Component Reuse**: Reuses the validated `LSTMAutoencoderInference`, `AnomalyTypeClassifier`, and `model_registry` directly without duplicating inference or classification logic.
+- **Pre-Execution Integrity Enforcement**: Automatically verifies cryptographic SHA-256 checksums and file sizes against `lstm-ae-v1_manifest.json` upon initialization.
+- **Zero Online Retraining**: Model weights (`lstm-ae-v1.pt`), scalers (`lstm-ae-v1_scaler.json`), and decision threshold (`0.017674`) remain strictly frozen during inference execution.
+- **Per-Sensor Isolation & State Management**: Maintains isolated 30-step sliding history deques for each supported sensor (`TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001`). Exposes `reset_sensor(sensor_id)` and `reset_all()` APIs for explicit state control.
+
+---
+
 ### Directory Layout
 - `ml/data/`: Data storage and synthetic generation scripts (`maitri_synthetic_telemetry.csv`).
 - `ml/models/`: Serialized model weights (`lstm-ae-v1.pt`), scalers, configs, model registry (`model_registry.py`), and version manifests (`lstm-ae-v1_manifest.json`).
 - `ml/training/`: Training scripts, baseline detectors (`zscore_detector.py`), autoencoder (`lstm_autoencoder.py`, `train_lstm_autoencoder.py`), threshold selection (`select_lstm_threshold.py`), model comparison (`compare_models.py`), and anomaly classifier evaluation (`evaluate_anomaly_classifier.py`).
-- `ml/inference/`: Production inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), validation harness (`validate_maitri_pipeline.py`), and streaming demos.
+- `ml/inference/`: Production ML service adapter (`maitri_ml_service.py`), inference service (`lstm_inference.py`), anomaly type classifier (`anomaly_type_classifier.py`), typed integration contracts (`inference_contract.py`), validation harness (`validate_maitri_pipeline.py`), service demo (`run_maitri_service_demo.py`), and streaming demos.
 - `ml/forecasting/`: Predictive telemetry forecasting modules.
-- `ml/tests/`: Pytest test suite (`test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
+- `ml/tests/`: Pytest test suite (`test_maitri_ml_service.py`, `test_maitri_end_to_end_pipeline.py`, `test_model_registry.py`, `test_anomaly_type_classifier.py`, `test_inference_contract.py`, `test_lstm_inference.py`, etc.).
 - `ml/results/`: Evaluation predictions, metrics JSON, comparison reports (`maitri_model_comparison.json`), end-to-end validation report (`maitri_end_to_end_validation.json`), anomaly type validation artifacts, registry validation reports, and contract examples.
+
 
