@@ -84,8 +84,8 @@ export const DigitalTwin = () => {
             resetTrigger={resetTrigger}
           />
 
-          {/* Status Color Legend */}
-          <TwinLegend />
+          {/* Status Color Legend with Dynamic Counts */}
+          <TwinLegend sensors={sensors} />
 
           {/* Camera Navigation Tip */}
           <div className="twin-nav-hint">
