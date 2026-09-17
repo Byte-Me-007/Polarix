@@ -13,6 +13,7 @@ export const useStationTelemetry = () => {
     config: station.stationConfig,
     telemetry: station.telemetry,
     alerts: station.alerts,
+    sensors: station.stationConfig?.sensors || [],
     acknowledgeAlert: station.acknowledgeAlert,
     scenario: station.activeScenario,
     setScenario: station.setScenario,

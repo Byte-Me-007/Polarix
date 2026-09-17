@@ -1130,3 +1130,549 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   SENSOR MONITORING REGISTRY & LIVE TELEMETRY
+   ========================================================================== */
+.sensors-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Page Header */
+.sensors-header-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--polaris-border);
+}
+
+.sensors-title-group h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--polaris-text-primary);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+.sensors-subtitle {
+  font-size: 0.8125rem;
+  color: var(--polaris-text-secondary);
+}
+
+.sensors-station-stamp {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.station-badge-clean {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--polaris-copper);
+  background: var(--polaris-copper-subtle);
+  border: 1px solid var(--polaris-copper-border);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.04em;
+}
+
+.simulation-data-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--polaris-text-muted);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.05em;
+}
+
+/* Summary Strip (Compact counts calculated dynamically) */
+.sensors-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.summary-stat-cell {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.summary-stat-cell:hover {
+  border-color: var(--polaris-border-strong);
+  transform: translateY(-1px);
+}
+
+.summary-stat-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--polaris-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.summary-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--polaris-text-primary);
+  line-height: 1;
+  margin-top: 0.4rem;
+}
+
+.summary-stat-value.normal { color: var(--status-normal); }
+.summary-stat-value.warning { color: var(--status-warning); }
+.summary-stat-value.critical { color: var(--status-critical); }
+.summary-stat-value.offline { color: var(--status-offline); }
+
+/* Dual Filter Bar (Domain + Status) */
+.sensors-filter-bar {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.filter-group-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-group-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--polaris-text-muted);
+  margin-right: 0.25rem;
+}
+
+.filter-pill-button {
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  color: var(--polaris-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-pill-button:hover {
+  background: #ffffff;
+  color: var(--polaris-text-primary);
+  border-color: var(--polaris-border-strong);
+}
+
+.filter-pill-button.active {
+  background: var(--polaris-text-primary);
+  color: #ffffff;
+  border-color: var(--polaris-text-primary);
+}
+
+/* Scientific Instrument Table */
+.sensor-table-container {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-subtle);
+  overflow: hidden;
+}
+
+.sensor-table-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--polaris-bg-subtle);
+  border-bottom: 1px solid var(--polaris-border);
+  font-family: var(--font-mono);
+  font-size: 0.7125rem;
+  color: var(--polaris-text-muted);
+}
+
+.sensor-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.sensor-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.sensor-table th {
+  background: var(--polaris-bg-subtle);
+  color: var(--polaris-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--polaris-border);
+  white-space: nowrap;
+}
+
+.sensor-table-row {
+  border-bottom: 1px solid var(--polaris-border-subtle);
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.sensor-table-row:hover {
+  background: var(--polaris-bg-subtle);
+}
+
+.sensor-table-row:focus {
+  outline: 2px solid var(--polaris-copper);
+  background: var(--polaris-bg-subtle);
+}
+
+.sensor-table td {
+  padding: 0.85rem 1.25rem;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.sensor-name-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.sensor-primary-name {
+  font-weight: 600;
+  color: var(--polaris-text-primary);
+}
+
+.sensor-id-sub {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--polaris-text-muted);
+  margin-top: 0.1rem;
+}
+
+.sensor-domain-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-xs);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  color: var(--polaris-text-secondary);
+  display: inline-block;
+}
+
+.sensor-tabular-val {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--polaris-text-primary);
+}
+
+.sensor-unit-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--polaris-text-muted);
+}
+
+.sensor-quality-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--polaris-text-secondary);
+}
+
+.sensor-time-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7125rem;
+  color: var(--polaris-text-muted);
+}
+
+.sensor-coords-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7125rem;
+  color: var(--polaris-text-secondary);
+}
+
+/* Status Indicator Pill */
+.sensor-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+}
+
+.sensor-status-indicator.normal {
+  color: var(--status-normal);
+  background: var(--status-normal-bg);
+  border-color: var(--status-normal-border);
+}
+
+.sensor-status-indicator.warning {
+  color: var(--status-warning);
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+}
+
+.sensor-status-indicator.critical {
+  color: var(--status-critical);
+  background: var(--status-critical-bg);
+  border-color: var(--status-critical-border);
+}
+
+.sensor-status-indicator.offline {
+  color: var(--status-offline);
+  background: var(--status-offline-bg);
+  border-color: var(--status-offline-border);
+}
+
+.sensor-status-indicator.unknown {
+  color: var(--status-offline);
+  background: var(--status-offline-bg);
+  border-color: var(--status-offline-border);
+}
+
+/* Mobile Stacked Sensor Cards (<768px) */
+.sensor-mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.sensor-card-mobile {
+  background: var(--polaris-bg-elevated);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.sensor-card-mobile:hover {
+  border-color: var(--polaris-border-strong);
+}
+
+/* Detail Modal / Slide-over */
+.sensor-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(25, 28, 32, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: modal-fade 0.2s ease;
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sensor-modal-content {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  max-width: 620px;
+  box-shadow: 0 16px 36px -4px rgba(25, 28, 32, 0.15);
+  overflow: hidden;
+  animation: modal-slide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-slide {
+  from { transform: translateY(12px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.sensor-modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--polaris-border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: var(--polaris-bg-subtle);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--polaris-text-muted);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: var(--polaris-bg-surface);
+  color: var(--polaris-text-primary);
+  border-color: var(--polaris-border-strong);
+}
+
+.sensor-modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sensor-hero-telemetry-banner {
+  background: var(--polaris-bg-elevated);
+  border: 1px solid var(--polaris-border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 1.25rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sensor-hero-reading {
+  font-family: var(--font-mono);
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: var(--polaris-text-primary);
+  line-height: 1;
+}
+
+.sensor-hero-reading .unit {
+  font-size: 1.1rem;
+  color: var(--polaris-text-muted);
+  margin-left: 0.25rem;
+  font-weight: 500;
+}
+
+.sensor-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem 1.25rem;
+  font-size: 0.8125rem;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+  padding-bottom: 0.4rem;
+}
+
+.spec-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.spec-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--polaris-text-primary);
+}
+
+.sensor-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.digital-twin-action-btn {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--polaris-copper);
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Responsive Breakpoints for Sensors */
+@media (max-width: 960px) {
+  .sensors-summary-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sensors-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sensors-summary-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sensor-table-container .sensor-table-scroll {
+    display: none;
+  }
+
+  .sensor-mobile-cards {
+    display: flex;
+  }
+
+  .sensors-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { StationProvider } from './context/StationContext';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './pages/Dashboard';
+import { Sensors } from './pages/Sensors';
 import { ModulePlaceholder } from './pages/ModulePlaceholder';
 import './styles/dashboard.css';
 
@@ -18,7 +19,7 @@ export function App() {
             <Route path="/alerts" element={<ModulePlaceholder />} />
             <Route path="/energy" element={<ModulePlaceholder />} />
             <Route path="/logistics" element={<ModulePlaceholder />} />
-            <Route path="/sensors" element={<ModulePlaceholder />} />
+            <Route path="/sensors" element={<Sensors />} />
             <Route path="/events" element={<ModulePlaceholder />} />
             <Route path="/settings" element={<ModulePlaceholder />} />
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -109,12 +109,20 @@ export const STATIONS = {
       sensors: []
     },
 
-    // Placeholder configuration for IoT sensor array topology
+    // Comprehensive sensor registry configuration
     sensors: [
-      { id: "SN-MTR-01", name: "Anemometer Mast Alpha", type: "WIND_SPEED", unit: "km/h", x: 12.4, y: 8.5, z: 0.0, status: "ACTIVE" },
-      { id: "SN-MTR-02", name: "External RTD Thermal Probe 1", type: "TEMPERATURE", unit: "°C", x: 5.2, y: 3.1, z: 1.2, status: "ACTIVE" },
-      { id: "SN-MTR-03", name: "DG-2 Vibration Accelerometer", type: "VIBRATION", unit: "mm/s", x: -8.0, y: 14.2, z: -0.5, status: "WARNING" },
-      { id: "SN-MTR-04", name: "Solar Array Pyranometer", type: "IRRADIANCE", unit: "W/m²", x: 18.0, y: -4.5, z: 2.0, status: "ACTIVE" }
+      { id: "ENV-MTR-001", name: "Ambient Meteorological RTD", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -18.4, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:09 UTC", criticality: "HIGH", minValue: -50.0, maxValue: 10.0, x: 2.0, y: 3.0, z: 4.0 },
+      { id: "ENV-MTR-002", name: "Anemometer Mast Alpha", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 42.5, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:07 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 160.0, x: 12.4, y: 8.5, z: 10.0 },
+      { id: "ENV-MTR-003", name: "Barometric Pressure Transducer", domain: "ENVIRONMENT", type: "PRESSURE", value: 986.2, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:55 UTC", criticality: "MEDIUM", minValue: 920.0, maxValue: 1040.0, x: 1.5, y: 2.0, z: 1.8 },
+      { id: "ENV-MTR-004", name: "East Mast Humidity Probe", domain: "ENVIRONMENT", type: "HUMIDITY", value: 58.0, unit: "%", status: "WARNING", quality: "DEGRADED", lastUpdate: "19:26:40 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 100.0, x: 14.0, y: 9.0, z: 6.0 },
+      { id: "ENG-MTR-001", name: "Solar Array Pyranometer", domain: "ENERGY", type: "IRRADIANCE", value: 420.0, unit: "W/m²", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:02 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 1200.0, x: 18.0, y: -4.5, z: 2.0 },
+      { id: "ENG-MTR-002", name: "DG-2 Vibration Accelerometer", domain: "ENERGY", type: "VIBRATION", value: 4.8, unit: "mm/s", status: "CRITICAL", quality: "DEGRADED", lastUpdate: "19:27:12 UTC", criticality: "CRITICAL", minValue: 0.0, maxValue: 3.5, x: -8.0, y: 14.2, z: -0.5 },
+      { id: "ENG-MTR-003", name: "Battery Bank B Voltage Monitor", domain: "ENERGY", type: "VOLTAGE", value: 418.2, unit: "V", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:05 UTC", criticality: "HIGH", minValue: 380.0, maxValue: 440.0, x: -6.5, y: 11.0, z: -0.2 },
+      { id: "ENG-MTR-004", name: "Wind Turbine Generator Load", domain: "ENERGY", type: "POWER", value: 18.4, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 50.0, x: 22.0, y: 15.0, z: 12.0 },
+      { id: "STR-MTR-001", name: "Main Living Module Strain Gauge 1", domain: "STRUCTURE", type: "STRAIN", value: 142.0, unit: "με", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:48 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 800.0, x: 0.0, y: 0.0, z: 1.5 },
+      { id: "STR-MTR-002", name: "Stilt Foundation Thermal Sensor", domain: "STRUCTURE", type: "TEMPERATURE", value: -14.2, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:30 UTC", criticality: "MEDIUM", minValue: -40.0, maxValue: 5.0, x: -2.0, y: 4.0, z: -1.8 },
+      { id: "LOG-MTR-001", name: "Bulk Fuel Tank #1 Ultrasonic Level", domain: "LOGISTICS", type: "LEVEL", value: 64.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:25:10 UTC", criticality: "HIGH", minValue: 15.0, maxValue: 100.0, x: -15.0, y: 6.0, z: 0.0 },
+      { id: "LOG-MTR-002", name: "Day Tank Flow Transducer", domain: "LOGISTICS", type: "FLOW", value: 0.0, unit: "L/min", status: "OFFLINE", quality: "OFFLINE", lastUpdate: "18:42:00 UTC", criticality: "LOW", minValue: 0.0, maxValue: 50.0, x: -8.5, y: 12.0, z: 0.2 }
     ]
   },
 
@@ -220,11 +228,18 @@ export const STATIONS = {
       sensors: []
     },
 
-    // Placeholder configuration for IoT sensor array topology
+    // Comprehensive sensor registry configuration
     sensors: [
-      { id: "SN-BHR-01", name: "Larsemann Anemometer Mast", type: "WIND_SPEED", unit: "km/h", x: 10.0, y: 12.0, z: 0.0, status: "ACTIVE" },
-      { id: "SN-BHR-02", name: "Optical Surface Temperature Sensor", type: "TEMPERATURE", unit: "°C", x: 4.0, y: 2.0, z: 1.0, status: "ACTIVE" },
-      { id: "SN-BHR-03", name: "Satellite Radome Feed Monitor", type: "RF_LEVEL", unit: "dBm", x: 0.0, y: 0.0, z: 6.5, status: "ACTIVE" }
+      { id: "ENV-BHR-001", name: "Larsemann Hills Optical Anemometer", domain: "ENVIRONMENT", type: "WIND_SPEED", value: 26.4, unit: "km/h", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:10 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 180.0, x: 10.0, y: 12.0, z: 8.0 },
+      { id: "ENV-BHR-002", name: "Surface Temperature Array", domain: "ENVIRONMENT", type: "TEMPERATURE", value: -12.6, unit: "°C", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:08 UTC", criticality: "HIGH", minValue: -45.0, maxValue: 15.0, x: 4.0, y: 2.0, z: 1.0 },
+      { id: "ENV-BHR-003", name: "Digital Microbarometer", domain: "ENVIRONMENT", type: "PRESSURE", value: 994.5, unit: "hPa", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:50 UTC", criticality: "MEDIUM", minValue: 930.0, maxValue: 1050.0, x: 0.5, y: 1.2, z: 2.5 },
+      { id: "ENG-BHR-001", name: "Clean Microgrid Solar Bus", domain: "ENERGY", type: "POWER", value: 54.2, unit: "kW", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:04 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 80.0, x: 16.0, y: -2.0, z: 3.0 },
+      { id: "ENG-BHR-002", name: "Lithium Iron Phosphate Battery SOH", domain: "ENERGY", type: "HEALTH", value: 99.4, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:28:00 UTC", criticality: "HIGH", minValue: 70.0, maxValue: 100.0, x: -4.0, y: 8.0, z: 0.0 },
+      { id: "ENG-BHR-003", name: "Wind Turbine #2 Pitch Actuator", domain: "ENERGY", type: "ANGLE", value: 14.5, unit: "deg", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:35 UTC", criticality: "MEDIUM", minValue: 0.0, maxValue: 90.0, x: 20.0, y: 18.0, z: 14.0 },
+      { id: "STR-BHR-001", name: "Integrated Pod Aerodynamic Load", domain: "STRUCTURE", type: "LOAD", value: 38.2, unit: "kN", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:42 UTC", criticality: "HIGH", minValue: 0.0, maxValue: 250.0, x: 0.0, y: 0.0, z: 3.2 },
+      { id: "STR-BHR-002", name: "Structural Joint Expansion Gauge", domain: "STRUCTURE", type: "DISPLACEMENT", value: 0.85, unit: "mm", status: "NORMAL", quality: "GOOD", lastUpdate: "19:26:50 UTC", criticality: "LOW", minValue: 0.0, maxValue: 5.0, x: 6.0, y: 3.0, z: 1.5 },
+      { id: "LOG-BHR-001", name: "Primary Polar Diesel Reserve", domain: "LOGISTICS", type: "LEVEL", value: 84.0, unit: "%", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:15 UTC", criticality: "HIGH", minValue: 20.0, maxValue: 100.0, x: -12.0, y: 4.0, z: -0.5 },
+      { id: "LOG-BHR-002", name: "Waste Heat Glycol Circulation", domain: "LOGISTICS", type: "FLOW", value: 42.0, unit: "L/min", status: "NORMAL", quality: "GOOD", lastUpdate: "19:27:00 UTC", criticality: "MEDIUM", minValue: 10.0, maxValue: 60.0, x: -5.0, y: 7.0, z: 0.5 }
     ]
   }
 };
