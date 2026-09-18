@@ -112,6 +112,7 @@ export const DigitalTwinScene = ({
         showLabels={showLabels}
         showHeatmap={twinMode === 'HEATMAP'}
         selectedZone={selectedSensor?.zone}
+        selectedSensor={selectedSensor}
         twinMode={twinMode}
         focusZone={focusZone}
         telemetry={telemetry}

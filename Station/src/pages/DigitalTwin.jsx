@@ -6,6 +6,7 @@ import { TwinLegend } from '../digital-twin/TwinLegend';
 import { SensorDetailsPanel } from '../digital-twin/SensorDetailsPanel';
 import { AssetInspectPanel } from '../digital-twin/AssetInspectPanel';
 import { ReplayController } from '../digital-twin/ReplayController';
+import { StationStatusHUD, EnvironmentalFeedHUD, RealtimeEventLogHUD } from '../digital-twin/StationHUDOverlays';
 import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
 import { useStation } from '../context/StationContext';
@@ -95,10 +96,24 @@ export const DigitalTwin = () => {
   const handleSelectAsset = useCallback((asset) => {
     setSelectedAsset(asset);
     setSelectedSensorId(null); // close sensor panel if open
+    // Switch to X-RAY so user can see inside
+    setTwinMode(prev => prev === 'NORMAL' ? 'XRAY' : prev);
+    if (asset?.zone) {
+      setFocusZone(asset.zone);
+    }
   }, []);
 
   const handleCloseAssetPanel = useCallback(() => {
     setSelectedAsset(null);
+  }, []);
+
+  const handleSelectSensor = useCallback((sensor) => {
+    setSelectedSensorId(sensor ? sensor.id : null);
+    setSelectedAsset(null); // close asset panel if open
+  }, []);
+
+  const handleCloseSensorPanel = useCallback(() => {
+    setSelectedSensorId(null);
   }, []);
 
   // Scenario-based test sequence (T1–T7, preserved from original)
@@ -142,15 +157,11 @@ export const DigitalTwin = () => {
         break;
       case 6:
         if (targetSensor) {
-          updateSensor(targetSensor.id, { status: 'CRITICAL', anomaly_score: 0.92, anomaly_status: 'CRITICAL' });
           setSelectedSensorId(targetSensor.id);
         }
         break;
       case 7:
-        setActiveStation(activeStation === 'MAITRI' ? 'BHARATI' : 'MAITRI');
-        setSelectedSensorId(null);
-        setSelectedAsset(null);
-        setFocusZone(null);
+        setActiveStation(prev => prev === 'MAITRI' ? 'BHARATI' : 'MAITRI');
         break;
       default:
         break;
@@ -160,31 +171,28 @@ export const DigitalTwin = () => {
   const currentModeDesc = MODES.find(m => m.id === twinMode)?.desc || '';
 
   return (
-    <main className="main-viewport digital-twin-page-container">
+    <main className="main-viewport digital-twin-page">
 
-      {/* ── Top Header ── */}
-      <section className="twin-header-bar" aria-label="Digital Twin Header">
-        <div className="twin-title-group">
+      {/* ── Top Header Bar (Standard Polaris Layout) ── */}
+      <section className="sensors-header-bar" aria-label="Digital Twin Overview">
+        <div className="sensors-title-group">
           <h1>DIGITAL TWIN</h1>
-          <p className="twin-subtitle">
-            Operational spatial twin — {currentModeDesc}
+          <p className="sensors-subtitle">
+            {currentModeDesc || 'Operational 3D spatial twin and facility telemetry monitor'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <StationSelector />
-          <div className="sensors-station-stamp">
-            <span className="station-badge-clean">
-              {stationTitle.toUpperCase()} / {stationCode}
-            </span>
-            <span className="simulation-data-tag">
-              {activeScenario !== 'NORMAL' ? `SCENARIO: ${activeScenario}` : 'LIVE TELEMETRY'}
-            </span>
-          </div>
+        <div className="sensors-station-stamp">
+          <span className="station-badge-clean">
+            {stationTitle.toUpperCase()} / {stationCode} • {config?.zones?.length || 6} MODULES • {sensors.length} SENSORS
+          </span>
+          <span className="simulation-data-tag">
+            {activeScenario && activeScenario !== 'NORMAL' ? `SCENARIO: ${activeScenario}` : 'LIVE TELEMETRY'}
+          </span>
         </div>
       </section>
 
-      {/* ── Mode Switcher ── */}
+      {/* ── Mode Switcher & Viewport Toolbar ── */}
       <div className="twin-mode-strip" role="toolbar" aria-label="Digital Twin Mode Controls">
         <div className="twin-mode-switcher">
           {MODES.map(mode => (
@@ -232,32 +240,51 @@ export const DigitalTwin = () => {
         </div>
       </div>
 
+      {/* ── Infrastructure Component Quick Selector Strip ── */}
+      <div className="twin-component-strip" role="toolbar" aria-label="Select Infrastructure Component">
+        <span className="twin-component-label">INFRASTRUCTURE ASSETS:</span>
+        {[
+          { id: 'ENERGY-BATT-01',    type: 'BATTERY',     label: 'BATTERY BANK A',  zone: 'ENERGY', status: 'RUNNING' },
+          { id: 'ENERGY-BATT-02',    type: 'BATTERY',     label: 'BATTERY BANK B',  zone: 'ENERGY', status: 'RUNNING' },
+          { id: 'ENERGY-INV-01',     type: 'INVERTER',    label: 'MICROGRID INV.',  zone: 'ENERGY', status: 'RUNNING' },
+          { id: 'ENERGY-TRANS-01',   type: 'TRANSFORMER', label: 'HV TRANSFORMER',  zone: 'ENERGY', status: 'RUNNING' },
+          { id: 'GENERATOR-GEN-01',  type: 'GENERATOR',   label: 'DIESEL GEN #1',   zone: 'GENERATOR', status: 'RUNNING' },
+          { id: 'GENERATOR-GEN-02',  type: 'GENERATOR',   label: 'DIESEL GEN #2',   zone: 'GENERATOR', status: 'RUNNING' },
+          { id: 'GENERATOR-FUEL-01', type: 'FUEL_TANK',   label: 'DAY TANK',        zone: 'GENERATOR', status: 'RUNNING' },
+          { id: 'MAIN-HVAC-01',      type: 'HVAC',        label: 'HVAC UNIT A',     zone: 'MAIN', status: 'RUNNING' },
+          { id: 'RESEARCH-RES-01',   type: 'RESEARCH',    label: 'MET ARRAY',       zone: 'RESEARCH', status: 'RUNNING' },
+          { id: 'STORAGE-FREEZE-01', type: 'FREEZER',     label: 'CRYO FREEZER',    zone: 'STORAGE', status: 'RUNNING' },
+        ].map(comp => (
+          <button
+            key={comp.id}
+            type="button"
+            className={`twin-comp-chip ${selectedAsset?.id === comp.id ? 'active' : ''}`}
+            onClick={() => handleSelectAsset(comp)}
+          >
+            <span className="twin-comp-dot" />
+            {comp.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Main 3D Viewport Card ── */}
       <section className="twin-viewport-card" aria-label="3D Spatial Model Viewport">
         <div className="twin-canvas-wrapper">
 
-          {/* Verification Sequence (Tests 1–7) — compact strip */}
-          <div className="twin-verify-strip">
-            <span className="twin-verify-label">VERIFY:</span>
-            {[
-              { id: 1, label: 'NORMAL' },
-              { id: 2, label: 'WARN' },
-              { id: 3, label: 'CRIT' },
-              { id: 4, label: 'OFFLINE' },
-              { id: 5, label: 'RECOVER' },
-              { id: 6, label: 'SELECT' },
-              { id: 7, label: 'SWITCH' }
-            ].map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`twin-verify-btn ${activeTestNum === t.id ? 'active' : ''}`}
-                onClick={() => handleRunTest(t.id)}
-              >
-                T{t.id}:{t.label}
-              </button>
-            ))}
-          </div>
+          {/* Top-Left: Station Status HUD (Matching Authentic Reference Design) */}
+          <StationStatusHUD
+            telemetry={telemetry}
+            sensors={sensors}
+            config={config}
+          />
+
+          {/* Top-Right & Bottom-Right HUDs (Visible when inspect panel is not open) */}
+          {!selectedAsset && !selectedSensor && (
+            <>
+              <EnvironmentalFeedHUD telemetry={telemetry} />
+              <RealtimeEventLogHUD telemetry={telemetry} alerts={config?.alerts} />
+            </>
+          )}
 
           {/* Heatmap inspection badge (HEATMAP mode only) */}
           {twinMode === 'HEATMAP' && (
@@ -300,9 +327,14 @@ export const DigitalTwin = () => {
             selectedAssetId={selectedAsset?.id}
           />
 
-          {/* Legend (all non-SYSTEM modes) */}
+          {/* Legend */}
           {twinMode !== 'REPLAY' && (
-            <TwinLegend sensors={sensors} isHeatmapActive={twinMode === 'HEATMAP'} />
+            <TwinLegend
+              sensors={sensors}
+              isHeatmapActive={twinMode === 'HEATMAP'}
+              isSystemActive={twinMode === 'SYSTEM'}
+              telemetry={telemetry}
+            />
           )}
 
           {/* Camera nav hint */}
@@ -326,6 +358,40 @@ export const DigitalTwin = () => {
             onClose={handleCloseAssetPanel}
           />
         )}
+      </section>
+
+      {/* ── Operational Diagnostics & Verification Test Sequence (T1–T7) ── */}
+      <section className="twin-diagnostics-section" aria-label="Operational Verification Suite">
+        <div className="twin-diagnostics-header">
+          <div className="twin-diagnostics-title">
+            <span style={{ color: 'var(--polaris-copper)' }}>⚡</span>
+            OPERATIONAL VERIFICATION &amp; TEST SEQUENCE (T1–T7)
+          </div>
+          <span style={{ fontSize: '0.6rem', color: 'var(--polaris-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            Targeted State &amp; Telemetry Validation
+          </span>
+        </div>
+        <div className="twin-diagnostics-grid">
+          {[
+            { id: 1, label: 'T1: NORMAL', desc: 'Restore nominal state and clear overrides' },
+            { id: 2, label: 'T2: WARNING', desc: 'Inject warning status and anomaly score 0.58' },
+            { id: 3, label: 'T3: CRITICAL', desc: 'Inject critical status and anomaly score 0.94' },
+            { id: 4, label: 'T4: OFFLINE', desc: 'Drop telemetry connection to offline' },
+            { id: 5, label: 'T5: RECOVERY', desc: 'Execute recovery cycle to healthy baseline' },
+            { id: 6, label: 'T6: SELECT SENSOR', desc: 'Target and select active sensor marker' },
+            { id: 7, label: 'T7: SWITCH STATION', desc: 'Toggle between Maitri and Bharati stations' }
+          ].map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`twin-diagnostics-btn ${activeTestNum === t.id ? 'active' : ''}`}
+              onClick={() => handleRunTest(t.id)}
+              title={t.desc}
+            >
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </div>
       </section>
 
       {/* REPLAY mode timeline dock */}

@@ -1,15 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 const STATUS_COLOR = {
-  RUNNING:  '#2d8a4e',
-  NORMAL:   '#2d8a4e',
-  CHARGING: '#2d8a4e',
-  WARNING:  '#c87a1a',
-  CRITICAL: '#c0392b',
-  OFFLINE:  '#5d6672'
+  RUNNING:  '#38a169',
+  NORMAL:   '#38a169',
+  CHARGING: '#38a169',
+  WARNING:  '#d97706',
+  CRITICAL: '#e53e3e',
+  OFFLINE:  '#64748b'
 };
 
 const getColor = (status) => STATUS_COLOR[status?.toUpperCase()] || STATUS_COLOR.RUNNING;
@@ -558,21 +558,16 @@ export const InternalAssetMarker = ({
   status = 'RUNNING',
   isHighlighted = false,
   isSelected = false,
+  isPrimary = true,
+  labelY = 3.2,
+  isAssociated = false,
+  selectedSensorId = null,
   showLabel = true,
   onClick
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const groupRef = useRef();
   const col = getColor(status);
-
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return;
-    if (isHighlighted || isSelected) {
-      const s = 1 + Math.sin(clock.getElapsedTime() * 2.5) * 0.015;
-      groupRef.current.scale.setScalar(s);
-    } else {
-      groupRef.current.scale.setScalar(1);
-    }
-  });
 
   const MeshComponent = ASSET_MESH_MAP[type] || ASSET_MESH_MAP.CONTROL;
 
@@ -581,10 +576,26 @@ export const InternalAssetMarker = ({
     if (onClick) onClick(id);
   };
 
+  const isActive = isHighlighted || isSelected || isAssociated;
+  const shouldShowLabel = showLabel && (isPrimary || isActive || isHovered);
+
   return (
-    <group ref={groupRef} position={position} onClick={handleClick}>
+    <group ref={groupRef} position={position}>
+      {/* Generous invisible bounding box for effortless raycast selection */}
+      <mesh
+        position={[0, 1.8, 0]}
+        onClick={handleClick}
+        onPointerOver={(e) => { e.stopPropagation(); setIsHovered(true); document.body.style.cursor = 'pointer'; }}
+        onPointerOut={(e) => { e.stopPropagation(); setIsHovered(false); document.body.style.cursor = 'default'; }}
+      >
+        <boxGeometry args={[4.2, 5.2, 3.4]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
       {/* Realistic 3D equipment model */}
-      <MeshComponent status={status} />
+      <group onClick={handleClick}>
+        <MeshComponent status={status} />
+      </group>
 
       {/* Floor shadow footprint */}
       <mesh
@@ -597,30 +608,45 @@ export const InternalAssetMarker = ({
         <meshBasicMaterial
           color="#000000"
           transparent
-          opacity={0.08}
+          opacity={0.06}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Highlight selection ring */}
-      {(isHighlighted || isSelected) && (
+      {/* Highlight / Association selection ring (Stationary, no flashing) */}
+      {isActive && (
         <mesh
           position={[0, 0.02, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           renderOrder={30}
+          raycast={() => null}
         >
-          <ringGeometry args={[1.8, 2.1, 32]} />
+          <ringGeometry args={[1.8, 2.15, 32]} />
           <meshBasicMaterial
-            color={isHighlighted ? '#b65a1f' : col}
+            color={isAssociated ? '#b65a1f' : isSelected ? '#b65a1f' : col}
             transparent
-            opacity={0.7}
+            opacity={0.85}
             depthWrite={false}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
 
-      {/* Subtle status floor glow */}
+      {/* Subtle copper focus outline frame around selected/associated asset */}
+      {isActive && (
+        <mesh position={[0, 1.8, 0]} raycast={() => null} renderOrder={29}>
+          <boxGeometry args={[3.8, 3.8, 2.6]} />
+          <meshBasicMaterial
+            color="#b65a1f"
+            wireframe
+            transparent
+            opacity={0.35}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
+
+      {/* Subtle status floor circle */}
       <mesh
         position={[0, 0.01, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -631,48 +657,163 @@ export const InternalAssetMarker = ({
         <meshBasicMaterial
           color={col}
           transparent
-          opacity={status === 'CRITICAL' ? 0.18 : status === 'WARNING' ? 0.12 : 0.06}
+          opacity={status === 'CRITICAL' ? 0.16 : status === 'WARNING' ? 0.10 : 0.05}
           depthWrite={false}
         />
       </mesh>
 
-      {/* HTML label — compact and clean */}
-      {showLabel && (
+      {/* HTML label — clickable badge with distinct hierarchy & sensor relationship */}
+      {shouldShowLabel && (
         <Html
-          position={[0, 3.2, 0]}
+          position={[0, labelY, 0]}
           center
-          distanceFactor={38}
-          zIndexRange={[60, 0]}
+          distanceFactor={40}
+          zIndexRange={[80, 0]}
           occlude={false}
         >
-          <div style={{
-            background: 'rgba(18,22,30,0.92)',
-            border: `1px solid ${isHighlighted ? '#b65a1f' : col}`,
-            borderRadius: '2px',
-            padding: '3px 8px',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '10px',
-            fontWeight: 700,
-            letterSpacing: '0.06em',
-            color: '#f0ece4',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            lineHeight: 1
-          }}>
-            <span style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: col,
-              flexShrink: 0,
-              boxShadow: `0 0 4px ${col}`
-            }} />
-            <span>{label}</span>
-          </div>
+          {isAssociated && selectedSensorId ? (
+            /* Selected Sensor to Asset Relationship Badge */
+            <div
+              onClick={handleClick}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '2px',
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+                userSelect: 'none'
+              }}
+            >
+              <div
+                style={{
+                  background: '#b65a1f',
+                  border: '1px solid #ff9d54',
+                  borderRadius: '2px',
+                  padding: '2px 7px',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '9px',
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 8px rgba(182,90,31,0.5)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {selectedSensorId}
+              </div>
+              <div
+                style={{
+                  color: '#b65a1f',
+                  fontSize: '12px',
+                  lineHeight: '10px',
+                  fontWeight: 900,
+                  textShadow: '0 0 3px rgba(182,90,31,0.8)'
+                }}
+              >
+                ↓
+              </div>
+              <div
+                style={{
+                  background: 'rgba(12, 16, 24, 0.96)',
+                  border: '1.5px solid #b65a1f',
+                  borderRadius: '2px',
+                  padding: '3px 8px',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '10.5px',
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  color: '#ffffff',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 0 16px rgba(182,90,31,0.55)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: col,
+                    flexShrink: 0
+                  }}
+                />
+                <span>{label}</span>
+              </div>
+            </div>
+          ) : isPrimary ? (
+            /* Primary Operational Asset Label (Larger, High Contrast, Always Readable) */
+            <div
+              onClick={handleClick}
+              style={{
+                background: 'rgba(12, 16, 24, 0.95)',
+                border: `1px solid ${isSelected ? '#b65a1f' : col}`,
+                borderRadius: '2px',
+                padding: '3px 8px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                color: '#ffffff',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.55)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                lineHeight: 1
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: col,
+                  flexShrink: 0
+                }}
+              />
+              <span>{label}</span>
+            </div>
+          ) : (
+            /* Secondary Infrastructure Label (Subtle, Smaller) */
+            <div
+              onClick={handleClick}
+              style={{
+                background: 'rgba(24, 30, 42, 0.65)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '2px',
+                padding: '2px 5px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '8px',
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                color: '#94a3b8',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                lineHeight: 1
+              }}
+            >
+              <span
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  background: col,
+                  flexShrink: 0
+                }}
+              />
+              <span>{label}</span>
+            </div>
+          )}
         </Html>
       )}
     </group>

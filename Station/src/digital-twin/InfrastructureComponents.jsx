@@ -98,7 +98,7 @@ export const SolarPanelArray = ({
           rotation={[tiltAngle, 0, 0]}
         >
           {/* Aluminum Outer Frame */}
-          <mesh castShadow>
+          <mesh castShadow raycast={isTransparent ? () => null : undefined}>
             <boxGeometry args={[panelWidth, 0.08, panelHeight]} />
             <meshStandardMaterial
               color="#cbd5e1"
@@ -111,7 +111,7 @@ export const SolarPanelArray = ({
           </mesh>
 
           {/* Deep Photovoltaic Silicon Wafer Surface (Vibrant Solar Blue) */}
-          <mesh position={[0, 0.045, 0]}>
+          <mesh position={[0, 0.045, 0]} raycast={isTransparent ? () => null : undefined}>
             <boxGeometry args={[panelWidth - 0.10, 0.02, panelHeight - 0.10]} />
             <meshStandardMaterial
               color="#1d4ed8"
@@ -213,9 +213,9 @@ export const RooftopHVACUnit = ({
           <mesh>
             <planeGeometry args={[width * 0.85, height * 0.7]} />
             <meshStandardMaterial
-              color="#1e293b"
+              color={isTransparent ? '#cbd5e1' : '#1e293b'}
               roughness={0.7}
-              metalness={0.5}
+              metalness={isTransparent ? 0.1 : 0.5}
               transparent={isTransparent}
               opacity={opacity}
               depthWrite={depthWrite}
@@ -226,8 +226,8 @@ export const RooftopHVACUnit = ({
             <mesh key={`lblade-${li}`} position={[0, ly, 0.01]}>
               <boxGeometry args={[width * 0.82, 0.03, 0.02]} />
               <meshStandardMaterial
-                color="#475569"
-                metalness={0.6}
+                color={isTransparent ? '#cbd5e1' : '#475569'}
+                metalness={isTransparent ? 0.1 : 0.6}
                 roughness={0.4}
                 transparent={isTransparent}
                 opacity={opacity}
@@ -244,11 +244,11 @@ export const RooftopHVACUnit = ({
         return (
           <group key={`fan-${fi}`} position={[fx, height + 0.24, 0]}>
             {/* Raised Circular Cowling Collar */}
-            <mesh position={[0, 0.12, 0]} castShadow>
+            <mesh position={[0, 0.12, 0]} castShadow={!isTransparent}>
               <cylinderGeometry args={[0.9, 0.96, 0.24, 24, 1, true]} />
               <meshStandardMaterial
-                color="#334155"
-                metalness={0.6}
+                color={isTransparent ? '#cbd5e1' : '#334155'}
+                metalness={isTransparent ? 0.1 : 0.6}
                 roughness={0.4}
                 side={THREE.DoubleSide}
                 transparent={isTransparent}
@@ -261,8 +261,8 @@ export const RooftopHVACUnit = ({
             <mesh position={[0, 0.02, 0]}>
               <cylinderGeometry args={[0.88, 0.88, 0.04, 24]} />
               <meshStandardMaterial
-                color="#0f172a"
-                metalness={0.8}
+                color={isTransparent ? '#cbd5e1' : '#0f172a'}
+                metalness={isTransparent ? 0.1 : 0.8}
                 roughness={0.2}
                 transparent={isTransparent}
                 opacity={opacity}
@@ -276,7 +276,7 @@ export const RooftopHVACUnit = ({
                 <torusGeometry args={[gr, 0.02, 6, 24]} />
                 <meshStandardMaterial
                   color="#94a3b8"
-                  metalness={0.85}
+                  metalness={isTransparent ? 0.1 : 0.85}
                   roughness={0.3}
                   transparent={isTransparent}
                   opacity={opacity}
@@ -289,8 +289,8 @@ export const RooftopHVACUnit = ({
             <mesh position={[0, 0.14, 0]}>
               <cylinderGeometry args={[0.22, 0.22, 0.16, 16]} />
               <meshStandardMaterial
-                color="#1e293b"
-                metalness={0.7}
+                color={isTransparent ? '#cbd5e1' : '#1e293b'}
+                metalness={isTransparent ? 0.1 : 0.7}
                 roughness={0.3}
                 transparent={isTransparent}
                 opacity={opacity}
@@ -301,11 +301,11 @@ export const RooftopHVACUnit = ({
             {/* Cross Spider Brackets */}
             <mesh position={[0, 0.23, 0]}>
               <boxGeometry args={[1.75, 0.025, 0.04]} />
-              <meshStandardMaterial color="#64748b" metalness={0.7} roughness={0.4} />
+              <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#64748b'} transparent={isTransparent} opacity={opacity} />
             </mesh>
             <mesh position={[0, 0.23, 0]}>
               <boxGeometry args={[0.04, 0.025, 1.75]} />
-              <meshStandardMaterial color="#64748b" metalness={0.7} roughness={0.4} />
+              <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#64748b'} transparent={isTransparent} opacity={opacity} />
             </mesh>
           </group>
         );
@@ -313,13 +313,13 @@ export const RooftopHVACUnit = ({
 
       {/* Electrical Service Disconnect Box */}
       <group position={[width / 2 + 0.12, height * 0.6, 0.4]}>
-        <mesh castShadow>
+        <mesh castShadow={!isTransparent}>
           <boxGeometry args={[0.24, 0.7, 0.45]} />
-          <meshStandardMaterial color="#475569" metalness={0.5} roughness={0.5} />
+          <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#475569'} transparent={isTransparent} opacity={opacity} />
         </mesh>
         <mesh position={[0.13, 0.1, 0]}>
           <boxGeometry args={[0.04, 0.15, 0.08]} />
-          <meshStandardMaterial color="#e2e8f0" metalness={0.8} />
+          <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#e2e8f0'} transparent={isTransparent} opacity={opacity} />
         </mesh>
       </group>
 
@@ -328,12 +328,12 @@ export const RooftopHVACUnit = ({
         {/* Horizontal run */}
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.08, 0.08, 0.6, 12]} />
-          <meshStandardMaterial color={pipeColor} metalness={0.65} roughness={0.3} />
+          <meshStandardMaterial color={isTransparent ? '#cbd5e1' : pipeColor} transparent={isTransparent} opacity={opacity} />
         </mesh>
         {/* 90-degree elbow to roof */}
         <mesh position={[-0.3, -0.2, 0]}>
           <cylinderGeometry args={[0.08, 0.08, 0.5, 12]} />
-          <meshStandardMaterial color={pipeColor} metalness={0.65} roughness={0.3} />
+          <meshStandardMaterial color={isTransparent ? '#cbd5e1' : pipeColor} transparent={isTransparent} opacity={opacity} />
         </mesh>
       </group>
     </group>
@@ -353,11 +353,13 @@ export const AirlockEntranceModule = ({
   depthWrite = true
 }) => {
   const isTransparent = opacity < 1.0;
+  const subOp = isTransparent ? Math.min(opacity, 0.10) : 1.0;
+  const subSteel = isTransparent ? '#94a3b8' : '#1e293b';
 
   return (
     <group position={position}>
       {/* Insulated Vestibule Shell */}
-      <mesh position={[0, height / 2, depth / 2]} castShadow receiveShadow>
+      <mesh position={[0, height / 2, depth / 2]} castShadow={!isTransparent} receiveShadow={!isTransparent}>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial
           color="#f1f5f9"
@@ -373,9 +375,9 @@ export const AirlockEntranceModule = ({
       <mesh position={[0, height / 2, depth + 0.06]}>
         <boxGeometry args={[width + 0.25, height + 0.25, 0.12]} />
         <meshStandardMaterial
-          color="#334155"
+          color={isTransparent ? '#cbd5e1' : '#334155'}
           roughness={0.5}
-          metalness={0.5}
+          metalness={isTransparent ? 0.1 : 0.5}
           transparent={isTransparent}
           opacity={opacity}
           depthWrite={depthWrite}
@@ -384,27 +386,30 @@ export const AirlockEntranceModule = ({
 
       {/* Heavy Sealed Arctic Airlock Hatch */}
       <group position={[0, height / 2, depth + 0.14]}>
-        {/* Door Frame with Illuminated Status Beacon Border */}
+        {/* Door Frame */}
         <mesh>
           <boxGeometry args={[2.2, 3.6, 0.12]} />
           <meshStandardMaterial
-            color="#1e293b"
-            roughness={0.4}
-            metalness={0.7}
+            color={subSteel}
+            roughness={0.6}
+            metalness={isTransparent ? 0.1 : 0.7}
             transparent={isTransparent}
-            opacity={opacity}
+            opacity={subOp}
             depthWrite={depthWrite}
           />
         </mesh>
 
-        {/* Status Light Trim (Green nominal status border) */}
+        {/* Status Light Trim */}
         <mesh position={[0, 0, 0.07]}>
           <boxGeometry args={[2.0, 3.4, 0.02]} />
           <meshStandardMaterial
-            color="#059669"
-            emissive="#10b981"
-            emissiveIntensity={0.6}
+            color={isTransparent ? '#94a3b8' : '#059669'}
+            emissive={isTransparent ? '#000000' : '#10b981'}
+            emissiveIntensity={isTransparent ? 0 : 0.6}
             roughness={0.2}
+            transparent={isTransparent}
+            opacity={subOp}
+            depthWrite={depthWrite}
           />
         </mesh>
 
@@ -413,8 +418,11 @@ export const AirlockEntranceModule = ({
           <boxGeometry args={[1.7, 3.1, 0.06]} />
           <meshStandardMaterial
             color="#cbd5e1"
-            metalness={0.85}
-            roughness={0.25}
+            metalness={isTransparent ? 0.2 : 0.85}
+            roughness={0.4}
+            transparent={isTransparent}
+            opacity={subOp}
+            depthWrite={depthWrite}
           />
         </mesh>
 
@@ -422,44 +430,50 @@ export const AirlockEntranceModule = ({
         <mesh position={[0, 0.6, 0.13]}>
           <boxGeometry args={[0.55, 0.8, 0.04]} />
           <meshStandardMaterial
-            color="#0284c7"
-            metalness={0.9}
-            roughness={0.1}
-            emissive="#0369a1"
-            emissiveIntensity={0.25}
+            color={isTransparent ? '#cbd5e1' : '#0284c7'}
+            metalness={isTransparent ? 0.1 : 0.9}
+            roughness={0.3}
+            emissive={isTransparent ? '#000000' : '#0369a1'}
+            emissiveIntensity={isTransparent ? 0 : 0.25}
+            transparent={isTransparent}
+            opacity={subOp}
+            depthWrite={depthWrite}
           />
         </mesh>
 
         {/* Industrial Locking Wheel / Lever */}
         <mesh position={[0.6, 0, 0.15]} rotation={[0, 0, 0.4]}>
           <cylinderGeometry args={[0.08, 0.08, 0.5, 8]} />
-          <meshStandardMaterial color="#f97316" metalness={0.7} roughness={0.3} />
+          <meshStandardMaterial
+            color={isTransparent ? '#94a3b8' : '#f97316'}
+            metalness={isTransparent ? 0.1 : 0.7}
+            roughness={0.4}
+            transparent={isTransparent}
+            opacity={subOp}
+            depthWrite={depthWrite}
+          />
         </mesh>
       </group>
 
-      {/* Outdoor Biometric / Status Terminal Screens (Left & Right) */}
+      {/* Outdoor Biometric / Status Terminal Screens */}
       {[-width * 0.38, width * 0.38].map((tx, ti) => (
         <group key={`screen-${ti}`} position={[tx, height * 0.55, depth + 0.2]}>
-          {/* Articulated Steel Mounting Arm */}
           <mesh position={[ti === 0 ? 0.2 : -0.2, 0, -0.15]}>
             <boxGeometry args={[0.3, 0.08, 0.3]} />
-            <meshStandardMaterial color="#475569" metalness={0.8} />
+            <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
           </mesh>
-
-          {/* Screen Ruggedized Metal Housing */}
-          <mesh castShadow>
+          <mesh castShadow={!isTransparent}>
             <boxGeometry args={[0.9, 0.65, 0.1]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.6} />
+            <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
           </mesh>
-
-          {/* Active Terminal Display (Emissive HUD glowing screen) */}
           <mesh position={[0, 0, 0.055]}>
             <planeGeometry args={[0.8, 0.55]} />
             <meshStandardMaterial
-              color="#0f172a"
-              emissive={ti === 0 ? '#10b981' : '#0284c7'}
-              emissiveIntensity={0.55}
-              roughness={0.2}
+              color={isTransparent ? '#cbd5e1' : '#0f172a'}
+              emissive={isTransparent ? '#000000' : (ti === 0 ? '#10b981' : '#0284c7')}
+              emissiveIntensity={isTransparent ? 0 : 0.55}
+              transparent={isTransparent}
+              opacity={subOp}
             />
           </mesh>
         </group>
@@ -467,64 +481,62 @@ export const AirlockEntranceModule = ({
 
       {/* Exterior Galvanized Steel Grating Entrance Porch */}
       <group position={[0, 0, depth + 2.2]}>
-        {/* Diamond Grip Deck Plate */}
-        <mesh position={[0, 0.15, 0]} receiveShadow>
+        <mesh position={[0, 0.15, 0]} receiveShadow={!isTransparent}>
           <boxGeometry args={[width * 1.05, 0.3, 3.8]} />
           <meshStandardMaterial
-            color="#334155"
+            color={subSteel}
             roughness={0.85}
-            metalness={0.4}
+            metalness={isTransparent ? 0.1 : 0.4}
             transparent={isTransparent}
-            opacity={opacity}
+            opacity={subOp}
             depthWrite={depthWrite}
           />
         </mesh>
 
-        {/* High-Visibility Copper / Orange Perimeter Edge Trim */}
         <mesh position={[0, 0.32, 1.9]}>
           <boxGeometry args={[width * 1.05, 0.06, 0.15]} />
-          <meshStandardMaterial color="#b45309" metalness={0.6} roughness={0.4} />
+          <meshStandardMaterial
+            color={isTransparent ? '#cbd5e1' : '#b45309'}
+            metalness={isTransparent ? 0.1 : 0.6}
+            transparent={isTransparent}
+            opacity={subOp}
+          />
         </mesh>
 
-        {/* Safety Railings (Left, Right, and Front openings) */}
+        {/* Safety Railings */}
         {[-width * 0.51, width * 0.51].map((rx, ri) => (
           <group key={`airlock-rail-${ri}`} position={[rx, 1.0, 0]}>
-            {/* Top rail */}
             <mesh>
               <boxGeometry args={[0.08, 0.08, 3.8]} />
-              <meshStandardMaterial color="#b45309" metalness={0.6} roughness={0.35} />
+              <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#b45309'} transparent={isTransparent} opacity={subOp} />
             </mesh>
-            {/* Mid rail */}
             <mesh position={[0, -0.4, 0]}>
               <boxGeometry args={[0.06, 0.06, 3.8]} />
-              <meshStandardMaterial color="#64748b" metalness={0.7} />
+              <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
             </mesh>
-            {/* Vertical stanchions */}
             {[-1.6, 0, 1.6].map((sz, si) => (
               <mesh key={`post-${si}`} position={[0, -0.45, sz]}>
                 <cylinderGeometry args={[0.05, 0.05, 0.9, 8]} />
-                <meshStandardMaterial color="#334155" metalness={0.7} />
+                <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
               </mesh>
             ))}
           </group>
         ))}
 
-        {/* Industrial Grating Stairs Descending to Snow Datum */}
+        {/* Industrial Grating Stairs */}
         <group position={[0, 0, 2.0]}>
           {Array.from({ length: 5 }).map((_, stepIdx) => {
             const stepY = -stepIdx * (stairElevation / 5.2);
             const stepZ = (stepIdx + 1) * 0.75;
             return (
               <group key={`step-${stepIdx}`} position={[0, stepY, stepZ]}>
-                {/* Tread */}
-                <mesh castShadow receiveShadow>
+                <mesh castShadow={!isTransparent} receiveShadow={!isTransparent}>
                   <boxGeometry args={[3.2, 0.16, 0.7]} />
-                  <meshStandardMaterial color="#1e293b" roughness={0.8} metalness={0.5} />
+                  <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
                 </mesh>
-                {/* Tread nosing */}
                 <mesh position={[0, 0.08, 0.35]}>
                   <boxGeometry args={[3.2, 0.04, 0.06]} />
-                  <meshStandardMaterial color="#b45309" metalness={0.5} />
+                  <meshStandardMaterial color={isTransparent ? '#cbd5e1' : '#b45309'} transparent={isTransparent} opacity={subOp} />
                 </mesh>
               </group>
             );
@@ -539,7 +551,7 @@ export const AirlockEntranceModule = ({
             rotation={[0.45, 0, 0]}
           >
             <cylinderGeometry args={[0.12, 0.12, stairElevation * 1.3, 8]} />
-            <meshStandardMaterial color="#1e293b" metalness={0.7} roughness={0.4} />
+            <meshStandardMaterial color={subSteel} transparent={isTransparent} opacity={subOp} />
           </mesh>
         ))}
       </group>
@@ -562,16 +574,19 @@ export const ParabolicDishAssembly = ({
   depthWrite = true
 }) => {
   const isTransparent = opacity < 1.0;
+  const actualYoke = isTransparent ? '#94a3b8' : yokeColor;
+  const actualDish = isTransparent ? '#cbd5e1' : dishColor;
+  const actualFeed = isTransparent ? '#cbd5e1' : feedColor;
 
   return (
     <group position={position} rotation={[0, azimuth, 0]}>
       {/* Heavy Steel Pedestal Mounting Base */}
-      <mesh position={[0, 0.35, 0]} castShadow>
+      <mesh position={[0, 0.35, 0]} castShadow={!isTransparent}>
         <cylinderGeometry args={[0.7, 0.9, 0.7, 16]} />
         <meshStandardMaterial
-          color={yokeColor}
-          metalness={0.7}
-          roughness={0.4}
+          color={actualYoke}
+          metalness={isTransparent ? 0.1 : 0.7}
+          roughness={isTransparent ? 0.8 : 0.4}
           transparent={isTransparent}
           opacity={opacity}
           depthWrite={depthWrite}
@@ -583,26 +598,40 @@ export const ParabolicDishAssembly = ({
         {/* Azimuth Rotor Hub */}
         <mesh position={[0, 0.2, 0]}>
           <cylinderGeometry args={[0.55, 0.55, 0.4, 16]} />
-          <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.3} />
+          <meshStandardMaterial
+            color={actualYoke}
+            metalness={isTransparent ? 0.1 : 0.8}
+            roughness={0.4}
+            transparent={isTransparent}
+            opacity={opacity}
+            depthWrite={depthWrite}
+          />
         </mesh>
 
         {/* Dual Support Yoke Arms */}
         {[-0.65, 0.65].map((yx, yi) => (
           <mesh key={`yoke-arm-${yi}`} position={[yx, 0.75, 0]}>
             <boxGeometry args={[0.18, 0.95, 0.35]} />
-            <meshStandardMaterial color={yokeColor} metalness={0.7} roughness={0.4} />
+            <meshStandardMaterial
+              color={actualYoke}
+              metalness={isTransparent ? 0.1 : 0.7}
+              roughness={0.4}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
         ))}
 
         {/* Tilted Elevation Head (Parabolic Dish + Feed Horn) */}
         <group position={[0, 1.1, 0]} rotation={[elevation, 0, 0]}>
-          {/* Parabolic Reflector Dish (Curved Shell) */}
-          <mesh castShadow receiveShadow>
+          {/* Parabolic Reflector Dish */}
+          <mesh castShadow={!isTransparent} receiveShadow={!isTransparent}>
             <sphereGeometry args={[radius, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.38]} />
             <meshStandardMaterial
-              color={dishColor}
-              metalness={0.4}
-              roughness={0.25}
+              color={actualDish}
+              metalness={isTransparent ? 0.1 : 0.4}
+              roughness={isTransparent ? 0.7 : 0.25}
               side={THREE.DoubleSide}
               transparent={isTransparent}
               opacity={opacity}
@@ -613,13 +642,26 @@ export const ParabolicDishAssembly = ({
           {/* Dish Aluminum Rim Reinforcing Ring */}
           <mesh position={[0, 0, radius * (1 - Math.cos(Math.PI * 0.38))]} rotation={[Math.PI / 2, 0, 0]}>
             <torusGeometry args={[radius * Math.sin(Math.PI * 0.38), 0.045, 8, 32]} />
-            <meshStandardMaterial color="#64748b" metalness={0.8} />
+            <meshStandardMaterial
+              color={actualYoke}
+              metalness={isTransparent ? 0.1 : 0.8}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
 
           {/* Rear Stiffener Rib Ring */}
           <mesh position={[0, 0, -0.3]}>
             <cylinderGeometry args={[0.9, 1.2, 0.3, 16]} />
-            <meshStandardMaterial color={yokeColor} metalness={0.7} roughness={0.4} />
+            <meshStandardMaterial
+              color={actualYoke}
+              metalness={isTransparent ? 0.1 : 0.7}
+              roughness={0.4}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
 
           {/* Feed Horn Support Struts (Quad-pod) */}
@@ -634,7 +676,13 @@ export const ParabolicDishAssembly = ({
                 rotation={[sy > 0 ? -0.4 : 0.4, sx > 0 ? 0.4 : -0.4, 0]}
               >
                 <cylinderGeometry args={[0.035, 0.035, radius * 0.9, 6]} />
-                <meshStandardMaterial color="#64748b" metalness={0.8} />
+                <meshStandardMaterial
+                  color={actualYoke}
+                  metalness={isTransparent ? 0.1 : 0.8}
+                  transparent={isTransparent}
+                  opacity={opacity}
+                  depthWrite={depthWrite}
+                />
               </mesh>
             );
           })}
@@ -643,11 +691,24 @@ export const ParabolicDishAssembly = ({
           <group position={[0, 0, radius * 0.95]}>
             <mesh rotation={[Math.PI / 2, 0, 0]}>
               <cylinderGeometry args={[0.18, 0.28, 0.35, 16]} />
-              <meshStandardMaterial color={feedColor} metalness={0.8} roughness={0.25} />
+              <meshStandardMaterial
+                color={actualFeed}
+                metalness={isTransparent ? 0.1 : 0.8}
+                roughness={0.4}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
             <mesh position={[0, 0, 0.2]}>
               <sphereGeometry args={[0.14, 16, 12]} />
-              <meshStandardMaterial color="#0f172a" metalness={0.9} />
+              <meshStandardMaterial
+                color={actualYoke}
+                metalness={isTransparent ? 0.1 : 0.9}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
           </group>
         </group>
@@ -671,6 +732,7 @@ export const LatticeTower = ({
   depthWrite = true
 }) => {
   const isTransparent = opacity < 1.0;
+  const actualSteel = isTransparent ? '#94a3b8' : steelColor;
   const sectionHeight = height / sections;
 
   return (
@@ -692,13 +754,13 @@ export const LatticeTower = ({
                 0,
                 -cx * Math.atan2((baseWidth - topWidth) / 2, height)
               ]}
-              castShadow
+              castShadow={!isTransparent}
             >
               <cylinderGeometry args={[0.08, 0.12, height, 8]} />
               <meshStandardMaterial
-                color={steelColor}
-                metalness={0.8}
-                roughness={0.35}
+                color={actualSteel}
+                metalness={isTransparent ? 0.1 : 0.8}
+                roughness={isTransparent ? 0.8 : 0.35}
                 transparent={isTransparent}
                 opacity={opacity}
                 depthWrite={depthWrite}
@@ -718,23 +780,51 @@ export const LatticeTower = ({
             {[-1, 1].map((hx) => (
               <mesh key={`h-x-${hx}`} position={[hx * currentW * 0.48, 0, 0]}>
                 <boxGeometry args={[0.06, 0.06, currentW]} />
-                <meshStandardMaterial color={steelColor} metalness={0.7} roughness={0.4} />
+                <meshStandardMaterial
+                  color={actualSteel}
+                  metalness={isTransparent ? 0.1 : 0.7}
+                  roughness={0.4}
+                  transparent={isTransparent}
+                  opacity={opacity}
+                  depthWrite={depthWrite}
+                />
               </mesh>
             ))}
             {[-1, 1].map((hz) => (
               <mesh key={`h-z-${hz}`} position={[0, 0, hz * currentW * 0.48]}>
                 <boxGeometry args={[currentW, 0.06, 0.06]} />
-                <meshStandardMaterial color={steelColor} metalness={0.7} roughness={0.4} />
+                <meshStandardMaterial
+                  color={actualSteel}
+                  metalness={isTransparent ? 0.1 : 0.7}
+                  roughness={0.4}
+                  transparent={isTransparent}
+                  opacity={opacity}
+                  depthWrite={depthWrite}
+                />
               </mesh>
             ))}
             {/* Diagonal X-struts */}
             <mesh rotation={[0, 0, 0.55]}>
               <boxGeometry args={[0.045, sectionHeight * 1.05, 0.045]} />
-              <meshStandardMaterial color={steelColor} metalness={0.7} roughness={0.4} />
+              <meshStandardMaterial
+                color={actualSteel}
+                metalness={isTransparent ? 0.1 : 0.7}
+                roughness={0.4}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
             <mesh rotation={[0, 0, -0.55]}>
               <boxGeometry args={[0.045, sectionHeight * 1.05, 0.045]} />
-              <meshStandardMaterial color={steelColor} metalness={0.7} roughness={0.4} />
+              <meshStandardMaterial
+                color={actualSteel}
+                metalness={isTransparent ? 0.1 : 0.7}
+                roughness={0.4}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
           </group>
         );
@@ -744,13 +834,26 @@ export const LatticeTower = ({
       <group position={[0, height, 0]}>
         <mesh>
           <boxGeometry args={[topWidth * 1.6, 0.1, topWidth * 1.6]} />
-          <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
+          <meshStandardMaterial
+            color={actualSteel}
+            metalness={isTransparent ? 0.1 : 0.8}
+            roughness={0.4}
+            transparent={isTransparent}
+            opacity={opacity}
+            depthWrite={depthWrite}
+          />
         </mesh>
         {/* Platform Railing */}
         {[-1, 1].map((rx) => (
           <mesh key={`top-rail-${rx}`} position={[rx * topWidth * 0.75, 0.4, 0]}>
             <boxGeometry args={[0.05, 0.05, topWidth * 1.5]} />
-            <meshStandardMaterial color="#f97316" metalness={0.6} />
+            <meshStandardMaterial
+              color={isTransparent ? '#cbd5e1' : '#f97316'}
+              metalness={isTransparent ? 0.1 : 0.6}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
         ))}
       </group>
@@ -759,24 +862,49 @@ export const LatticeTower = ({
       {hasMetGear && (
         <group position={[0, height + 0.1, 0]}>
           {/* Central Lightning Arrester / Whip Antenna Spire */}
-          <mesh position={[0, 2.5, 0]} castShadow>
+          <mesh position={[0, 2.5, 0]} castShadow={!isTransparent}>
             <cylinderGeometry args={[0.03, 0.06, 5.0, 8]} />
-            <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial
+              color="#cbd5e1"
+              metalness={isTransparent ? 0.2 : 0.9}
+              roughness={0.3}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
 
           {/* Cross Meteorological Sensor Arm */}
           <mesh position={[0, 1.2, 0]}>
             <boxGeometry args={[1.8, 0.06, 0.06]} />
-            <meshStandardMaterial color="#334155" metalness={0.8} />
+            <meshStandardMaterial
+              color={actualSteel}
+              metalness={isTransparent ? 0.1 : 0.8}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
           </mesh>
 
           {/* 3D Ultrasonic Anemometer Head */}
           <group position={[-0.85, 1.5, 0]}>
             <cylinderGeometry args={[0.08, 0.08, 0.4, 8]} />
-            <meshStandardMaterial color="#e2e8f0" metalness={0.7} />
+            <meshStandardMaterial
+              color="#e2e8f0"
+              metalness={isTransparent ? 0.1 : 0.7}
+              transparent={isTransparent}
+              opacity={opacity}
+              depthWrite={depthWrite}
+            />
             <mesh position={[0, 0.25, 0]}>
               <sphereGeometry args={[0.12, 12, 8]} />
-              <meshStandardMaterial color="#f97316" metalness={0.5} />
+              <meshStandardMaterial
+                color={isTransparent ? '#cbd5e1' : '#f97316'}
+                metalness={isTransparent ? 0.1 : 0.5}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
           </group>
 
@@ -784,11 +912,22 @@ export const LatticeTower = ({
           <group position={[0.85, 1.5, 0]}>
             <mesh>
               <cylinderGeometry args={[0.06, 0.06, 0.4, 8]} />
-              <meshStandardMaterial color="#e2e8f0" />
+              <meshStandardMaterial
+                color="#e2e8f0"
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
             <mesh position={[0.15, 0.22, 0]} rotation={[0, 0, Math.PI / 2]}>
               <boxGeometry args={[0.04, 0.35, 0.15]} />
-              <meshStandardMaterial color="#38bdf8" metalness={0.7} />
+              <meshStandardMaterial
+                color={isTransparent ? '#cbd5e1' : '#38bdf8'}
+                metalness={isTransparent ? 0.1 : 0.7}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
           </group>
         </group>
@@ -808,20 +947,31 @@ export const StructuralTrussStilts = ({
   steelColor = '#242a35',
   footingColor = '#3a4454',
   opacity = 1.0,
-  depthWrite = true
+  depthWrite = true,
+  castShadow = true,
+  raycast = undefined
 }) => {
   const isTransparent = opacity < 1.0;
+  const matMetalness = isTransparent ? 0.1 : 0.75;
+  const matRoughness = isTransparent ? 0.9 : 0.4;
 
-  // Generate cross-bracing pairs between adjacent pilings
+  // Generate cross-bracing pairs ONLY between immediate adjacent orthogonal pilings (no criss-crossing diagonal spiderwebs)
   const braces = useMemo(() => {
+    // In X-RAY or transparent mode, completely omit interior diagonal cross-braces to eliminate structural visual noise
+    if (isTransparent) return [];
+
     const list = [];
     for (let i = 0; i < pilings.length; i++) {
       for (let j = i + 1; j < pilings.length; j++) {
         const [x1, z1] = pilings[i];
         const [x2, z2] = pilings[j];
+        const dx = Math.abs(x2 - x1);
+        const dz = Math.abs(z2 - z1);
         const dist = Math.hypot(x2 - x1, z2 - z1);
-        // Only brace closely adjacent pilings (e.g. within 6 to 12 units)
-        if (dist > 4.0 && dist < 12.0) {
+
+        // Only brace immediate adjacent neighbors along row or column (dist between 4.0 and 7.5, aligned along X or Z)
+        const isOrthogonalAdjacent = (dx < 0.2 && dz > 3.5 && dz < 7.5) || (dz < 0.2 && dx > 3.5 && dx < 7.5);
+        if (isOrthogonalAdjacent) {
           list.push({
             midX: (x1 + x2) / 2,
             midZ: (z1 + z2) / 2,
@@ -834,7 +984,7 @@ export const StructuralTrussStilts = ({
       }
     }
     return list;
-  }, [pilings]);
+  }, [pilings, isTransparent]);
 
   return (
     <group>
@@ -842,12 +992,12 @@ export const StructuralTrussStilts = ({
       {pilings.map(([cx, cz], idx) => (
         <group key={`piling-${idx}`} position={[cx, stiltY, cz]}>
           {/* Main Round Steel Tube Piling */}
-          <mesh castShadow>
+          <mesh castShadow={castShadow && !isTransparent} raycast={raycast}>
             <cylinderGeometry args={[pilingRadius, pilingRadius, stiltHeight, 12]} />
             <meshStandardMaterial
               color={steelColor}
-              metalness={0.75}
-              roughness={0.4}
+              metalness={matMetalness}
+              roughness={matRoughness}
               transparent={isTransparent}
               opacity={opacity}
               depthWrite={depthWrite}
@@ -855,12 +1005,12 @@ export const StructuralTrussStilts = ({
           </mesh>
 
           {/* Top Hydraulic/Shim Mounting Flange to Building Underbelly */}
-          <mesh position={[0, stiltHeight / 2 - 0.08, 0]}>
+          <mesh position={[0, stiltHeight / 2 - 0.08, 0]} raycast={raycast}>
             <cylinderGeometry args={[pilingRadius * 2.2, pilingRadius * 2.2, 0.16, 12]} />
             <meshStandardMaterial
-              color="#475569"
-              metalness={0.8}
-              roughness={0.3}
+              color={steelColor}
+              metalness={matMetalness}
+              roughness={matRoughness}
               transparent={isTransparent}
               opacity={opacity}
               depthWrite={depthWrite}
@@ -868,12 +1018,12 @@ export const StructuralTrussStilts = ({
           </mesh>
 
           {/* Heavy Concrete Footing Baseplate anchored into Permafrost Datum */}
-          <mesh position={[0, -stiltHeight / 2 + 0.1, 0]} receiveShadow>
+          <mesh position={[0, -stiltHeight / 2 + 0.1, 0]} receiveShadow raycast={raycast}>
             <boxGeometry args={[1.2, 0.22, 1.2]} />
             <meshStandardMaterial
               color={footingColor}
-              roughness={0.85}
-              metalness={0.25}
+              roughness={0.9}
+              metalness={0.1}
               transparent={isTransparent}
               opacity={opacity}
               depthWrite={depthWrite}
@@ -883,9 +1033,16 @@ export const StructuralTrussStilts = ({
           {/* Hex Nut / Anchor Bolt Stubs on baseplate */}
           {[-0.4, 0.4].map((bx) =>
             [-0.4, 0.4].map((bz) => (
-              <mesh key={`bolt-${bx}-${bz}`} position={[bx, -stiltHeight / 2 + 0.24, bz]}>
+              <mesh key={`bolt-${bx}-${bz}`} position={[bx, -stiltHeight / 2 + 0.24, bz]} raycast={raycast}>
                 <cylinderGeometry args={[0.04, 0.04, 0.1, 6]} />
-                <meshStandardMaterial color="#cbd5e1" metalness={0.9} />
+                <meshStandardMaterial
+                  color={steelColor}
+                  metalness={matMetalness}
+                  roughness={matRoughness}
+                  transparent={isTransparent}
+                  opacity={opacity}
+                  depthWrite={depthWrite}
+                />
               </mesh>
             ))
           )}
@@ -901,33 +1058,40 @@ export const StructuralTrussStilts = ({
         return (
           <group key={b.id} position={[b.midX, stiltY, b.midZ]} rotation={[0, angleY, 0]}>
             {/* Diagonal Strut 1 */}
-            <mesh rotation={[pitchAngle, 0, 0]}>
+            <mesh rotation={[pitchAngle, 0, 0]} raycast={raycast}>
               <cylinderGeometry args={[0.075, 0.075, strutLen, 8]} />
               <meshStandardMaterial
                 color={steelColor}
-                metalness={0.7}
-                roughness={0.4}
+                metalness={matMetalness}
+                roughness={matRoughness}
                 transparent={isTransparent}
                 opacity={opacity}
                 depthWrite={depthWrite}
               />
             </mesh>
             {/* Diagonal Strut 2 (Crossing to make the X) */}
-            <mesh rotation={[-pitchAngle, 0, 0]}>
+            <mesh rotation={[-pitchAngle, 0, 0]} raycast={raycast}>
               <cylinderGeometry args={[0.075, 0.075, strutLen, 8]} />
               <meshStandardMaterial
                 color={steelColor}
-                metalness={0.7}
-                roughness={0.4}
+                metalness={matMetalness}
+                roughness={matRoughness}
                 transparent={isTransparent}
                 opacity={opacity}
                 depthWrite={depthWrite}
               />
             </mesh>
             {/* Center Gusset Connection Plate */}
-            <mesh>
+            <mesh raycast={raycast}>
               <cylinderGeometry args={[0.18, 0.18, 0.12, 8]} rotation={[0, 0, Math.PI / 2]} />
-              <meshStandardMaterial color="#475569" metalness={0.8} />
+              <meshStandardMaterial
+                color={steelColor}
+                metalness={matMetalness}
+                roughness={matRoughness}
+                transparent={isTransparent}
+                opacity={opacity}
+                depthWrite={depthWrite}
+              />
             </mesh>
           </group>
         );

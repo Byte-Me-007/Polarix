@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { InternalAssetMarker } from './InternalAssetMarker';
-import { ZONE_INTERNAL_ASSETS, resolveAssetStatus } from './stationAssets';
+import { ZONE_INTERNAL_ASSETS, resolveAssetStatus, getAssociatedAssetIdForSensor } from './stationAssets';
 import {
   SolarPanelArray,
   RooftopHVACUnit,
@@ -53,11 +53,19 @@ export const StationZone = ({
   sensors = [],
   telemetry = {},
   onSelectAsset,
-  selectedAssetId = null
+  selectedAssetId = null,
+  selectedSensor = null
 }) => {
   const [px, py, pz] = zone.position;
   const [sx, sy, sz] = zone.size;
   const code = zone.code || zone.id;
+
+  // Resolve whether an internal asset in this zone is associated with the selected sensor
+  const associatedAssetId = useMemo(() => {
+    if (!selectedSensor) return null;
+    const targetId = getAssociatedAssetIdForSensor(selectedSensor);
+    return targetId?.startsWith(`${code}-`) ? targetId : null;
+  }, [selectedSensor, code]);
 
   // Resolved status metadata for vivid heatmap coloring
   const meta = useMemo(() => {
@@ -95,11 +103,14 @@ export const StationZone = ({
   const wallOpacity     = showHeatmap ? 0.32 : (isXray || isSystem) ? 0.20 : 1.0;
   const wallDepthWrite  = !isSemiTransparent;
 
-  const roofOpacity     = showHeatmap ? 0.08 : (isXray || isSystem) ? 0.05 : 1.0;
+  const roofOpacity     = showHeatmap ? 0.08 : (isXray || isSystem) ? 0.04 : 1.0;
   const roofColor       = isSemiTransparent ? '#f4efe6' : '#1e242d';
   const roofDepthWrite  = !isSemiTransparent;
 
-  const equipOpacity    = showHeatmap ? 0.18 : (isXray || isSystem) ? 0.14 : 1.0;
+  const parapetOpacity  = isSemiTransparent ? 0.04 : 1.0;
+  const parapetColor    = isSemiTransparent ? '#e2e8f0' : '#334155';
+
+  const equipOpacity    = showHeatmap ? 0.18 : (isXray || isSystem) ? 0.06 : 1.0;
   const equipDepthWrite = !isSemiTransparent;
 
   // Primary architectural cladding color palette (clean off-white polar insulated panels)
@@ -115,9 +126,12 @@ export const StationZone = ({
     }
   }, [code]);
 
-  // Internal assets (revealed in XRAY or SYSTEM mode)
+  // When in X-RAY, SYSTEM, or HEATMAP mode, disable raycasting on the outer building shell so internal assets receive all clicks
+  const shellRaycast = isSemiTransparent ? () => null : undefined;
+
+  // Internal assets (revealed in XRAY, SYSTEM, or HEATMAP modes, or when an asset is selected)
   const internalAssets = useMemo(() => {
-    if (!isXray && !isSystem) return [];
+    if (!isXray && !isSystem && !showHeatmap && !selectedAssetId) return [];
     const zoneDefs = ZONE_INTERNAL_ASSETS[code] || [];
     return zoneDefs.map(assetDef => ({
       ...assetDef,
@@ -129,7 +143,7 @@ export const StationZone = ({
       ],
       status: resolveAssetStatus(assetDef, code, sensors, telemetry)
     }));
-  }, [isXray, isSystem, code, sensors, telemetry, px, py, pz]);
+  }, [isXray, isSystem, showHeatmap, selectedAssetId, code, sensors, telemetry, px, py, pz]);
 
   // Stilt footing calculations - polar foundation elevated above ground y=0
   const stiltRadius = 0.26;
@@ -163,8 +177,12 @@ export const StationZone = ({
           stiltHeight={stiltHeight}
           stiltY={stiltY}
           pilingRadius={stiltRadius}
-          opacity={isSemiTransparent ? 0.35 : 1.0}
+          opacity={isXray ? 0.10 : isSemiTransparent ? 0.35 : 1.0}
+          steelColor={isXray ? '#94a3b8' : isSemiTransparent ? '#475569' : '#242a35'}
+          footingColor={isXray ? '#cbd5e1' : isSemiTransparent ? '#475569' : '#3a4454'}
           depthWrite={!isSemiTransparent}
+          castShadow={!isXray}
+          raycast={shellRaycast}
         />
       )}
 
@@ -270,7 +288,7 @@ export const StationZone = ({
       {code === 'MAIN' && (
         <group>
           {/* Main Architectural Building Body */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -283,8 +301,8 @@ export const StationZone = ({
           </mesh>
 
           {/* Horizontal Architectural Cladding Seam Lines (Floors 1 & 2 reveals) */}
-          {[sy * 0.35, sy * 0.70].map((ly, li) => (
-            <mesh key={`main-reveal-${li}`} position={[0, ly, 0]}>
+          {!isSemiTransparent && [sy * 0.35, sy * 0.70].map((ly, li) => (
+            <mesh key={`main-reveal-${li}`} position={[0, ly, 0]} raycast={() => null}>
               <boxGeometry args={[sx + 0.08, 0.08, sz + 0.08]} />
               <meshStandardMaterial
                 color="#1e293b"
@@ -297,20 +315,20 @@ export const StationZone = ({
           ))}
 
           {/* Roof Parapet Architectural Edge Frame / Coping */}
-          <mesh position={[0, sy + 0.15, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.15, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.25, 0.3, sz + 0.25]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={showHeatmap ? 0.25 : 1.0}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
 
           {/* Slate Charcoal Roof Deck Membrane */}
-          <mesh position={[0, sy + 0.05, 0]} renderOrder={11}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.05, 0]} renderOrder={11}>
             <boxGeometry args={[sx * 0.98, 0.1, sz * 0.98]} />
             <meshStandardMaterial
               color={roofColor}
@@ -328,20 +346,20 @@ export const StationZone = ({
             const ww = sx * 0.82;
             return (
               <group key={`win-south-${ti}`} position={[0, wy, sz / 2 + 0.04]}>
-                {/* Window Dark Glass */}
-                <mesh>
+                {/* Window Glass */}
+                <mesh raycast={shellRaycast}>
                   <boxGeometry args={[ww, 0.9, 0.08]} />
                   <meshStandardMaterial
-                    color="#0f172a"
+                    color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
                     roughness={0.08}
-                    metalness={0.92}
+                    metalness={isSemiTransparent ? 0.1 : 0.92}
                     transparent={true}
-                    opacity={wallOpacity}
+                    opacity={isSemiTransparent ? 0.04 : wallOpacity}
                   />
                 </mesh>
                 {/* Aluminum Mullion Dividers */}
-                {[-10, -5, 0, 5, 10].map((mx, mi) => (
-                  <mesh key={`mull-${mi}`} position={[mx, 0, 0.02]}>
+                {!isSemiTransparent && [-10, -5, 0, 5, 10].map((mx, mi) => (
+                  <mesh key={`mull-${mi}`} position={[mx, 0, 0.02]} raycast={() => null}>
                     <boxGeometry args={[0.08, 0.92, 0.08]} />
                     <meshStandardMaterial color="#475569" metalness={0.8} roughness={0.3} />
                   </mesh>
@@ -351,14 +369,14 @@ export const StationZone = ({
           })}
 
           {/* North Facade Ribbon Windows */}
-          <mesh position={[0, sy * 0.55, -sz / 2 - 0.04]}>
+          <mesh raycast={shellRaycast} position={[0, sy * 0.55, -sz / 2 - 0.04]}>
             <boxGeometry args={[sx * 0.78, 0.9, 0.08]} />
             <meshStandardMaterial
-              color="#0f172a"
+              color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
               roughness={0.08}
-              metalness={0.92}
+              metalness={isSemiTransparent ? 0.1 : 0.92}
               transparent={true}
-              opacity={wallOpacity}
+              opacity={isSemiTransparent ? 0.04 : wallOpacity}
             />
           </mesh>
 
@@ -409,7 +427,7 @@ export const StationZone = ({
 
           {/* Central Utility Penthouse / Stair Bulkhead */}
           <group position={[0, sy + 0.8, 0]}>
-            <mesh castShadow>
+            <mesh castShadow={!isSemiTransparent}>
               <boxGeometry args={[5.8, 1.6, 4.4]} />
               <meshStandardMaterial
                 color="#64748b"
@@ -424,7 +442,12 @@ export const StationZone = ({
             {[-1.8, 1.8].map((lx, i) => (
               <mesh key={`pen-louver-${i}`} position={[lx, 0.1, 2.22]}>
                 <boxGeometry args={[1.5, 0.9, 0.04]} />
-                <meshStandardMaterial color="#1e293b" roughness={0.8} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                  roughness={0.8}
+                  transparent={isSemiTransparent}
+                  opacity={equipOpacity}
+                />
               </mesh>
             ))}
           </group>
@@ -447,7 +470,7 @@ export const StationZone = ({
       {code === 'RESEARCH' && (
         <group>
           {/* Main Laboratory Body */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -460,26 +483,26 @@ export const StationZone = ({
           </mesh>
 
           {/* Cladding Seam Lines */}
-          {[sy * 0.48].map((ly, li) => (
-            <mesh key={`res-reveal-${li}`} position={[0, ly, 0]}>
+          {!isSemiTransparent && [sy * 0.48].map((ly, li) => (
+            <mesh key={`res-reveal-${li}`} position={[0, ly, 0]} raycast={() => null}>
               <boxGeometry args={[sx + 0.08, 0.08, sz + 0.08]} />
               <meshStandardMaterial color="#1e293b" roughness={0.7} metalness={0.4} />
             </mesh>
           ))}
 
           {/* Roof Parapet Frame & Deck */}
-          <mesh position={[0, sy + 0.15, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.15, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.25, 0.3, sz + 0.25]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={showHeatmap ? 0.25 : 1.0}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
-          <mesh position={[0, sy + 0.05, 0]} renderOrder={11}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.05, 0]} renderOrder={11}>
             <boxGeometry args={[sx * 0.98, 0.1, sz * 0.98]} />
             <meshStandardMaterial
               color={roofColor}
@@ -492,45 +515,45 @@ export const StationZone = ({
           </mesh>
 
           {/* South Facade Ribbon Windows */}
-          <mesh position={[0, sy * 0.55, sz / 2 + 0.04]}>
+          <mesh raycast={shellRaycast} position={[0, sy * 0.55, sz / 2 + 0.04]}>
             <boxGeometry args={[sx * 0.82, 0.9, 0.08]} />
             <meshStandardMaterial
-              color="#0f172a"
+              color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
               roughness={0.08}
-              metalness={0.92}
+              metalness={isSemiTransparent ? 0.1 : 0.92}
               transparent={true}
-              opacity={wallOpacity}
+              opacity={isSemiTransparent ? 0.04 : wallOpacity}
             />
           </mesh>
 
           {/* East Facade Ribbon Windows */}
-          <mesh position={[sx / 2 + 0.04, sy * 0.55, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <mesh raycast={shellRaycast} position={[sx / 2 + 0.04, sy * 0.55, 0]} rotation={[0, Math.PI / 2, 0]}>
             <boxGeometry args={[sz * 0.72, 0.9, 0.08]} />
             <meshStandardMaterial
-              color="#0f172a"
+              color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
               roughness={0.08}
-              metalness={0.92}
+              metalness={isSemiTransparent ? 0.1 : 0.92}
               transparent={true}
-              opacity={wallOpacity}
+              opacity={isSemiTransparent ? 0.04 : wallOpacity}
             />
           </mesh>
 
           {/* Optical & Astrophotometry Geodesic Radome (Center-Right Roof) */}
           <group position={[2.8, sy + 0.1, 2.2]}>
             {/* Raised Cylindrical Coaming Base */}
-            <mesh position={[0, 0.45, 0]}>
+            <mesh position={[0, 0.45, 0]} raycast={shellRaycast}>
               <cylinderGeometry args={[2.4, 2.6, 0.9, 24]} />
               <meshStandardMaterial
-                color="#334155"
+                color={isSemiTransparent ? '#cbd5e1' : '#334155'}
                 roughness={0.5}
-                metalness={0.5}
+                metalness={isSemiTransparent ? 0.1 : 0.5}
                 transparent={true}
                 opacity={equipOpacity}
                 depthWrite={equipDepthWrite}
               />
             </mesh>
             {/* Clean White Observation Hemisphere */}
-            <mesh position={[0, 0.9, 0]} castShadow>
+            <mesh position={[0, 0.9, 0]} castShadow={!isSemiTransparent} raycast={shellRaycast}>
               <sphereGeometry args={[2.4, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
               <meshStandardMaterial
                 color="#ffffff"
@@ -542,9 +565,14 @@ export const StationZone = ({
               />
             </mesh>
             {/* Optical Viewing Slit Hatch */}
-            <mesh position={[0, 2.0, 1.1]}>
+            <mesh position={[0, 2.0, 1.1]} raycast={() => null}>
               <boxGeometry args={[0.55, 2.1, 0.25]} />
-              <meshStandardMaterial color="#0f172a" metalness={0.8} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
+                metalness={isSemiTransparent ? 0.1 : 0.8}
+                transparent={isSemiTransparent}
+                opacity={equipOpacity}
+              />
             </mesh>
           </group>
 
@@ -600,7 +628,7 @@ export const StationZone = ({
       {code === 'ENERGY' && (
         <group>
           {/* Main Power Module Body */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -613,18 +641,18 @@ export const StationZone = ({
           </mesh>
 
           {/* Roof Parapet Frame & Deck */}
-          <mesh position={[0, sy + 0.15, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.15, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.25, 0.3, sz + 0.25]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={showHeatmap ? 0.25 : 1.0}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
-          <mesh position={[0, sy + 0.05, 0]} renderOrder={11}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.05, 0]} renderOrder={11}>
             <boxGeometry args={[sx * 0.98, 0.1, sz * 0.98]} />
             <meshStandardMaterial
               color={roofColor}
@@ -667,7 +695,13 @@ export const StationZone = ({
             {[-2.0, 2.0].map((fx, fi) => (
               <mesh key={`xfr-fin-${fi}`} position={[fx, 0.9, 0]}>
                 <boxGeometry args={[0.15, 1.5, 4.0]} />
-                <meshStandardMaterial color="#1e293b" metalness={0.7} roughness={0.3} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                  metalness={isSemiTransparent ? 0.1 : 0.7}
+                  roughness={0.4}
+                  transparent={isSemiTransparent}
+                  opacity={equipOpacity}
+                />
               </mesh>
             ))}
 
@@ -676,33 +710,50 @@ export const StationZone = ({
               <group key={`bush-${bi}`} position={[bx, 1.9, 0.8]}>
                 <mesh>
                   <cylinderGeometry args={[0.12, 0.16, 0.9, 12]} />
-                  <meshStandardMaterial color="#8b5cf6" roughness={0.3} metalness={0.4} />
+                  <meshStandardMaterial
+                    color={isSemiTransparent ? '#cbd5e1' : '#8b5cf6'}
+                    roughness={0.3}
+                    metalness={isSemiTransparent ? 0.1 : 0.4}
+                    transparent={isSemiTransparent}
+                    opacity={equipOpacity}
+                  />
                 </mesh>
                 {/* Ceramic sheds / rings */}
                 {[0.1, 0.25, 0.4].map((syVal, si) => (
                   <mesh key={`shed-${si}`} position={[0, syVal, 0]}>
                     <cylinderGeometry args={[0.22, 0.22, 0.05, 12]} />
-                    <meshStandardMaterial color="#7c3aed" roughness={0.3} />
+                    <meshStandardMaterial
+                      color={isSemiTransparent ? '#cbd5e1' : '#7c3aed'}
+                      roughness={0.3}
+                      transparent={isSemiTransparent}
+                      opacity={equipOpacity}
+                    />
                   </mesh>
                 ))}
               </group>
             ))}
 
             {/* Microgrid Inverter Control Cabinet */}
-            <mesh position={[0, 0.8, -2.6]} castShadow>
+            <mesh position={[0, 0.8, -2.6]} castShadow={!isSemiTransparent}>
               <boxGeometry args={[2.8, 1.6, 1.2]} />
-              <meshStandardMaterial color="#475569" metalness={0.5} roughness={0.4} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#475569'}
+                metalness={isSemiTransparent ? 0.1 : 0.5}
+                roughness={0.4}
+                transparent={isSemiTransparent}
+                opacity={equipOpacity}
+              />
             </mesh>
           </group>
 
           {/* Outdoor Battery Storage Bank Enclosures (North facade) */}
           <group position={[0, sy * 0.45, -sz / 2 - 0.7]}>
-            <mesh castShadow>
+            <mesh castShadow={!isSemiTransparent}>
               <boxGeometry args={[sx * 0.72, sy * 0.8, 1.4]} />
               <meshStandardMaterial
-                color="#b45309"
+                color={isSemiTransparent ? '#cbd5e1' : '#b45309'}
                 roughness={0.4}
-                metalness={0.5}
+                metalness={isSemiTransparent ? 0.1 : 0.5}
                 transparent={true}
                 opacity={wallOpacity}
                 depthWrite={wallDepthWrite}
@@ -711,7 +762,12 @@ export const StationZone = ({
             {[-4.5, -1.5, 1.5, 4.5].map((vx, i) => (
               <mesh key={`bat-vent-${i}`} position={[vx, 0.3, -0.72]}>
                 <boxGeometry args={[1.4, 0.9, 0.05]} />
-                <meshStandardMaterial color="#1e293b" roughness={0.9} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                  roughness={0.9}
+                  transparent={isSemiTransparent}
+                  opacity={wallOpacity}
+                />
               </mesh>
             ))}
           </group>
@@ -724,7 +780,7 @@ export const StationZone = ({
       {code === 'GENERATOR' && (
         <group>
           {/* Main Industrial Housing Body */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -737,18 +793,18 @@ export const StationZone = ({
           </mesh>
 
           {/* Roof Parapet Frame & Deck */}
-          <mesh position={[0, sy + 0.15, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.15, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.25, 0.3, sz + 0.25]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={showHeatmap ? 0.25 : 1.0}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
-          <mesh position={[0, sy + 0.05, 0]} renderOrder={11}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.05, 0]} renderOrder={11}>
             <boxGeometry args={[sx * 0.98, 0.1, sz * 0.98]} />
             <meshStandardMaterial
               color={roofColor}
@@ -764,7 +820,7 @@ export const StationZone = ({
           {[-2.6, 2.6].map((offX, i) => (
             <group key={`gen-exhaust-${i}`} position={[offX, sy + 2.8, -sz * 0.2]}>
               {/* Vertical Flue Pipe */}
-              <mesh castShadow>
+              <mesh castShadow raycast={shellRaycast}>
                 <cylinderGeometry args={[0.38, 0.44, 5.6, 16]} />
                 <meshStandardMaterial
                   color="#334155"
@@ -777,27 +833,38 @@ export const StationZone = ({
               </mesh>
               {/* Thermal Heat Wrap Insulation Bands */}
               {[-1.2, 0, 1.2].map((by, bi) => (
-                <mesh key={`band-${bi}`} position={[0, by, 0]}>
+                <mesh key={`band-${bi}`} position={[0, by, 0]} raycast={() => null}>
                   <cylinderGeometry args={[0.42, 0.42, 0.2, 16]} />
-                  <meshStandardMaterial color="#64748b" metalness={0.8} />
+                  <meshStandardMaterial
+                    color={isSemiTransparent ? '#cbd5e1' : '#64748b'}
+                    metalness={isSemiTransparent ? 0.1 : 0.8}
+                    transparent={isSemiTransparent}
+                    opacity={equipOpacity}
+                  />
                 </mesh>
               ))}
               {/* Conical Rain Cowl */}
-              <mesh position={[0, 2.9, 0]}>
+              <mesh position={[0, 2.9, 0]} raycast={() => null}>
                 <coneGeometry args={[0.75, 0.5, 16]} />
-                <meshStandardMaterial color="#1e293b" roughness={0.4} metalness={0.6} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                  roughness={0.4}
+                  metalness={isSemiTransparent ? 0.1 : 0.6}
+                  transparent={isSemiTransparent}
+                  opacity={equipOpacity}
+                />
               </mesh>
             </group>
           ))}
 
           {/* Large Western Cooling Radiator & Ventilation Louver Bank */}
           <group position={[-sx / 2 - 0.7, sy * 0.5, 0]}>
-            <mesh castShadow>
+            <mesh castShadow={!isSemiTransparent} raycast={shellRaycast}>
               <boxGeometry args={[1.4, sy * 0.8, sz * 0.75]} />
               <meshStandardMaterial
-                color="#334155"
+                color={isSemiTransparent ? '#cbd5e1' : '#334155'}
                 roughness={0.7}
-                metalness={0.4}
+                metalness={isSemiTransparent ? 0.1 : 0.4}
                 transparent={true}
                 opacity={wallOpacity}
                 depthWrite={wallDepthWrite}
@@ -805,9 +872,15 @@ export const StationZone = ({
             </mesh>
             {/* Dual Radiator Fans */}
             {[-3.0, 3.0].map((fz, fi) => (
-              <mesh key={`rad-fan-${fi}`} position={[-0.72, 0, fz]} rotation={[0, 0, Math.PI / 2]}>
+              <mesh key={`rad-fan-${fi}`} position={[-0.72, 0, fz]} rotation={[0, 0, Math.PI / 2]} raycast={() => null}>
                 <cylinderGeometry args={[1.4, 1.4, 0.08, 20]} />
-                <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#0f172a'}
+                  roughness={0.3}
+                  metalness={isSemiTransparent ? 0.1 : 0.8}
+                  transparent={isSemiTransparent}
+                  opacity={wallOpacity}
+                />
               </mesh>
             ))}
           </group>
@@ -815,31 +888,48 @@ export const StationZone = ({
           {/* Horizontal Cylindrical Fuel Reserve / Day-Tank on South Facade */}
           <group position={[0, sy * 0.42, sz / 2 + 1.4]} rotation={[0, 0, Math.PI / 2]}>
             {/* Main Tank Barrel */}
-            <mesh castShadow>
+            <mesh castShadow={!isSemiTransparent} raycast={shellRaycast}>
               <cylinderGeometry args={[1.2, 1.2, 8.0, 24]} />
               <meshStandardMaterial
-                color="#475569"
+                color={isSemiTransparent ? '#cbd5e1' : '#475569'}
                 roughness={0.4}
-                metalness={0.6}
+                metalness={isSemiTransparent ? 0.1 : 0.6}
                 transparent={true}
                 opacity={wallOpacity}
                 depthWrite={wallDepthWrite}
               />
             </mesh>
             {/* Dished End Caps */}
-            <mesh position={[0, 4.0, 0]}>
+            <mesh position={[0, 4.0, 0]} raycast={() => null}>
               <sphereGeometry args={[1.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-              <meshStandardMaterial color="#334155" roughness={0.4} metalness={0.6} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#334155'}
+                roughness={0.4}
+                metalness={isSemiTransparent ? 0.1 : 0.6}
+                transparent={isSemiTransparent}
+                opacity={wallOpacity}
+              />
             </mesh>
-            <mesh position={[0, -4.0, 0]} rotation={[Math.PI, 0, 0]}>
+            <mesh position={[0, -4.0, 0]} rotation={[Math.PI, 0, 0]} raycast={() => null}>
               <sphereGeometry args={[1.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-              <meshStandardMaterial color="#334155" roughness={0.4} metalness={0.6} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#334155'}
+                roughness={0.4}
+                metalness={isSemiTransparent ? 0.1 : 0.6}
+                transparent={isSemiTransparent}
+                opacity={wallOpacity}
+              />
             </mesh>
             {/* Heavy Steel Saddle Support Mounts */}
             {[-2.5, 2.5].map((my, mi) => (
-              <mesh key={`saddle-${mi}`} position={[0, my, -1.0]} rotation={[0, 0, -Math.PI / 2]}>
+              <mesh key={`saddle-${mi}`} position={[0, my, -1.0]} rotation={[0, 0, -Math.PI / 2]} raycast={() => null}>
                 <boxGeometry args={[0.5, 1.4, 1.6]} />
-                <meshStandardMaterial color="#1e293b" metalness={0.8} />
+                <meshStandardMaterial
+                  color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                  metalness={isSemiTransparent ? 0.1 : 0.8}
+                  transparent={isSemiTransparent}
+                  opacity={wallOpacity}
+                />
               </mesh>
             ))}
           </group>
@@ -852,7 +942,7 @@ export const StationZone = ({
       {code === 'STORAGE' && (
         <group>
           {/* Main Warehouse Enclosure */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -865,18 +955,18 @@ export const StationZone = ({
           </mesh>
 
           {/* Roof Parapet Frame & Deck */}
-          <mesh position={[0, sy + 0.15, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.15, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.25, 0.3, sz + 0.25]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={showHeatmap ? 0.25 : 1.0}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
-          <mesh position={[0, sy + 0.05, 0]} renderOrder={11}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.05, 0]} renderOrder={11}>
             <boxGeometry args={[sx * 0.98, 0.1, sz * 0.98]} />
             <meshStandardMaterial
               color={roofColor}
@@ -890,22 +980,40 @@ export const StationZone = ({
 
           {/* Horizontal Polar Container Corrugation / Ribbing Lines */}
           {[-2.2, -1.1, 0, 1.1, 2.2].map((yOff, i) => (
-            <mesh key={`stor-rib-${i}`} position={[0, sy / 2 + yOff, sz / 2 + 0.04]}>
+            <mesh key={`stor-rib-${i}`} position={[0, sy / 2 + yOff, sz / 2 + 0.04]} raycast={() => null}>
               <boxGeometry args={[sx * 0.92, 0.16, 0.06]} />
-              <meshStandardMaterial color="#94a3b8" roughness={0.6} metalness={0.3} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#94a3b8'}
+                roughness={0.6}
+                metalness={0.3}
+                transparent={isSemiTransparent}
+                opacity={wallOpacity}
+              />
             </mesh>
           ))}
 
           {/* Heavy Overhead Industrial Cargo Loading Door (East facade) */}
           <group position={[sx / 2 + 0.05, sy * 0.45, 0]}>
-            <mesh>
+            <mesh raycast={shellRaycast}>
               <boxGeometry args={[0.08, sy * 0.75, sz * 0.65]} />
-              <meshStandardMaterial color="#1e293b" roughness={0.8} metalness={0.5} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+                roughness={0.8}
+                metalness={isSemiTransparent ? 0.1 : 0.5}
+                transparent={isSemiTransparent}
+                opacity={wallOpacity}
+              />
             </mesh>
             {/* Safety Hazard Yellow/Orange Perimeter Frame */}
-            <mesh position={[0.04, 0, 0]}>
+            <mesh position={[0.04, 0, 0]} raycast={() => null}>
               <boxGeometry args={[0.04, sy * 0.8, sz * 0.7]} />
-              <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.4} />
+              <meshStandardMaterial
+                color={isSemiTransparent ? '#cbd5e1' : '#f59e0b'}
+                metalness={isSemiTransparent ? 0.1 : 0.6}
+                roughness={0.4}
+                transparent={isSemiTransparent}
+                opacity={wallOpacity}
+              />
             </mesh>
           </group>
 
@@ -941,7 +1049,7 @@ export const StationZone = ({
       {code === 'COMMS' && (
         <group>
           {/* Base RF Operations Shelter */}
-          <mesh castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
+          <mesh raycast={shellRaycast} castShadow receiveShadow position={[0, sy / 2, 0]} renderOrder={8}>
             <boxGeometry args={[sx, sy, sz]} />
             <meshStandardMaterial
               color={wallColor}
@@ -954,14 +1062,14 @@ export const StationZone = ({
           </mesh>
 
           {/* Roof Parapet */}
-          <mesh position={[0, sy + 0.1, 0]} renderOrder={12}>
+          <mesh raycast={shellRaycast} position={[0, sy + 0.1, 0]} renderOrder={12}>
             <boxGeometry args={[sx + 0.2, 0.2, sz + 0.2]} />
             <meshStandardMaterial
-              color="#334155"
+              color={parapetColor}
               roughness={0.6}
               metalness={0.4}
               transparent={true}
-              opacity={roofOpacity}
+              opacity={parapetOpacity}
               depthWrite={roofDepthWrite}
             />
           </mesh>
@@ -969,7 +1077,13 @@ export const StationZone = ({
           {/* Heavy Structural Steel Pedestal Collar */}
           <mesh position={[0, sy + 0.4, 0]}>
             <cylinderGeometry args={[2.2, 2.8, 0.6, 16]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.6} metalness={0.7} />
+            <meshStandardMaterial
+              color={isSemiTransparent ? '#cbd5e1' : '#1e293b'}
+              roughness={0.6}
+              metalness={isSemiTransparent ? 0.1 : 0.7}
+              transparent={isSemiTransparent}
+              opacity={equipOpacity}
+            />
           </mesh>
 
           {/* Multi-stage High-Altitude Open Lattice Steel Communications Tower */}
@@ -1043,24 +1157,31 @@ export const StationZone = ({
       {/* ------------------------------------------------------------- */}
       {/* 5. INTERNAL ASSET MARKERS (X-RAY and SYSTEM modes)             */}
       {/* ------------------------------------------------------------- */}
-      {internalAssets.map((asset) => (
-        <InternalAssetMarker
-          key={asset.fullId}
-          id={asset.fullId}
-          type={asset.type}
-          label={asset.label}
-          position={[
-            asset.worldPos[0] - px,
-            asset.worldPos[1] - py,
-            asset.worldPos[2] - pz
-          ]}
-          status={asset.status}
-          isHighlighted={isHighlighted || selectedAssetId === asset.fullId}
-          isSelected={selectedAssetId === asset.fullId}
-          showLabel={true}
-          onClick={(id) => onSelectAsset && onSelectAsset({ id, type: asset.type, label: asset.label, zone: code, status: asset.status })}
-        />
-      ))}
+      {internalAssets.map((asset) => {
+        const isAssociated = associatedAssetId === asset.fullId;
+        return (
+          <InternalAssetMarker
+            key={asset.fullId}
+            id={asset.fullId}
+            type={asset.type}
+            label={asset.label}
+            position={[
+              asset.worldPos[0] - px,
+              asset.worldPos[1] - py,
+              asset.worldPos[2] - pz
+            ]}
+            status={asset.status}
+            isHighlighted={isHighlighted || selectedAssetId === asset.fullId || isAssociated}
+            isSelected={selectedAssetId === asset.fullId || isAssociated}
+            isPrimary={asset.isPrimary !== false}
+            labelY={asset.labelY || 3.2}
+            isAssociated={isAssociated}
+            selectedSensorId={isAssociated ? selectedSensor?.id : null}
+            showLabel={true}
+            onClick={(id) => onSelectAsset && onSelectAsset({ id, type: asset.type, label: asset.label, zone: code, status: asset.status })}
+          />
+        );
+      })}
 
       {/* ------------------------------------------------------------- */}
       {/* 6. CROSS-MODULE HIGHLIGHT RING                                 */}

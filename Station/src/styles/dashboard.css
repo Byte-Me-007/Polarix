@@ -6809,6 +6809,55 @@ body {
   flex-shrink: 0;
 }
 
+/* ── Component Quick Selector Strip ── */
+.twin-component-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 1.25rem;
+  background: var(--polaris-bg-sunken, #f4efe6);
+  border-bottom: 1px solid var(--polaris-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.twin-component-strip::-webkit-scrollbar {
+  display: none;
+}
+.twin-component-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--polaris-text-muted);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+.twin-comp-chip {
+  padding: 0.2rem 0.55rem;
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--polaris-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.twin-comp-chip:hover {
+  border-color: var(--polaris-copper);
+  color: var(--polaris-copper);
+  background: var(--polaris-bg-elevated);
+}
+.twin-comp-chip.active {
+  background: rgba(182, 90, 31, 0.12);
+  border-color: var(--polaris-copper);
+  color: var(--polaris-copper);
+  font-weight: 700;
+}
+
 .twin-mode-btn.active .twin-mode-badge-dot {
   background: var(--polaris-copper);
 }
@@ -6867,7 +6916,7 @@ body {
   white-space: nowrap;
 }
 
-/* ── Verify Strip (debug test sequence) ── */
+/* ── Verify & Diagnostics Suite ── */
 .twin-verify-strip {
   position: absolute;
   top: 0.55rem;
@@ -6875,47 +6924,363 @@ body {
   z-index: 15;
   display: flex;
   align-items: center;
-  gap: 3px;
-  background: rgba(255,255,255,0.92);
-  border: 1px solid var(--polaris-border);
+  gap: 4px;
+  background: rgba(18, 24, 34, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xs);
-  padding: 0.28rem 0.55rem;
-  backdrop-filter: blur(6px);
+  padding: 0.24rem 0.55rem;
+  backdrop-filter: blur(8px);
 }
 
 .twin-verify-label {
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 700;
-  color: var(--polaris-text-light);
-  letter-spacing: 0.07em;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
   margin-right: 2px;
 }
 
 .twin-verify-btn {
-  padding: 0.18rem 0.4rem;
-  border: 1px solid var(--polaris-border);
-  background: var(--polaris-bg-elevated);
-  color: var(--polaris-text-muted);
+  padding: 0.18rem 0.42rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
   border-radius: var(--radius-xs);
-  transition: background 0.1s, color 0.1s;
+  transition: all 0.12s;
   white-space: nowrap;
 }
 
 .twin-verify-btn:hover {
-  background: var(--polaris-bg-sunken);
-  color: var(--polaris-text-primary);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .twin-verify-btn.active {
-  background: var(--polaris-copper-subtle);
+  background: rgba(182, 90, 31, 0.35);
+  color: #ff9d54;
+  border-color: #b65a1f;
+}
+
+/* ==========================================================================
+   MISSION-CONTROL 3D CANVAS HUD OVERLAYS (Matching Authentic Station Ref)
+   ========================================================================== */
+
+.station-hud-card {
+  position: absolute;
+  z-index: 22;
+  background: rgba(18, 24, 34, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 0.65rem 0.85rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  color: #f1f5f9;
+  font-family: var(--font-mono);
+  user-select: none;
+  pointer-events: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hud-top-left {
+  top: 0.85rem;
+  left: 0.85rem;
+  min-width: 220px;
+}
+
+.hud-top-right {
+  top: 0.85rem;
+  right: 0.85rem;
+  min-width: 240px;
+}
+
+.hud-bottom-right {
+  bottom: 2rem;
+  right: 0.85rem;
+  max-width: 310px;
+}
+
+.hud-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.35rem;
+}
+
+.hud-header-title {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.hud-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: hudPulse 2.2s infinite ease-in-out;
+}
+
+@keyframes hudPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+.hud-status-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.hud-health-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.hud-metric-label {
+  font-size: 0.54rem;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.hud-metric-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #38a169;
+}
+
+.hud-health-bar-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.hud-health-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.hud-gauge-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hud-gauge-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hud-gauge-track {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.hud-gauge-progress {
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.hud-gauge-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.hud-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.54rem;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.hud-footer-tag.normal {
+  color: #38a169;
+  font-weight: 700;
+}
+
+/* Environmental Grid */
+.hud-env-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.hud-env-cell {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  padding: 0.32rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hud-env-cell.wide {
+  grid-column: span 2;
+}
+
+.hud-env-sublabel {
+  font-size: 0.52rem;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.hud-env-val {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.hud-env-wind-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.hud-env-wind-val {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.hud-env-wind-sec {
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
+
+.hud-unit {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.hud-wind-icon {
+  color: #94a3b8;
+}
+
+/* Real-time Event Log */
+.hud-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hud-event-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.58rem;
+  color: #cbd5e1;
+  line-height: 1.3;
+}
+
+.hud-event-pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hud-event-pip.normal { background: #38a169; }
+.hud-event-pip.warning { background: #d97706; }
+.hud-event-pip.critical { background: #e53e3e; }
+
+.hud-event-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Diagnostics & Verification Section (Dedicated Test Suite at Bottom) */
+.twin-diagnostics-section {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.twin-diagnostics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.twin-diagnostics-title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--polaris-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.twin-diagnostics-grid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.twin-diagnostics-btn {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-elevated);
+  color: var(--polaris-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.twin-diagnostics-btn:hover {
+  border-color: var(--polaris-copper);
   color: var(--polaris-copper);
+  background: var(--polaris-bg-sunken);
+}
+
+.twin-diagnostics-btn.active {
+  background: var(--polaris-copper-subtle);
   border-color: var(--polaris-copper-border);
+  color: var(--polaris-copper);
+  font-weight: 700;
 }
 
 /* ==========================================================================
