@@ -69,11 +69,12 @@ export const StationModel = ({
   const isXray = twinMode === 'XRAY';
   const isSemiTransparent = showHeatmap || isXray || twinMode === 'SYSTEM';
 
-  // Connecting Corridor Material Styles (Subordinated in X-RAY mode)
-  const corridorOpacity     = isXray ? 0.12 : isSemiTransparent ? 0.30 : 1.0;
-  const corridorParapetOp   = isXray ? 0.06 : isSemiTransparent ? 0.18 : 1.0;
-  const corridorLegOpacity  = isXray ? 0.08 : isSemiTransparent ? 0.35 : 1.0;
-  const corridorLegColor    = isXray ? '#94a3b8' : '#242a35';
+  // Connecting Corridor Material Styles (Subordinated in X-RAY mode, solid technical in SYSTEM)
+  const isSystem = twinMode === 'SYSTEM';
+  const corridorOpacity     = isXray ? 0.12 : isSystem ? 0.45 : isSemiTransparent ? 0.30 : 1.0;
+  const corridorParapetOp   = isXray ? 0.06 : isSystem ? 0.28 : isSemiTransparent ? 0.18 : 1.0;
+  const corridorLegOpacity  = isXray ? 0.08 : isSystem ? 0.35 : isSemiTransparent ? 0.35 : 1.0;
+  const corridorLegColor    = isXray ? '#94a3b8' : isSystem ? '#475569' : '#242a35';
   const corridorCastShadow  = !isXray;
   const corridorRaycast     = isXray ? () => null : undefined;
 

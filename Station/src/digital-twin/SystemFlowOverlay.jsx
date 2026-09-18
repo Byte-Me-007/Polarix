@@ -4,16 +4,29 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 
 /**
- * SystemFlowOverlay — Live Spatial Infrastructure Flow Overlay for SYSTEM Mode
+ * SystemFlowOverlay — Comprehensive Polar Research Station Electrical & Utility Grid
  *
- * Implements POLARIS Antarctic Research Station System Mode:
- * - Anchors major energy infrastructure as physical spatial nodes on station buildings
- * - Visualizes live electrical connections and energy flow directions
- * - Direction-aware battery charging (MICROGRID -> BATTERY) vs discharging (BATTERY -> MICROGRID / LOAD)
- * - Directly reflects live application telemetry (solar, wind, diesel, battery, load)
- * - Responsive to POWER CRISIS, STORM, and NORMAL operational scenarios
- * - Interactive: Clicking any node highlights/focuses the corresponding operational machinery
- * - Seamlessly integrates with sensor-to-asset hierarchy and station switching (Maitri & Bharati)
+ * Simulates an authentic Antarctic station multi-circuit microgrid:
+ * 1. Heavy Generation Circuits:
+ *    - DG #1 & DG #2 branch feeders to local generator switchgear
+ *    - Day Tank fuel feed manifold
+ *    - West Utility Bridge conduit to central substation
+ * 2. Renewable Energy Feeders:
+ *    - Dual rooftop solar array feeders (Storage & Main) to solar inverters
+ *    - East ridge wind turbine feeder routing via Research Corridor to microgrid
+ * 3. Energy Storage Dual-Bus:
+ *    - Battery Bank A & B LiFePO4 cabinet circuits to BMS inverter
+ *    - Bidirectional charging (Microgrid -> Battery) and discharging (Battery -> Microgrid)
+ * 4. Facility Sub-Distribution Feeders (Station Loads):
+ *    - Main Spine 415V busway through South Corridor into Main Habitat Hub
+ *    - Command & Expedition Console feeder
+ *    - Environmental Life Support feeder
+ *    - HVAC Mechanical & Thermal Plant loop
+ *    - Scientific Laboratories & Optical Radome feeder
+ *    - Logistics, Fuel Transfer & Cryo-Freezer feeder
+ *    - Deep Space Satellite Tracking & Comms RF Shelter feeder
+ * 5. Industrial Substation Junction Tap Boxes at module entryways with live status LEDs
+ * 6. Live telemetry synchronization with POWER CRISIS, STORM, and NORMAL scenarios
  */
 
 // Helper to extract numerical kW values safely
@@ -23,77 +36,12 @@ const parseKW = (v) => {
   return parseFloat(v.toString().replace(/[^0-9.]/g, '')) || 0;
 };
 
-// Physical 3D spatial node definitions anchored to building facilities
-const NODE_DEFINITIONS = {
-  SOLAR: {
-    id: 'SOLAR',
-    label: 'SOLAR ARRAY',
-    shortLabel: 'SOLAR',
-    pos: [10.0, 11.5, -28.0],
-    roofPos: [10.0, 6.5, -28.0],
-    zone: 'ENERGY',
-    defaultAsset: { id: 'ENERGY-INV-02', type: 'INVERTER', label: 'SOLAR INVERTER', zone: 'ENERGY' },
-    icon: '☀'
-  },
-  WIND: {
-    id: 'WIND',
-    label: 'WIND TURBINE',
-    shortLabel: 'WIND',
-    pos: [44.0, 14.0, -10.0],
-    roofPos: [44.0, 6.5, -10.0],
-    zone: 'RESEARCH',
-    defaultAsset: { id: 'RESEARCH-RES-01', type: 'RESEARCH', label: 'MET ARRAY', zone: 'RESEARCH' },
-    icon: '⚡'
-  },
-  DIESEL: {
-    id: 'DIESEL',
-    label: 'DIESEL PLANT',
-    shortLabel: 'DIESEL',
-    pos: [-30.0, 11.5, -30.0],
-    roofPos: [-30.0, 5.5, -30.0],
-    zone: 'GENERATOR',
-    defaultAsset: { id: 'GENERATOR-GEN-02', type: 'GENERATOR', label: 'DIESEL GEN #2', zone: 'GENERATOR' },
-    icon: '⚙'
-  },
-  MICROGRID: {
-    id: 'MICROGRID',
-    label: 'MICROGRID BUS',
-    shortLabel: 'MICROGRID',
-    pos: [0.0, 12.0, -28.0],
-    roofPos: [0.0, 6.5, -28.0],
-    zone: 'ENERGY',
-    defaultAsset: { id: 'ENERGY-INV-01', type: 'INVERTER', label: 'MICROGRID INVERTER', zone: 'ENERGY' },
-    icon: '⎇'
-  },
-  BATTERY: {
-    id: 'BATTERY',
-    label: 'BATTERY BANK',
-    shortLabel: 'BATTERY',
-    pos: [-7.5, 11.0, -26.0],
-    roofPos: [-7.5, 6.5, -26.0],
-    zone: 'ENERGY',
-    defaultAsset: { id: 'ENERGY-BATT-01', type: 'BATTERY', label: 'BATTERY BANK', zone: 'ENERGY' },
-    icon: '🔋'
-  },
-  STATION: {
-    id: 'STATION',
-    label: 'STATION LOAD',
-    shortLabel: 'STATION LOAD',
-    pos: [0.0, 13.5, 0.0],
-    roofPos: [0.0, 7.0, 0.0],
-    zone: 'MAIN',
-    defaultAsset: { id: 'MAIN-PANEL-01', type: 'CONTROL', label: 'COMMAND CONSOLE', zone: 'MAIN' },
-    icon: '⌂'
-  }
-};
-
-// Create a smooth overhead conduit arch between two 3D spatial points
-const makeCurvedRoute = (from, to) => {
+// Create smooth multi-point path routed along utility bridge corridors
+const makeCurvedRoute = (from, to, archElevation = 0.6) => {
   const dx = to[0] - from[0];
   const dz = to[2] - from[2];
   const dist = Math.hypot(dx, dz);
-  const archHeight = Math.min(2.5, Math.max(0.9, dist * 0.075));
-  const midY = Math.max(from[1], to[1]) + archHeight;
+  const midY = Math.max(from[1], to[1]) + Math.min(1.8, Math.max(0.4, dist * 0.05)) + archElevation;
   const midPoint = new THREE.Vector3((from[0] + to[0]) / 2, midY, (from[2] + to[2]) / 2);
 
   return new THREE.QuadraticBezierCurve3(
@@ -103,80 +51,77 @@ const makeCurvedRoute = (from, to) => {
   );
 };
 
-// Single flow line with animated directional energy pulses along the curve
-const FlowConduit = ({
-  connection,
+// Individual animated technical conduit segment
+const ConduitSegment = ({
+  circuit,
   isEmphasized = false,
-  isDimmed = false
+  isDimmed = false,
+  globalSpeed = 0.35
 }) => {
-  const { from, to, active, direction, color, baseWidth, isCritical } = connection;
-  const curve = useMemo(() => makeCurvedRoute(from, to), [from, to]);
-  const tubeGeometry = useMemo(() => new THREE.TubeGeometry(curve, 28, baseWidth, 8, false), [curve, baseWidth]);
+  const { from, to, active, direction = 'forward', color, baseWidth = 0.12, arch = 0.4, pulses = 2, isCritical } = circuit;
+  const curve = useMemo(() => makeCurvedRoute(from, to, arch), [from, to, arch]);
+  const geometry = useMemo(() => new THREE.TubeGeometry(curve, 24, baseWidth, 6, false), [curve, baseWidth]);
 
-  // Three directional pulse markers moving smoothly along the curve
-  const pulseRefs = [useRef(), useRef(), useRef()];
+  // Animated energy chevron pulses
+  const pulseRefs = useMemo(() => Array.from({ length: pulses }).map(() => React.createRef()), [pulses]);
 
   useFrame((state) => {
     if (!active || direction === 'idle') return;
     const time = state.clock.elapsedTime;
-    const speed = 0.35; // deliberate, calm operational pace
+    const speed = globalSpeed * (circuit.speedMultiplier || 1.0);
 
     pulseRefs.forEach((ref, idx) => {
       if (!ref.current) return;
-      const offset = idx / 3;
+      const offset = idx / pulses;
       let t = ((time * speed + offset) % 1.0);
       if (direction === 'reverse') {
         t = 1.0 - t;
       }
-
-      // Safe bounds
-      t = Math.max(0.01, Math.min(0.99, t));
+      t = Math.max(0.02, Math.min(0.98, t));
       const pt = curve.getPoint(t);
       const tangent = curve.getTangent(t);
 
       ref.current.position.copy(pt);
-      if (direction === 'reverse') {
-        tangent.negate();
-      }
+      if (direction === 'reverse') tangent.negate();
       ref.current.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
     });
   });
 
   const conduitOpacity = isEmphasized
-    ? 0.92
+    ? 0.95
     : isDimmed
-    ? 0.20
+    ? 0.18
     : active
-    ? 0.70
-    : 0.15;
+    ? 0.72
+    : 0.12;
 
   const actualColor = isCritical ? '#b5382b' : color;
 
   return (
-    <group name={`flow-${connection.id}`}>
+    <group name={`circuit-${circuit.id}`}>
       {/* Base Conduit Tube */}
-      <mesh geometry={tubeGeometry} renderOrder={20} raycast={() => null}>
+      <mesh geometry={geometry} renderOrder={20} raycast={() => null}>
         <meshStandardMaterial
-          color={active ? actualColor : '#94a3b8'}
+          color={active ? actualColor : '#64748b'}
           roughness={0.45}
-          metalness={0.3}
+          metalness={0.4}
           transparent
           opacity={conduitOpacity}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Directional Chevron / Cone Pulses */}
+      {/* Directional Chevron Pulses */}
       {active && direction !== 'idle' && (
         <>
-          {[0, 1, 2].map((idx) => (
+          {Array.from({ length: pulses }).map((_, idx) => (
             <mesh
               key={`pulse-${idx}`}
               ref={pulseRefs[idx]}
               renderOrder={22}
               raycast={() => null}
             >
-              <coneGeometry args={[baseWidth * 1.55, baseWidth * 3.8, 8]} />
+              <coneGeometry args={[baseWidth * 1.55, baseWidth * 3.6, 6]} />
               <meshBasicMaterial
                 color={actualColor}
                 transparent
@@ -191,7 +136,81 @@ const FlowConduit = ({
   );
 };
 
-// Grounded Stanchion and Interactive HTML badge for each system node
+// Industrial Substation Tap Box with glowing status LED mounted at corridor junctions
+const UtilityJunctionBox = ({
+  position,
+  label,
+  subLabel,
+  status = 'NOMINAL',
+  color = '#475569',
+  onClick
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const statusColor = status === 'CRITICAL' ? '#e53e3e' : status === 'WARNING' ? '#d97706' : status === 'OFFLINE' ? '#64748b' : '#38a169';
+
+  return (
+    <group position={position}>
+      {/* Heavy Weatherproof Junction Enclosure */}
+      <mesh
+        castShadow
+        onClick={(e) => { e.stopPropagation(); if (onClick) onClick(); }}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = 'pointer'; }}
+        onPointerOut={(e) => { e.stopPropagation(); setHovered(false); document.body.style.cursor = 'default'; }}
+      >
+        <boxGeometry args={[1.2, 0.8, 0.9]} />
+        <meshStandardMaterial
+          color={hovered ? '#b65a1f' : color}
+          metalness={0.65}
+          roughness={0.35}
+        />
+      </mesh>
+
+      {/* Top Mounting Collar */}
+      <mesh position={[0, 0.45, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.12, 8]} />
+        <meshStandardMaterial color="#334155" metalness={0.8} />
+      </mesh>
+
+      {/* Glowing Status Pilot Beacon */}
+      <mesh position={[0, 0.55, 0]}>
+        <sphereGeometry args={[0.12, 12, 8]} />
+        <meshBasicMaterial color={statusColor} />
+      </mesh>
+
+      {/* Technical Junction Label */}
+      <Html position={[0, 1.1, 0]} center distanceFactor={34} zIndexRange={[60, 0]}>
+        <div
+          onClick={(e) => { e.stopPropagation(); if (onClick) onClick(); }}
+          style={{
+            background: 'rgba(24, 28, 36, 0.94)',
+            border: `1px solid ${hovered ? '#b65a1f' : statusColor}`,
+            borderRadius: '2px',
+            padding: '2px 5px',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '7.5px',
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            color: '#ffffff',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'auto',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            userSelect: 'none'
+          }}
+        >
+          <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: statusColor, flexShrink: 0 }} />
+          <span>{label}</span>
+          {subLabel && <span style={{ color: '#94a3b8', fontSize: '6.5px' }}>{subLabel}</span>}
+        </div>
+      </Html>
+    </group>
+  );
+};
+
+// Major Interactive System Node (HTML badge with comprehensive telemetry)
 const SystemNodeBadge = ({
   node,
   value,
@@ -334,6 +353,70 @@ const SystemNodeBadge = ({
   );
 };
 
+// Physical 3D spatial node definitions anchored to building facilities
+const NODE_DEFINITIONS = {
+  SOLAR: {
+    id: 'SOLAR',
+    label: 'SOLAR ARRAY',
+    shortLabel: 'SOLAR',
+    pos: [10.0, 11.8, -28.0],
+    roofPos: [10.0, 6.5, -28.0],
+    zone: 'ENERGY',
+    defaultAsset: { id: 'ENERGY-INV-02', type: 'INVERTER', label: 'SOLAR INVERTER', zone: 'ENERGY' },
+    icon: '☀'
+  },
+  WIND: {
+    id: 'WIND',
+    label: 'WIND TURBINE',
+    shortLabel: 'WIND',
+    pos: [44.0, 14.5, -10.0],
+    roofPos: [44.0, 6.5, -10.0],
+    zone: 'RESEARCH',
+    defaultAsset: { id: 'RESEARCH-RES-01', type: 'RESEARCH', label: 'MET ARRAY', zone: 'RESEARCH' },
+    icon: '⚡'
+  },
+  DIESEL: {
+    id: 'DIESEL',
+    label: 'DIESEL PLANT',
+    shortLabel: 'DIESEL',
+    pos: [-30.0, 11.5, -30.0],
+    roofPos: [-30.0, 5.5, -30.0],
+    zone: 'GENERATOR',
+    defaultAsset: { id: 'GENERATOR-GEN-02', type: 'GENERATOR', label: 'DIESEL GEN #2', zone: 'GENERATOR' },
+    icon: '⚙'
+  },
+  MICROGRID: {
+    id: 'MICROGRID',
+    label: 'MICROGRID BUS',
+    shortLabel: 'MICROGRID',
+    pos: [0.0, 12.2, -28.0],
+    roofPos: [0.0, 6.5, -28.0],
+    zone: 'ENERGY',
+    defaultAsset: { id: 'ENERGY-INV-01', type: 'INVERTER', label: 'MICROGRID INVERTER', zone: 'ENERGY' },
+    icon: '⎇'
+  },
+  BATTERY: {
+    id: 'BATTERY',
+    label: 'BATTERY BANK',
+    shortLabel: 'BATTERY',
+    pos: [-7.5, 11.2, -26.0],
+    roofPos: [-7.5, 6.5, -26.0],
+    zone: 'ENERGY',
+    defaultAsset: { id: 'ENERGY-BATT-01', type: 'BATTERY', label: 'BATTERY BANK', zone: 'ENERGY' },
+    icon: '🔋'
+  },
+  STATION: {
+    id: 'STATION',
+    label: 'STATION LOAD',
+    shortLabel: 'STATION LOAD',
+    pos: [0.0, 13.8, 0.0],
+    roofPos: [0.0, 7.0, 0.0],
+    zone: 'MAIN',
+    defaultAsset: { id: 'MAIN-PANEL-01', type: 'CONTROL', label: 'COMMAND CONSOLE', zone: 'MAIN' },
+    icon: '⌂'
+  }
+};
+
 export const SystemFlowOverlay = ({
   telemetry = {},
   station,
@@ -343,7 +426,6 @@ export const SystemFlowOverlay = ({
 }) => {
   const power     = telemetry?.power     || {};
   const battery   = telemetry?.battery   || {};
-  const health    = telemetry?.healthStatus || 'NOMINAL';
 
   // 1. Live Telemetry Extraction & Parsing
   const solarKW   = parseKW(power.solarGeneration);
@@ -362,7 +444,7 @@ export const SystemFlowOverlay = ({
   const windActive    = windKW > 0.5;
   const dieselActive  = dieselKW > 0.5;
 
-  // 2. Determine Focused Node/Connection from Selected Asset or Sensor
+  // 2. Focused System Node Detection
   const focusedNodeId = useMemo(() => {
     if (selectedAssetId) {
       if (selectedAssetId.includes('BATT')) return 'BATTERY';
@@ -385,118 +467,402 @@ export const SystemFlowOverlay = ({
     return null;
   }, [selectedAssetId, selectedSensor]);
 
-  // 3. Declarative System Connection Model
-  const connections = useMemo(() => {
+  // 3. Multi-circuit Realistic Electrical Grid Topology
+  const circuits = useMemo(() => {
     const list = [];
 
-    // Connection A: SOLAR -> MICROGRID
+    // =========================================================================
+    // A. DIESEL GENERATION FACILITY (West Subsystem)
+    // =========================================================================
+    // 1. DG #1 Engine Feeder to Local Generator Switchgear
     list.push({
-      id: 'solar-microgrid',
-      source: 'SOLAR',
-      target: 'MICROGRID',
-      from: NODE_DEFINITIONS.SOLAR.pos,
-      to: NODE_DEFINITIONS.MICROGRID.pos,
-      active: solarActive,
-      direction: 'forward',
-      value: solarKW,
-      color: '#d97706',
-      baseWidth: 0.12 + Math.min(0.10, (solarKW / 60) * 0.10),
-      isCritical: false
-    });
-
-    // Connection B: WIND -> MICROGRID
-    list.push({
-      id: 'wind-microgrid',
-      source: 'WIND',
-      target: 'MICROGRID',
-      from: NODE_DEFINITIONS.WIND.pos,
-      to: NODE_DEFINITIONS.MICROGRID.pos,
-      active: windActive,
-      direction: 'forward',
-      value: windKW,
-      color: '#4f6f52',
-      baseWidth: 0.12 + Math.min(0.10, (windKW / 60) * 0.10),
-      isCritical: false
-    });
-
-    // Connection C: DIESEL -> MICROGRID
-    list.push({
-      id: 'diesel-microgrid',
-      source: 'DIESEL',
-      target: 'MICROGRID',
-      from: NODE_DEFINITIONS.DIESEL.pos,
-      to: NODE_DEFINITIONS.MICROGRID.pos,
+      id: 'gen-dg1-swg',
+      category: 'generation',
+      from: [-34.5, 3.2, -27.0],
+      to: [-28.0, 5.0, -30.0],
       active: dieselActive,
       direction: 'forward',
-      value: dieselKW,
-      color: dieselActive ? '#b65a1f' : '#94a3b8',
-      baseWidth: dieselActive ? (0.13 + Math.min(0.09, (dieselKW / 50) * 0.09)) : 0.07,
-      isCritical: false
+      color: dieselActive ? '#b65a1f' : '#64748b',
+      baseWidth: 0.11,
+      pulses: 1,
+      arch: 0.2
     });
 
-    // Connection D: BATTERY <-> MICROGRID (Direction depends on charge/discharge)
-    if (isCharging) {
-      list.push({
-        id: 'microgrid-battery',
-        source: 'MICROGRID',
-        target: 'BATTERY',
-        from: NODE_DEFINITIONS.MICROGRID.pos,
-        to: NODE_DEFINITIONS.BATTERY.pos,
-        active: true,
-        direction: 'forward', // Microgrid -> Battery
-        value: battPercent,
-        color: '#4f6f52',
-        baseWidth: 0.14,
-        isCritical: false
-      });
-    } else if (isDischarging) {
-      list.push({
-        id: 'battery-microgrid',
-        source: 'BATTERY',
-        target: 'MICROGRID',
-        from: NODE_DEFINITIONS.BATTERY.pos,
-        to: NODE_DEFINITIONS.MICROGRID.pos,
-        active: true,
-        direction: 'forward', // Battery -> Microgrid
-        value: battPercent,
-        color: isCriticalBatt ? '#b5382b' : '#d97706',
-        baseWidth: isCriticalBatt ? 0.18 : 0.14,
-        isCritical: isCriticalBatt
-      });
-    } else {
-      list.push({
-        id: 'battery-idle',
-        source: 'BATTERY',
-        target: 'MICROGRID',
-        from: NODE_DEFINITIONS.BATTERY.pos,
-        to: NODE_DEFINITIONS.MICROGRID.pos,
-        active: false,
-        direction: 'idle',
-        value: battPercent,
-        color: '#94a3b8',
-        baseWidth: 0.07,
-        isCritical: false
-      });
-    }
-
-    // Connection E: MICROGRID -> STATION LOAD
-    const stationActive = (solarActive || windActive || dieselActive || isDischarging);
+    // 2. DG #2 Engine Feeder to Local Generator Switchgear
     list.push({
-      id: 'microgrid-station',
-      source: 'MICROGRID',
-      target: 'STATION',
-      from: NODE_DEFINITIONS.MICROGRID.pos,
-      to: NODE_DEFINITIONS.STATION.pos,
-      active: stationActive,
+      id: 'gen-dg2-swg',
+      category: 'generation',
+      from: [-25.5, 3.2, -27.0],
+      to: [-28.0, 5.0, -30.0],
+      active: dieselActive,
       direction: 'forward',
-      value: currentKW,
-      color: isCriticalBatt ? '#d97706' : '#b65a1f',
-      baseWidth: 0.18,
+      color: dieselActive ? '#b65a1f' : '#64748b',
+      baseWidth: 0.11,
+      pulses: 1,
+      arch: 0.2
+    });
+
+    // 3. Day Tank Fuel Supply Loop
+    list.push({
+      id: 'gen-fuel-feed',
+      category: 'fuel',
+      from: [-30.0, 3.2, -35.0],
+      to: [-30.0, 3.2, -28.5],
+      active: dieselActive,
+      direction: 'forward',
+      color: '#d97706',
+      baseWidth: 0.09,
+      pulses: 1,
+      arch: 0.15
+    });
+
+    // 4. West Utility Corridor 3 Trunk: Generator Switchgear -> Energy Substation Bus
+    list.push({
+      id: 'gen-swg-corridor',
+      category: 'generation',
+      from: [-28.0, 5.0, -30.0],
+      to: [-16.5, 7.8, -30.0],
+      active: dieselActive,
+      direction: 'forward',
+      color: dieselActive ? '#b65a1f' : '#64748b',
+      baseWidth: 0.15,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    list.push({
+      id: 'gen-corridor-substation',
+      category: 'generation',
+      from: [-16.5, 7.8, -30.0],
+      to: [-2.0, 5.5, -30.0],
+      active: dieselActive,
+      direction: 'forward',
+      color: dieselActive ? '#b65a1f' : '#64748b',
+      baseWidth: 0.15,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // =========================================================================
+    // B. RENEWABLE SOLAR & WIND INFEEDS
+    // =========================================================================
+    // 5. Storage Rooftop Solar Array Trunk -> Corridor 4
+    list.push({
+      id: 'solar-stor-c4',
+      category: 'solar',
+      from: [30.5, 11.2, -28.5],
+      to: [17.5, 7.8, -30.0],
+      active: solarActive,
+      direction: 'forward',
+      color: '#d97706',
+      baseWidth: 0.12,
+      pulses: 2,
+      arch: 0.4
+    });
+
+    // 6. Corridor 4 -> Solar Inverter INV-02 in Energy Zone
+    list.push({
+      id: 'solar-c4-inv',
+      category: 'solar',
+      from: [17.5, 7.8, -30.0],
+      to: [5.5, 3.5, -26.5],
+      active: solarActive,
+      direction: 'forward',
+      color: '#d97706',
+      baseWidth: 0.12,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 7. Solar Inverter -> Substation Central Microgrid Bus
+    list.push({
+      id: 'solar-inv-bus',
+      category: 'solar',
+      from: [5.5, 3.5, -26.5],
+      to: [0.0, 5.5, -28.0],
+      active: solarActive,
+      direction: 'forward',
+      color: '#d97706',
+      baseWidth: 0.14,
+      pulses: 2,
+      arch: 0.2
+    });
+
+    // 8. Wind Turbine East Mast -> Research Roof Subpanel
+    list.push({
+      id: 'wind-mast-res',
+      category: 'wind',
+      from: [48.0, 14.0, -14.0],
+      to: [38.0, 7.2, 0.0],
+      active: windActive,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.5,
+      speedMultiplier: windKW > 40 ? 1.8 : 1.0
+    });
+
+    // 9. Research Subpanel -> Corridor 1 Trunk
+    list.push({
+      id: 'wind-res-c1',
+      category: 'wind',
+      from: [38.0, 7.2, 0.0],
+      to: [22.0, 7.8, 0.0],
+      active: windActive,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 10. Corridor 1 -> Main Building Junction
+    list.push({
+      id: 'wind-c1-main',
+      category: 'wind',
+      from: [22.0, 7.8, 0.0],
+      to: [0.0, 7.5, 0.0],
+      active: windActive,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.14,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 11. Main Junction -> Corridor 2 Spine -> Substation Bus
+    list.push({
+      id: 'wind-main-spine',
+      category: 'wind',
+      from: [0.0, 7.5, 0.0],
+      to: [0.0, 8.0, -16.0],
+      active: windActive,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.14,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    list.push({
+      id: 'wind-spine-bus',
+      category: 'wind',
+      from: [0.0, 8.0, -16.0],
+      to: [0.0, 5.5, -28.0],
+      active: windActive,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.14,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // =========================================================================
+    // C. ENERGY STORAGE DUAL-BANK (Substation <-> Battery Banks)
+    // =========================================================================
+    // 12. Battery Bank A (BATT-01) <-> Substation BMS
+    list.push({
+      id: 'batt-bank-a',
+      category: 'battery',
+      from: [-7.0, 3.2, -34.0],
+      to: [-3.5, 4.8, -30.0],
+      active: true,
+      direction: isDischarging ? 'forward' : isCharging ? 'reverse' : 'idle',
+      color: isCriticalBatt ? '#b5382b' : isDischarging ? '#d97706' : '#4f6f52',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.2,
       isCritical: isCriticalBatt
     });
 
+    // 13. Battery Bank B (BATT-02) <-> Substation BMS
+    list.push({
+      id: 'batt-bank-b',
+      category: 'battery',
+      from: [-7.0, 3.2, -26.0],
+      to: [-3.5, 4.8, -30.0],
+      active: true,
+      direction: isDischarging ? 'forward' : isCharging ? 'reverse' : 'idle',
+      color: isCriticalBatt ? '#b5382b' : isDischarging ? '#d97706' : '#4f6f52',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.2,
+      isCritical: isCriticalBatt
+    });
+
+    // 14. BMS Subpanel <-> Central Microgrid Bus
+    list.push({
+      id: 'batt-bms-bus',
+      category: 'battery',
+      from: [-3.5, 4.8, -30.0],
+      to: [0.0, 5.5, -28.0],
+      active: true,
+      direction: isDischarging ? 'forward' : isCharging ? 'reverse' : 'idle',
+      color: isCriticalBatt ? '#b5382b' : isDischarging ? '#d97706' : '#4f6f52',
+      baseWidth: 0.16,
+      pulses: 3,
+      arch: 0.25,
+      isCritical: isCriticalBatt
+    });
+
+    // =========================================================================
+    // D. FACILITY LOAD DISTRIBUTION FEEDERS (Substation -> Station Facilities)
+    // =========================================================================
+    const gridEnergized = (solarActive || windActive || dieselActive || isDischarging);
+
+    // 15. Primary Spine Feeder Trunk: Substation -> Corridor 2 -> Main Habitat Master Panel
+    list.push({
+      id: 'bus-spine-c2',
+      category: 'load',
+      from: [0.0, 5.5, -28.0],
+      to: [0.0, 8.0, -16.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: isCriticalBatt ? '#d97706' : '#b65a1f',
+      baseWidth: 0.18,
+      pulses: 3,
+      arch: 0.2
+    });
+
+    list.push({
+      id: 'spine-c2-mainhub',
+      category: 'load',
+      from: [0.0, 8.0, -16.0],
+      to: [0.0, 7.5, -2.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: isCriticalBatt ? '#d97706' : '#b65a1f',
+      baseWidth: 0.18,
+      pulses: 3,
+      arch: 0.2
+    });
+
+    // 16. Main Hub Branch -> Expedition Command Console
+    list.push({
+      id: 'main-command-feed',
+      category: 'load',
+      from: [0.0, 7.5, -2.0],
+      to: [0.0, 3.0, 0.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#b65a1f',
+      baseWidth: 0.12,
+      pulses: 1,
+      arch: 0.2
+    });
+
+    // 17. Main Hub Branch -> Environmental Life Support Plant (Vital Load)
+    list.push({
+      id: 'main-lifesupport-feed',
+      category: 'load',
+      from: [0.0, 7.5, -2.0],
+      to: [8.5, 3.0, 5.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#38a169',
+      baseWidth: 0.14,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 18. Main Hub Branch -> HVAC Thermal Plant Loop
+    list.push({
+      id: 'main-hvac-feed',
+      category: 'load',
+      from: [0.0, 7.5, -2.0],
+      to: [-8.5, 3.0, -4.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: isCriticalBatt ? '#d97706' : '#38a169',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 19. Main Hub -> Corridor 1 -> Research Laboratories (Scientific Instruments)
+    list.push({
+      id: 'main-c1-reslab',
+      category: 'load',
+      from: [0.0, 7.5, -2.0],
+      to: [22.0, 7.8, 0.0],
+      active: gridEnergized && !isCriticalBatt, // Load shedding in extreme power crisis
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.12,
+      pulses: 2,
+      arch: 0.25
+    });
+
+    list.push({
+      id: 'c1-reslab-gear',
+      category: 'load',
+      from: [22.0, 7.8, 0.0],
+      to: [38.0, 3.5, 0.0],
+      active: gridEnergized && !isCriticalBatt,
+      direction: 'forward',
+      color: '#4f6f52',
+      baseWidth: 0.12,
+      pulses: 2,
+      arch: 0.3
+    });
+
+    // 20. Substation -> Corridor 4 -> Logistics & Cold Provisions (Cryo Freezer)
+    list.push({
+      id: 'substation-c4-storage',
+      category: 'load',
+      from: [0.0, 5.5, -28.0],
+      to: [17.5, 7.8, -30.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#b65a1f',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.25
+    });
+
+    list.push({
+      id: 'c4-storage-freezer',
+      category: 'load',
+      from: [17.5, 7.8, -30.0],
+      to: [32.0, 4.0, -30.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#b65a1f',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.25
+    });
+
+    // 21. Substation -> Corridor 5 -> Comms & Ku-Band Dish Shelter
+    list.push({
+      id: 'substation-c5-comms',
+      category: 'load',
+      from: [0.0, 5.5, -28.0],
+      to: [0.0, 6.0, -43.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#38a169',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.2
+    });
+
+    list.push({
+      id: 'c5-comms-shelter',
+      category: 'load',
+      from: [0.0, 6.0, -43.0],
+      to: [0.0, 4.5, -54.0],
+      active: gridEnergized,
+      direction: 'forward',
+      color: '#38a169',
+      baseWidth: 0.13,
+      pulses: 2,
+      arch: 0.25
+    });
+
     return list;
-  }, [solarActive, solarKW, windActive, windKW, dieselActive, dieselKW, isCharging, isDischarging, isCriticalBatt, battPercent, currentKW]);
+  }, [dieselActive, solarActive, windActive, windKW, isCharging, isDischarging, isCriticalBatt]);
 
   // Handle click on node badge: focus and inspect matching operational machinery
   const handleNodeClick = (node) => {
@@ -507,28 +873,90 @@ export const SystemFlowOverlay = ({
 
   return (
     <group name="system-flow-overlay">
-      {/* 1. Technical Overhead Power Flow Conduits */}
-      {connections.map((conn) => {
+      {/* 1. Multi-Circuit Technical Power Grid Conduits */}
+      {circuits.map((circuit) => {
         const isEmphasized = focusedNodeId
-          ? (conn.source === focusedNodeId || conn.target === focusedNodeId)
+          ? (
+              (focusedNodeId === 'BATTERY'   && circuit.category === 'battery') ||
+              (focusedNodeId === 'DIESEL'    && circuit.category === 'generation') ||
+              (focusedNodeId === 'SOLAR'     && circuit.category === 'solar') ||
+              (focusedNodeId === 'WIND'      && circuit.category === 'wind') ||
+              (focusedNodeId === 'STATION'   && circuit.category === 'load') ||
+              (focusedNodeId === 'MICROGRID' && (circuit.category === 'load' || circuit.id.includes('bus')))
+            )
           : false;
         const isDimmed = focusedNodeId ? !isEmphasized : false;
 
         return (
-          <FlowConduit
-            key={conn.id}
-            connection={conn}
+          <ConduitSegment
+            key={circuit.id}
+            circuit={circuit}
             isEmphasized={isEmphasized}
             isDimmed={isDimmed}
           />
         );
       })}
 
-      {/* 2. Interactive Grounded System Nodes with Real Telemetry */}
+      {/* 2. Industrial Substation Junction Tap Boxes at Corridor Intersections */}
+      <UtilityJunctionBox
+        position={[-28.0, 5.0, -30.0]}
+        label="DG SWITCHGEAR"
+        subLabel="415V"
+        status={dieselActive ? 'ACTIVE' : 'OFFLINE'}
+        color="#334155"
+        onClick={() => onSelectAsset && onSelectAsset(NODE_DEFINITIONS.DIESEL.defaultAsset)}
+      />
+
+      <UtilityJunctionBox
+        position={[0.0, 7.8, -28.0]}
+        label="SUBSTATION BUS"
+        subLabel="415V • 50Hz"
+        status={isCriticalBatt ? 'CRITICAL' : 'NOMINAL'}
+        color="#1e293b"
+        onClick={() => onSelectAsset && onSelectAsset(NODE_DEFINITIONS.MICROGRID.defaultAsset)}
+      />
+
+      <UtilityJunctionBox
+        position={[0.0, 8.2, -2.0]}
+        label="HAB DISTRIBUTION"
+        subLabel="230V AC"
+        status="NOMINAL"
+        color="#334155"
+        onClick={() => onSelectAsset && onSelectAsset(NODE_DEFINITIONS.STATION.defaultAsset)}
+      />
+
+      <UtilityJunctionBox
+        position={[38.0, 7.2, 0.0]}
+        label="RESEARCH SUBPANEL"
+        subLabel="LAB BUS"
+        status={windActive ? 'ACTIVE' : 'NOMINAL'}
+        color="#334155"
+        onClick={() => onSelectAsset && onSelectAsset(NODE_DEFINITIONS.WIND.defaultAsset)}
+      />
+
+      <UtilityJunctionBox
+        position={[32.0, 6.2, -30.0]}
+        label="COLD LOGISTICS TAP"
+        subLabel="3-PHASE"
+        status="NOMINAL"
+        color="#334155"
+        onClick={() => onSelectAsset && onSelectAsset({ id: 'STORAGE-FREEZE-01', type: 'FREEZER', label: 'CRYO FREEZER', zone: 'STORAGE' })}
+      />
+
+      <UtilityJunctionBox
+        position={[0.0, 5.8, -50.0]}
+        label="COMMS RF TAP"
+        subLabel="UPS BUS"
+        status="NOMINAL"
+        color="#334155"
+        onClick={() => onSelectAsset && onSelectAsset({ id: 'COMMS-COMM-01', type: 'COMMS', label: 'RF SHELTER', zone: 'COMMS' })}
+      />
+
+      {/* 3. Major Interactive System Node Badges with Real Telemetry */}
       <SystemNodeBadge
         node={NODE_DEFINITIONS.SOLAR}
         value={solarActive ? `${solarKW.toFixed(1)} kW` : '0.0 kW'}
-        subMetric={solarActive ? 'ACTIVE' : 'STOWED / NIGHT'}
+        subMetric={solarActive ? 'DUAL ARRAY' : 'STOWED / NIGHT'}
         status={solarActive ? 'ACTIVE' : 'OFFLINE'}
         isHighlighted={focusedNodeId === 'SOLAR'}
         onClick={handleNodeClick}
@@ -537,7 +965,7 @@ export const SystemFlowOverlay = ({
       <SystemNodeBadge
         node={NODE_DEFINITIONS.WIND}
         value={windActive ? `${windKW.toFixed(1)} kW` : '0.0 kW'}
-        subMetric={windActive ? 'EAST MAST' : 'CALM'}
+        subMetric={windActive ? 'EAST RIDGE MAST' : 'CALM'}
         status={windActive ? 'NOMINAL' : 'OFFLINE'}
         isHighlighted={focusedNodeId === 'WIND'}
         onClick={handleNodeClick}
@@ -546,7 +974,7 @@ export const SystemFlowOverlay = ({
       <SystemNodeBadge
         node={NODE_DEFINITIONS.DIESEL}
         value={dieselActive ? `${dieselKW.toFixed(1)} kW` : '0.0 kW'}
-        subMetric={dieselActive ? 'DG #1 & #2' : 'TRIPPED / STBY'}
+        subMetric={dieselActive ? 'DG #1 & #2 ONLINE' : 'TRIPPED / STANDBY'}
         status={dieselActive ? 'ACTIVE' : 'OFFLINE'}
         isHighlighted={focusedNodeId === 'DIESEL'}
         onClick={handleNodeClick}
@@ -555,7 +983,7 @@ export const SystemFlowOverlay = ({
       <SystemNodeBadge
         node={NODE_DEFINITIONS.MICROGRID}
         value={`${currentKW.toFixed(1)} kW`}
-        subMetric="415V • 50 Hz"
+        subMetric="415V • 50 Hz SYNCH"
         status={isCriticalBatt ? 'CRITICAL' : 'NOMINAL'}
         isHighlighted={focusedNodeId === 'MICROGRID'}
         onClick={handleNodeClick}
