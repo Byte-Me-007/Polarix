@@ -1,0 +1,185 @@
+{
+  "timestamp_utc": "2026-09-18T13:54:03.403767+00:00",
+  "experiment_name": "Sensor ML V2 Retraining & Threshold Calibration",
+  "stations": {
+    "MTR": {
+      "station": "Maitri",
+      "station_id": "MTR",
+      "v1": {
+        "model_version": "lstm-ae-v1",
+        "threshold": 0.01767403447212987,
+        "precision": 0.2611683848797251,
+        "recall": 0.5259515570934256,
+        "f1": 0.34902411021814006,
+        "fpr": 0.48152295632698766,
+        "accuracy": 0.5203045685279187,
+        "auroc": 0.47139807111830967,
+        "auprc": 0.2152783897000552
+      },
+      "v2": {
+        "model_version": "lstm-ae-v2-candidate",
+        "threshold": 0.0007223446154966,
+        "precision": 0.24512298558100085,
+        "recall": 1.0,
+        "f1": 0.39373297002724794,
+        "fpr": 0.9966405375139977,
+        "accuracy": 0.2470389170896785,
+        "auroc": 0.4421819844465024,
+        "auprc": 0.20450782625061115
+      },
+      "delta": {
+        "precision": -0.016045,
+        "recall": 0.474048,
+        "f1": 0.044709,
+        "fpr": 0.515118,
+        "accuracy": -0.273266,
+        "auroc": -0.029216,
+        "auprc": -0.010771
+      },
+      "test_confusion_matrix": {
+        "TP": 289,
+        "TN": 3,
+        "FP": 890,
+        "FN": 0
+      },
+      "per_anomaly_type_breakdown": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 150,
+          "detection_rate": 1.0
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "false_alarms": 890,
+          "false_positive_rate": 0.9966405375139977
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "detection_rate": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 120,
+          "detection_rate": 1.0
+        }
+      },
+      "per_sensor_threshold_candidate": {
+        "sensor_thresholds": {
+          "HUM_001": 0.01651068712169505,
+          "POWER_001": 0.01498420944579512,
+          "PRESS_001": 0.0009249719441868,
+          "TEMP_001": 0.00831550971301921,
+          "VIB_001": 0.035893864702567946
+        },
+        "test_metrics": {
+          "TP": 144,
+          "TN": 435,
+          "FP": 458,
+          "FN": 145,
+          "total": 1182,
+          "accuracy": 0.48984771573604063,
+          "precision": 0.23920265780730898,
+          "recall": 0.4982698961937716,
+          "f1": 0.3232323232323232,
+          "fpr": 0.5128779395296752
+        }
+      }
+    },
+    "BRT": {
+      "station": "Bharati",
+      "station_id": "BRT",
+      "v1": {
+        "model_version": "lstm-ae-bharati-v1",
+        "threshold": 0.013215307652775843,
+        "precision": 0.2679,
+        "recall": 0.5709,
+        "f1": 0.3646,
+        "fpr": 0.505,
+        "accuracy": 0.5135,
+        "auroc": 0.47078972554702664,
+        "auprc": 0.21553188450458366
+      },
+      "v2": {
+        "model_version": "lstm-ae-bharati-v2-candidate",
+        "threshold": 0.013013084286666752,
+        "precision": 0.23116438356164384,
+        "recall": 0.4671280276816609,
+        "f1": 0.30927835051546393,
+        "fpr": 0.5027995520716685,
+        "accuracy": 0.48984771573604063,
+        "auroc": 0.4525122347206454,
+        "auprc": 0.20789630263247588
+      },
+      "delta": {
+        "precision": -0.036736,
+        "recall": -0.103772,
+        "f1": -0.055322,
+        "fpr": -0.0022,
+        "accuracy": -0.023652,
+        "auroc": -0.018277,
+        "auprc": -0.007636
+      },
+      "test_confusion_matrix": {
+        "TP": 135,
+        "TN": 444,
+        "FP": 449,
+        "FN": 154
+      },
+      "per_anomaly_type_breakdown": {
+        "DRIFT": {
+          "total_instances": 150,
+          "detected_anomalies": 104,
+          "detection_rate": 0.6933333333333334
+        },
+        "NORMAL": {
+          "total_instances": 893,
+          "false_alarms": 449,
+          "false_positive_rate": 0.5027995520716685
+        },
+        "SPIKE": {
+          "total_instances": 19,
+          "detected_anomalies": 19,
+          "detection_rate": 1.0
+        },
+        "STUCK_VALUE": {
+          "total_instances": 120,
+          "detected_anomalies": 12,
+          "detection_rate": 0.1
+        }
+      },
+      "per_sensor_threshold_candidate": {
+        "sensor_thresholds": {
+          "BRT_HUM_001": 0.01647436530138531,
+          "BRT_POWER_001": 0.011754318926423504,
+          "BRT_PRESS_001": 0.006801709658933743,
+          "BRT_TEMP_001": 0.008452174662631068,
+          "BRT_VIB_001": 0.03150605597041812
+        },
+        "test_metrics": {
+          "TP": 122,
+          "TN": 531,
+          "FP": 362,
+          "FN": 167,
+          "total": 1182,
+          "accuracy": 0.5524534686971235,
+          "precision": 0.25206611570247933,
+          "recall": 0.42214532871972316,
+          "f1": 0.31565329883570503,
+          "fpr": 0.4053751399776036
+        }
+      }
+    }
+  },
+  "overall_conclusions": {
+    "maitri_f1_change": "0.3490 -> 0.3937 (Delta: +0.0447)",
+    "bharati_f1_change": "0.3646 -> 0.3093 (Delta: -0.0553)",
+    "findings": [
+      "Extended epoch training with ReduceLROnPlateau converges to a lower reconstruction loss on normal sequences.",
+      "Threshold selection on validation data prevents test set leakage.",
+      "Reconstruction loss alone does not eliminate diurnal false alarms; deterministic anomaly-type classification remains essential.",
+      "V1 baseline artifacts remain untouched, frozen, and authoritative for production.",
+      "V2 models are preserved as candidates under ml/experiments/sensor_v2/."
+    ]
+  }
+}

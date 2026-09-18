@@ -1,0 +1,18 @@
+{
+  "station_id": "MTR",
+  "model_version": "lstm-ae-v2-candidate",
+  "decision_threshold": 0.0007223446154966,
+  "selection_criterion": "max_validation_f1",
+  "validation_metrics": {
+    "TP": 292,
+    "TN": 1,
+    "FP": 888,
+    "FN": 0,
+    "total": 1181,
+    "accuracy": 0.2480948348856901,
+    "precision": 0.24745762711864408,
+    "recall": 1.0,
+    "f1": 0.3967391304347826,
+    "fpr": 0.9988751406074241
+  }
+}
