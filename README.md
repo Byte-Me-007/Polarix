@@ -49,11 +49,23 @@ The smoke test verifies the HTTP API endpoints (`/health`, `/devices/`, `/sensor
    python scripts/smoke_test_maitri.py
    ```
 
-## Maitri Environment Configuration
+## Antarctic Stations & Sensors Foundation
 
-- Copy `.env.example` to `.env` if local custom settings are needed.
-- `DATABASE_URL` controls the database connection.
-- Default database is local SQLite: `sqlite:///./maitri.db`.
+The backend provides station and sensor tracking for Antarctic research bases (**Maitri (`MTR`)** and **Bharati (`BHR`)**):
+
+- **List all stations:**
+  `GET /stations`
+- **Get station details (by ID or station code):**
+  `GET /stations/{station_id}` (e.g. `GET /stations/MTR` or `GET /stations/BHR`)
+- **Get sensors for a station:**
+  `GET /stations/{station_id}/sensors` (e.g. `GET /stations/MTR/sensors`)
+
+Representative sensors span four core domains:
+- **`ENVIRONMENT`**: Ambient temperature, wind speed, humidity, barometric pressure.
+- **`STRUCTURE`**: Building foundation vibration, superstructure strain, roof tilt inclinometers.
+- **`ENERGY`**: Diesel generator output, battery storage bank voltage, solar array generation.
+- **`LOGISTICS`**: Main fuel storage tank level, fresh water reservoir levels.
+
 
 
 

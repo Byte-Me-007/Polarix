@@ -11,6 +11,12 @@ from maitri.services.sensor_service import (
     create_sensor_reading,
     list_sensor_readings,
 )
+from maitri.services.station_service import (
+    get_sensors_by_station,
+    get_station_by_id_or_code,
+    list_stations,
+    seed_default_stations,
+)
 from maitri.services.websocket_manager import ConnectionManager, manager
 
 __all__ = [
@@ -23,6 +29,8 @@ __all__ = [
     "parse_sensor_message",
     "ConnectionManager",
     "manager",
+    "list_stations",
+    "get_station_by_id_or_code",
+    "get_sensors_by_station",
+    "seed_default_stations",
 ]
-
-

@@ -7,6 +7,15 @@ from maitri.schemas.sensor_reading import (
     SensorReadingCreate,
     SensorReadingResponse,
 )
+from maitri.schemas.station import (
+    SensorBase,
+    SensorCreate,
+    SensorResponse,
+    StationBase,
+    StationCreate,
+    StationDetailResponse,
+    StationResponse,
+)
 
 __all__ = [
     "DeviceBase",
@@ -16,5 +25,11 @@ __all__ = [
     "SensorReadingBase",
     "SensorReadingCreate",
     "SensorReadingResponse",
+    "StationBase",
+    "StationCreate",
+    "StationResponse",
+    "StationDetailResponse",
+    "SensorBase",
+    "SensorCreate",
+    "SensorResponse",
 ]
-

@@ -1,6 +1,12 @@
 import maitri.models  # noqa: F401 - Register models with Base.metadata
-from maitri.database import Base, engine
+from maitri.database import Base, SessionLocal, engine
+from maitri.services.station_service import seed_default_stations
 
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        seed_default_stations(db)
+    finally:
+        db.close()
