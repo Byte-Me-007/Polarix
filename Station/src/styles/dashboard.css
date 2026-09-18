@@ -6741,3 +6741,476 @@ body {
 }
 
 
+
+/* ==========================================================================
+   DIGITAL TWIN — MODE SWITCHER & OPERATIONAL UPGRADE STYLES
+   ========================================================================== */
+
+/* ── Mode Strip (sits between header and viewport) ── */
+.twin-mode-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 1.25rem;
+  background: var(--polaris-bg-surface);
+  border-bottom: 1px solid var(--polaris-border);
+  border-top: 1px solid var(--polaris-border-subtle);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ── Mode Switcher Pill Group ── */
+.twin-mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--polaris-bg-sunken);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.twin-mode-btn {
+  position: relative;
+  padding: 0.26rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--polaris-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.twin-mode-btn:hover {
+  background: var(--polaris-bg-elevated);
+  color: var(--polaris-text-secondary);
+}
+
+.twin-mode-btn.active {
+  background: var(--polaris-bg-surface);
+  color: var(--polaris-copper);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--polaris-copper-border);
+}
+
+.twin-mode-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--polaris-text-muted);
+  flex-shrink: 0;
+}
+
+.twin-mode-btn.active .twin-mode-badge-dot {
+  background: var(--polaris-copper);
+}
+
+/* ── Quick Controls (right side of mode strip) ── */
+.twin-quick-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.twin-tool-btn-sm {
+  padding: 0.24rem 0.6rem;
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-elevated);
+  color: var(--polaris-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+
+.twin-tool-btn-sm:hover {
+  background: var(--polaris-bg-sunken);
+  color: var(--polaris-text-secondary);
+}
+
+.twin-tool-btn-sm.active {
+  background: var(--polaris-copper-subtle);
+  color: var(--polaris-copper);
+  border-color: var(--polaris-copper-border);
+}
+
+/* ── Inspection / Mode Chip (overlaid on canvas) ── */
+.twin-inspection-chip {
+  position: absolute;
+  top: 0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 16;
+  background: rgba(255,255,255,0.94);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.22rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--polaris-text-muted);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ── Verify Strip (debug test sequence) ── */
+.twin-verify-strip {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.75rem;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.28rem 0.55rem;
+  backdrop-filter: blur(6px);
+}
+
+.twin-verify-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.07em;
+  margin-right: 2px;
+}
+
+.twin-verify-btn {
+  padding: 0.18rem 0.4rem;
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-elevated);
+  color: var(--polaris-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.twin-verify-btn:hover {
+  background: var(--polaris-bg-sunken);
+  color: var(--polaris-text-primary);
+}
+
+.twin-verify-btn.active {
+  background: var(--polaris-copper-subtle);
+  color: var(--polaris-copper);
+  border-color: var(--polaris-copper-border);
+}
+
+/* ==========================================================================
+   ASSET INSPECT PANEL
+   ========================================================================== */
+
+.asset-inspect-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--polaris-bg-surface);
+  border-left: 1px solid var(--polaris-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.asset-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+  gap: 0.5rem;
+}
+
+.asset-panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.asset-panel-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-xs);
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.asset-panel-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-primary);
+  line-height: 1.3;
+}
+
+.asset-panel-zone {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.asset-panel-close {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-elevated);
+  color: var(--polaris-text-muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.1s;
+}
+
+.asset-panel-close:hover {
+  background: var(--polaris-bg-sunken);
+  color: var(--polaris-text-primary);
+}
+
+.asset-panel-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+}
+
+.asset-panel-status-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid;
+}
+
+.asset-panel-type-tag {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.06em;
+}
+
+.asset-panel-telemetry {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.asset-panel-data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.42rem 1rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+  gap: 0.5rem;
+}
+
+.asset-panel-data-row:last-child {
+  border-bottom: none;
+}
+
+.asset-panel-data-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--polaris-text-muted);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.asset-panel-data-value {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--polaris-text-primary);
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+.asset-panel-unavailable {
+  padding: 1.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.asset-panel-footer {
+  padding: 0.45rem 1rem;
+  border-top: 1px solid var(--polaris-border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   REPLAY CONTROLLER DOCK
+   ========================================================================== */
+
+.replay-controller-dock {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.replay-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.replay-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--polaris-text-primary);
+}
+
+.replay-unavail-badge {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  color: var(--polaris-text-muted);
+  background: var(--polaris-bg-sunken);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  padding: 0.15rem 0.5rem;
+}
+
+.replay-timeline-track {
+  position: relative;
+  padding-bottom: 1.4rem;
+}
+
+.replay-track-bar {
+  position: relative;
+  height: 4px;
+  background: var(--polaris-bg-sunken);
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.replay-event-marker {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  top: -4px;
+}
+
+.replay-marker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--marker-color, var(--polaris-border-strong));
+  border: 2px solid var(--polaris-bg-surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.replay-marker-label {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--polaris-text-muted);
+  white-space: nowrap;
+  margin-top: 6px;
+}
+
+.replay-scrubber-handle {
+  position: absolute;
+  top: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  border: 2px solid var(--polaris-border-strong);
+  background: var(--polaris-bg-surface);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: border-color 0.15s;
+}
+
+.replay-scrubber-handle.active {
+  border-color: var(--polaris-copper);
+  cursor: ew-resize;
+}
+
+.replay-scrubber-handle.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.replay-time-axis {
+  position: relative;
+  height: 14px;
+}
+
+.replay-time-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--polaris-text-light);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.replay-status-note {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--polaris-text-muted);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  border-top: 1px solid var(--polaris-border-subtle);
+  padding-top: 0.5rem;
+}

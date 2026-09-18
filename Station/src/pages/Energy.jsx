@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 import { StationSelector } from '../components/StationSelector';
 import { ExecutiveEnergyStrip } from '../components/energy/ExecutiveEnergyStrip';
@@ -25,6 +26,15 @@ export const Energy = () => {
     activeAlerts,
     scenario
   } = useStationTelemetry();
+
+  const navigate = useNavigate();
+
+  // Digital Twin cross-navigation
+  const handleViewGeneratorInTwin = () => navigate('/digital-twin', { state: { focusZone: 'GENERATOR', twinMode: 'XRAY' } });
+  const handleViewBatteryInTwin   = () => navigate('/digital-twin', { state: { focusZone: 'ENERGY',    twinMode: 'XRAY' } });
+  const handleViewSystemInTwin    = () => navigate('/digital-twin', { state: { twinMode: 'SYSTEM' } });
+  const handleViewSolarInTwin     = () => navigate('/digital-twin', { state: { focusZone: 'ENERGY',    twinMode: 'SYSTEM' } });
+
 
   // Helper to parse numbers safely from strings like "84.3 kW"
   const parseNum = (val, defaultVal = 0) => {

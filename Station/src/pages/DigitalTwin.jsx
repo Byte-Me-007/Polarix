@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 import { DigitalTwinScene } from '../digital-twin/DigitalTwinScene';
 import { TwinLegend } from '../digital-twin/TwinLegend';
 import { SensorDetailsPanel } from '../digital-twin/SensorDetailsPanel';
+import { AssetInspectPanel } from '../digital-twin/AssetInspectPanel';
+import { ReplayController } from '../digital-twin/ReplayController';
 import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
+import { useStation } from '../context/StationContext';
+
+// Mode definitions
+const MODES = [
+  { id: 'NORMAL',  label: 'NORMAL',  desc: 'Full station view — realistic appearance' },
+  { id: 'XRAY',    label: 'X-RAY',   desc: 'Transparent shells — internal infrastructure visible' },
+  { id: 'SYSTEM',  label: 'SYSTEM',  desc: 'Energy flow relationships and infrastructure dependencies' },
+  { id: 'HEATMAP', label: 'HEATMAP', desc: 'Spatial sensor condition anomaly intensity overlay' },
+  { id: 'REPLAY',  label: 'REPLAY',  desc: 'Incident playback timeline — backend data required' }
+];
 
 export const DigitalTwin = () => {
   const location = useLocation();
@@ -16,130 +28,146 @@ export const DigitalTwin = () => {
     clearSensorOverrides,
     setScenario,
     activeStation,
-    setActiveStation
+    setActiveStation,
+    activeScenario
   } = useStationTelemetry();
 
+  const { telemetry } = useStation();
+
+  const [twinMode, setTwinMode]         = useState('NORMAL');
   const [selectedSensorId, setSelectedSensorId] = useState(null);
-  const [showSensors, setShowSensors] = useState(true);
-  const [showLabels, setShowLabels] = useState(true);
-  const [showHeatmap, setShowHeatmap] = useState(true); // Default to ON for quick heatmap inspection
-  const [resetTrigger, setResetTrigger] = useState(0);
-  const [activeTestNum, setActiveTestNum] = useState(null);
+  const [selectedAsset, setSelectedAsset]       = useState(null);
+  const [showSensors, setShowSensors]           = useState(true);
+  const [showLabels, setShowLabels]             = useState(true);
+  const [resetTrigger, setResetTrigger]         = useState(0);
+  const [focusZone, setFocusZone]               = useState(null);
+  const [activeTestNum, setActiveTestNum]       = useState(null);
 
-  // Handle incoming alert location intent: /alerts -> Digital Twin (Section 11)
+  // ── Cross-module navigation state handling ───────────────────────────────
   useEffect(() => {
-    if (location.state?.locateSensorId) {
-      setSelectedSensorId(location.state.locateSensorId);
-      setShowSensors(true);
-      setShowHeatmap(true);
-    }
-  }, [location.state?.locateSensorId]);
+    const state = location.state;
+    if (!state) return;
 
-  // Dynamically resolve selected sensor to react to telemetry updates & scenario changes
+    // From Alerts: { locateSensorId, highlightZone, twinMode }
+    if (state.locateSensorId) {
+      setSelectedSensorId(state.locateSensorId);
+      setShowSensors(true);
+    }
+    // From Alerts / Energy / Logistics: { focusZone, twinMode }
+    if (state.focusZone) {
+      setFocusZone(state.focusZone);
+    }
+    // Incoming mode override
+    if (state.twinMode && MODES.find(m => m.id === state.twinMode)) {
+      setTwinMode(state.twinMode);
+    }
+  }, [location.state]);
+
+  // Clear focusZone after a delay so it doesn't lock camera
+  useEffect(() => {
+    if (!focusZone) return;
+    const timer = setTimeout(() => setFocusZone(null), 3500);
+    return () => clearTimeout(timer);
+  }, [focusZone]);
+
+  // Dynamically resolve selected sensor
   const selectedSensor = React.useMemo(() => {
     if (!selectedSensorId) return null;
     return sensors.find((s) => s.id === selectedSensorId) || null;
   }, [selectedSensorId, sensors]);
 
   const stationTitle = config.displayName || `${config.stationId || 'MAITRI'} Research Station`;
-  const stationCode = config.shortCode || config.id || 'MTR';
+  const stationCode  = config.shortCode || config.id || 'MTR';
 
   const handleResetView = () => {
-    setResetTrigger((prev) => prev + 1);
+    setResetTrigger(prev => prev + 1);
+    setFocusZone(null);
   };
 
-  // Dedicated test sequence runner (TEST 1 - TEST 7 per specification)
+  const handleModeChange = (modeId) => {
+    setTwinMode(modeId);
+    // Clear sensor + asset selection when switching modes
+    if (modeId !== 'HEATMAP') {
+      // preserve sensor selection in heatmap
+    }
+  };
+
+  const handleSelectAsset = useCallback((asset) => {
+    setSelectedAsset(asset);
+    setSelectedSensorId(null); // close sensor panel if open
+  }, []);
+
+  const handleCloseAssetPanel = useCallback(() => {
+    setSelectedAsset(null);
+  }, []);
+
+  // Scenario-based test sequence (T1–T7, preserved from original)
   const handleRunTest = (testNum) => {
     setActiveTestNum(testNum);
-    setShowHeatmap(true);
+    if (testNum !== 1) setTwinMode(prev => prev); // keep mode
 
-    // Pick first sensor in active station for consistent demonstration
     const targetSensor = sensors[0];
 
     switch (testNum) {
-      case 1: // TEST 1: All sensors NORMAL -> station mostly clean, very subtle/no heatmap
+      case 1:
         clearSensorOverrides();
         setScenario('NORMAL');
         setSelectedSensorId(null);
         break;
-
-      case 2: // TEST 2: One sensor WARNING -> small/medium amber spatial region
+      case 2:
         clearSensorOverrides();
         setScenario('NORMAL');
         setSelectedSensorId(null);
         if (targetSensor) {
-          updateSensor(targetSensor.id, {
-            status: 'WARNING',
-            anomaly_score: 0.58,
-            anomaly_status: 'WARNING'
-          });
+          updateSensor(targetSensor.id, { status: 'WARNING', anomaly_score: 0.58, anomaly_status: 'WARNING' });
         }
         break;
-
-      case 3: // TEST 3: Same sensor becomes CRITICAL -> stronger red region, larger radius, higher intensity
+      case 3:
         if (targetSensor) {
-          updateSensor(targetSensor.id, {
-            status: 'CRITICAL',
-            anomaly_score: 0.94,
-            anomaly_status: 'CRITICAL'
-          });
+          updateSensor(targetSensor.id, { status: 'CRITICAL', anomaly_score: 0.94, anomaly_status: 'CRITICAL' });
         }
         setSelectedSensorId(null);
         break;
-
-      case 4: // TEST 4: Sensor becomes OFFLINE -> alarm heatmap disappears, sensor marker becomes gray
+      case 4:
         if (targetSensor) {
-          updateSensor(targetSensor.id, {
-            status: 'OFFLINE',
-            quality: 'LOST',
-            anomaly_score: null,
-            anomaly_status: 'OFFLINE'
-          });
+          updateSensor(targetSensor.id, { status: 'OFFLINE', quality: 'LOST', anomaly_score: null, anomaly_status: 'OFFLINE' });
         }
         setSelectedSensorId(null);
         break;
-
-      case 5: // TEST 5: Sensor returns to NORMAL -> heatmap fades away smoothly
+      case 5:
         if (targetSensor) {
-          updateSensor(targetSensor.id, {
-            status: 'NORMAL',
-            quality: 'GOOD',
-            anomaly_score: 0.02,
-            anomaly_status: 'NORMAL'
-          });
+          updateSensor(targetSensor.id, { status: 'NORMAL', quality: 'GOOD', anomaly_score: 0.02, anomaly_status: 'NORMAL' });
         }
         setSelectedSensorId(null);
         break;
-
-      case 6: // TEST 6: Click the sensor -> sensor detail panel opens, highlights sensor & heatmap contribution
+      case 6:
         if (targetSensor) {
-          updateSensor(targetSensor.id, {
-            status: 'CRITICAL',
-            anomaly_score: 0.92,
-            anomaly_status: 'CRITICAL'
-          });
+          updateSensor(targetSensor.id, { status: 'CRITICAL', anomaly_score: 0.92, anomaly_status: 'CRITICAL' });
           setSelectedSensorId(targetSensor.id);
         }
         break;
-
-      case 7: // TEST 7: Switch MAITRI <-> BHARATI -> all heatmaps reposition correctly
+      case 7:
         setActiveStation(activeStation === 'MAITRI' ? 'BHARATI' : 'MAITRI');
         setSelectedSensorId(null);
+        setSelectedAsset(null);
+        setFocusZone(null);
         break;
-
       default:
         break;
     }
   };
 
+  const currentModeDesc = MODES.find(m => m.id === twinMode)?.desc || '';
+
   return (
     <main className="main-viewport digital-twin-page-container">
-      {/* Top Header */}
+
+      {/* ── Top Header ── */}
       <section className="twin-header-bar" aria-label="Digital Twin Header">
         <div className="twin-title-group">
           <h1>DIGITAL TWIN</h1>
           <p className="twin-subtitle">
-            Antarctic station 3D spatial monitoring & dynamic data-driven heatmaps
+            Operational spatial twin — {currentModeDesc}
           </p>
         </div>
 
@@ -150,131 +178,162 @@ export const DigitalTwin = () => {
               {stationTitle.toUpperCase()} / {stationCode}
             </span>
             <span className="simulation-data-tag">
-              SPATIAL HEATMAP • DATA-DRIVEN
+              {activeScenario !== 'NORMAL' ? `SCENARIO: ${activeScenario}` : 'LIVE TELEMETRY'}
             </span>
           </div>
         </div>
       </section>
 
-      {/* Main 3D Viewport Card */}
+      {/* ── Mode Switcher ── */}
+      <div className="twin-mode-strip" role="toolbar" aria-label="Digital Twin Mode Controls">
+        <div className="twin-mode-switcher">
+          {MODES.map(mode => (
+            <button
+              key={mode.id}
+              type="button"
+              className={`twin-mode-btn ${twinMode === mode.id ? 'active' : ''}`}
+              onClick={() => handleModeChange(mode.id)}
+              title={mode.desc}
+            >
+              {mode.label}
+              {mode.id === 'REPLAY' && (
+                <span className="twin-mode-badge-dot" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Quick control strip on the right */}
+        <div className="twin-quick-controls">
+          <button
+            type="button"
+            className={`twin-tool-btn-sm ${showSensors ? 'active' : ''}`}
+            onClick={() => setShowSensors(v => !v)}
+            title="Toggle sensor markers"
+          >
+            {showSensors ? 'SENSORS: ON' : 'SENSORS: OFF'}
+          </button>
+          <button
+            type="button"
+            className={`twin-tool-btn-sm ${showLabels ? 'active' : ''}`}
+            onClick={() => setShowLabels(v => !v)}
+            title="Toggle zone labels"
+          >
+            {showLabels ? 'LABELS: ON' : 'LABELS: OFF'}
+          </button>
+          <button
+            type="button"
+            className="twin-tool-btn-sm"
+            onClick={handleResetView}
+            title="Reset camera to full station overview"
+          >
+            RESET VIEW
+          </button>
+        </div>
+      </div>
+
+      {/* ── Main 3D Viewport Card ── */}
       <section className="twin-viewport-card" aria-label="3D Spatial Model Viewport">
         <div className="twin-canvas-wrapper">
-          {/* View Controls Overlay */}
-          <div className="twin-toolbar-overlay" role="toolbar" aria-label="3D Viewport Controls">
-            <button
-              type="button"
-              className="twin-tool-btn"
-              onClick={handleResetView}
-              title="Reset camera angle to default perspective"
-            >
-              RESET VIEW
-            </button>
 
-            <button
-              type="button"
-              className={`twin-tool-btn ${showHeatmap ? 'active' : ''}`}
-              onClick={() => setShowHeatmap(!showHeatmap)}
-              title="Toggle 3D spatial sensor condition heatmap"
-            >
-              HEATMAP MODE: {showHeatmap ? 'ON' : 'OFF'}
-            </button>
-
-            {showHeatmap && (
-              <span className="twin-inspection-badge" title="Roof transparency active for internal spatial condition inspection">
-                INSPECTION MODE
-              </span>
-            )}
-
-            <button
-              type="button"
-              className={`twin-tool-btn ${showSensors ? 'active' : ''}`}
-              onClick={() => setShowSensors(!showSensors)}
-              title="Toggle 3D sensor markers visibility"
-            >
-              {showSensors ? 'HIDE SENSORS' : 'SHOW SENSORS'}
-            </button>
-
-            <button
-              type="button"
-              className={`twin-tool-btn ${showLabels ? 'active' : ''}`}
-              onClick={() => setShowLabels(!showLabels)}
-              title="Toggle zone name labels"
-            >
-              {showLabels ? 'HIDE LABELS' : 'SHOW LABELS'}
-            </button>
-          </div>
-
-          {/* Quick Verification Toolbar (Tests 1-7) */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '3.4rem',
-              left: '1rem',
-              zIndex: 15,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              background: 'rgba(255, 255, 255, 0.94)',
-              border: '1px solid var(--polaris-border)',
-              borderRadius: 'var(--radius-xs)',
-              padding: '0.35rem 0.6rem',
-              backdropFilter: 'blur(8px)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
-            }}
-          >
-            <span style={{ fontSize: '0.625rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--polaris-text-muted)', marginRight: '0.25rem' }}>
-              VERIFY SEQUENCE:
-            </span>
+          {/* Verification Sequence (Tests 1–7) — compact strip */}
+          <div className="twin-verify-strip">
+            <span className="twin-verify-label">VERIFY:</span>
             {[
-              { id: 1, label: 'T1: NORMAL' },
-              { id: 2, label: 'T2: WARNING' },
-              { id: 3, label: 'T3: CRITICAL' },
-              { id: 4, label: 'T4: OFFLINE' },
-              { id: 5, label: 'T5: RECOVERY' },
-              { id: 6, label: 'T6: SELECT' },
-              { id: 7, label: 'T7: SWITCH' }
+              { id: 1, label: 'NORMAL' },
+              { id: 2, label: 'WARN' },
+              { id: 3, label: 'CRIT' },
+              { id: 4, label: 'OFFLINE' },
+              { id: 5, label: 'RECOVER' },
+              { id: 6, label: 'SELECT' },
+              { id: 7, label: 'SWITCH' }
             ].map((t) => (
               <button
                 key={t.id}
                 type="button"
-                className={`twin-tool-btn ${activeTestNum === t.id ? 'active' : ''}`}
-                style={{ fontSize: '0.625rem', padding: '0.2rem 0.45rem' }}
+                className={`twin-verify-btn ${activeTestNum === t.id ? 'active' : ''}`}
                 onClick={() => handleRunTest(t.id)}
               >
-                {t.label}
+                T{t.id}:{t.label}
               </button>
             ))}
           </div>
+
+          {/* Heatmap inspection badge (HEATMAP mode only) */}
+          {twinMode === 'HEATMAP' && (
+            <div className="twin-inspection-chip">
+              INSPECTION MODE — TRANSPARENT ROOF
+            </div>
+          )}
+
+          {/* X-RAY mode badge */}
+          {twinMode === 'XRAY' && (
+            <div className="twin-inspection-chip" style={{ background: 'rgba(182,90,31,0.10)', color: '#b65a1f', borderColor: 'rgba(182,90,31,0.28)' }}>
+              X-RAY MODE — INTERNAL INFRASTRUCTURE VISIBLE
+            </div>
+          )}
+
+          {/* SYSTEM mode badge */}
+          {twinMode === 'SYSTEM' && (
+            <div className="twin-inspection-chip" style={{ background: 'rgba(79,111,82,0.10)', color: '#4f6f52', borderColor: 'rgba(79,111,82,0.28)' }}>
+              SYSTEM MODE — ENERGY FLOW VISUALIZATION
+            </div>
+          )}
 
           {/* 3D Scene */}
           <DigitalTwinScene
             station={config}
             sensors={sensors}
+            telemetry={telemetry}
             selectedSensor={selectedSensor}
-            onSelectSensor={(sensor) => setSelectedSensorId(sensor ? sensor.id : null)}
+            onSelectSensor={(sensor) => {
+              setSelectedSensorId(sensor ? sensor.id : null);
+              setSelectedAsset(null);
+            }}
             showSensors={showSensors}
             showLabels={showLabels}
-            showHeatmap={showHeatmap}
+            showHeatmap={twinMode === 'HEATMAP'}
             resetTrigger={resetTrigger}
+            twinMode={twinMode}
+            focusZone={focusZone}
+            onSelectAsset={handleSelectAsset}
+            selectedAssetId={selectedAsset?.id}
           />
 
-          {/* Status Color Legend with Dynamic Counts & Heatmap Mode */}
-          <TwinLegend sensors={sensors} isHeatmapActive={showHeatmap} />
+          {/* Legend (all non-SYSTEM modes) */}
+          {twinMode !== 'REPLAY' && (
+            <TwinLegend sensors={sensors} isHeatmapActive={twinMode === 'HEATMAP'} />
+          )}
 
-          {/* Camera Navigation Tip */}
+          {/* Camera nav hint */}
           <div className="twin-nav-hint">
             L-CLICK: ROTATE &nbsp;|&nbsp; R-CLICK: PAN &nbsp;|&nbsp; SCROLL: ZOOM
           </div>
         </div>
 
-        {/* Selected Sensor Detail Drawer (Overlaid on Viewport) */}
-        {selectedSensor && (
+        {/* Sensor Detail Panel */}
+        {selectedSensor && !selectedAsset && (
           <SensorDetailsPanel
             sensor={selectedSensor}
             onClose={() => setSelectedSensorId(null)}
           />
         )}
+
+        {/* Asset Inspect Panel */}
+        {selectedAsset && !selectedSensor && (
+          <AssetInspectPanel
+            asset={selectedAsset}
+            onClose={handleCloseAssetPanel}
+          />
+        )}
       </section>
+
+      {/* REPLAY mode timeline dock */}
+      {twinMode === 'REPLAY' && (
+        <section style={{ marginTop: '0.75rem' }}>
+          <ReplayController activeScenario={activeScenario} />
+        </section>
+      )}
 
       {/* Integrated Simulation Control (Demo Mode) */}
       <section style={{ marginTop: '0.75rem' }}>

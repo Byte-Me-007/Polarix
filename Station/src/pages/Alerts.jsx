@@ -81,16 +81,21 @@ export const Alerts = () => {
     });
   }, [allAlerts, activeSeverityFilter, selectedZone, searchQuery]);
 
-  // Deep locate into 3D Digital Twin (Section 11)
+  // Deep locate into 3D Digital Twin — passes zone, mode, and sensor focus
   const handleLocateInTwin = (alert) => {
     const alertStation = alert.station_id || alert.station;
     if (alertStation && alertStation !== activeStation) {
       setActiveStation(alertStation);
     }
     navigate('/digital-twin', {
-      state: { locateSensorId: alert.sensor_id || alert.sensorId }
+      state: {
+        locateSensorId: alert.sensor_id || alert.sensorId,
+        focusZone: alert.zone || null,
+        twinMode: 'XRAY'
+      }
     });
   };
+
 
   const stationName = config?.displayName || `${activeStation} RESEARCH STATION`;
   const stationShort = config?.shortCode || activeStation;

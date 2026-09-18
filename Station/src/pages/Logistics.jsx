@@ -72,11 +72,22 @@ export const Logistics = () => {
   }, [stationLogistics.inventory, fuelTotalLiters, fuelCapacityLiters, fuelDailyBurnRate, fuelAutonomyDays, fuelReservePct, effectiveEtaDays]);
 
   // Digital Twin Cross-Navigation
-  const handleLocateInTwin = (sensorId) => {
+  const handleLocateInTwin = (sensorId, zone = 'STORAGE') => {
     navigate('/digital-twin', {
-      state: { locateSensorId: sensorId || 'LOG-MTR-004' }
+      state: {
+        locateSensorId: sensorId || 'LOG-MTR-004',
+        focusZone: zone,
+        twinMode: 'XRAY'
+      }
     });
   };
+
+  const handleLocateFuelInTwin = () => {
+    navigate('/digital-twin', {
+      state: { focusZone: 'GENERATOR', twinMode: 'XRAY' }
+    });
+  };
+
 
   const stationTitle = config.displayName || `${activeStation} Research Station`;
   const stationCode = config.shortCode || config.id || activeStation;

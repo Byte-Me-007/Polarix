@@ -5,21 +5,34 @@ import { StationModel } from './StationModel';
 import { SensorMarker, computeDisplayPos } from './SensorMarker';
 import { SpatialHeatmap } from './SpatialHeatmap';
 
-// Elevated overview framing — full scaled station footprint visible (all 6 zones).
-// New station footprint: X -44..+52, Z -64..+20  → center ≈ (4, 0, -22)
-// Camera at [22, 95, 36] frames ~80% of viewport. FOV 50 keeps edges uncropped.
-const DEFAULT_CAMERA_POS = [22, 95, 36];
-const DEFAULT_TARGET = [4, 2, -22];
+// Elevated perspective overview — calibrated to match authentic station angle
+const DEFAULT_CAMERA_POS = [18, 65, 75];
+const DEFAULT_TARGET = [3, 8, -16];
+
+// Zone focus positions — calibrated for taller buildings
+const ZONE_FOCUS = {
+  MAIN:      { pos: [30,  55, 40],   target: [0,   7.0, 0]   },
+  RESEARCH:  { pos: [72,  55, 30],   target: [38,  6.5, 0]   },
+  ENERGY:    { pos: [28,  52, 5],    target: [0,   6.5, -30] },
+  GENERATOR: { pos: [-14, 52, 5],    target: [-30, 5.5, -30] },
+  STORAGE:   { pos: [60,  52, 5],    target: [32,  5.5, -30] },
+  COMMS:     { pos: [25,  48, -30],  target: [0,   5.0, -54] }
+};
 
 export const DigitalTwinScene = ({
   station,
   sensors = [],
+  telemetry = {},
   selectedSensor,
   onSelectSensor,
   showSensors = true,
   showLabels = true,
   showHeatmap = false,
-  resetTrigger = 0
+  resetTrigger = 0,
+  twinMode = 'NORMAL',
+  focusZone = null,
+  onSelectAsset,
+  selectedAssetId = null
 }) => {
   const controlsRef = useRef();
   const zones = station?.digitalTwin?.zones || [];
@@ -34,7 +47,7 @@ export const DigitalTwinScene = ({
     }
   }, [resetTrigger]);
 
-  // Smooth camera target focus when a sensor is selected (focus on its visible display point)
+  // Smooth camera target focus when a sensor is selected
   useEffect(() => {
     if (controlsRef.current && selectedSensor) {
       const disp = computeDisplayPos(selectedSensor, zones);
@@ -46,6 +59,18 @@ export const DigitalTwinScene = ({
       controlsRef.current.update();
     }
   }, [selectedSensor?.id]);
+
+  // Smooth camera focus when a zone is targeted from cross-module navigation
+  useEffect(() => {
+    if (!controlsRef.current || !focusZone) return;
+    const focus = ZONE_FOCUS[focusZone] || ZONE_FOCUS.MAIN;
+    controlsRef.current.object.position.set(...focus.pos);
+    controlsRef.current.target.set(...focus.target);
+    controlsRef.current.update();
+  }, [focusZone]);
+
+  // Determine effective heatmap: HEATMAP mode always shows it; others use prop
+  const effectiveHeatmap = twinMode === 'HEATMAP' ? true : (twinMode === 'NORMAL' ? false : showHeatmap);
 
   return (
     <Canvas
@@ -77,23 +102,28 @@ export const DigitalTwinScene = ({
         dampingFactor={0.06}
         minDistance={12}
         maxDistance={200}
-        maxPolarAngle={Math.PI / 2 - 0.04} // Ground level floor limit
+        maxPolarAngle={Math.PI / 2 - 0.04}
       />
 
       {/* Main Connected Modular Station Footprint */}
-      <StationModel 
-        station={station} 
+      <StationModel
+        station={station}
         sensors={sensors}
-        showLabels={showLabels} 
-        showHeatmap={showHeatmap}
+        showLabels={showLabels}
+        showHeatmap={twinMode === 'HEATMAP'}
         selectedZone={selectedSensor?.zone}
+        twinMode={twinMode}
+        focusZone={focusZone}
+        telemetry={telemetry}
+        onSelectAsset={onSelectAsset}
+        selectedAssetId={selectedAssetId}
       />
 
-      {/* Spatial Sensor Condition Heatmap Overlay */}
-      {showHeatmap && (
-        <SpatialHeatmap 
-          sensors={sensors} 
-          zones={zones} 
+      {/* Spatial Sensor Condition Heatmap Overlay (HEATMAP mode only) */}
+      {twinMode === 'HEATMAP' && (
+        <SpatialHeatmap
+          sensors={sensors}
+          zones={zones}
           selectedSensor={selectedSensor}
         />
       )}

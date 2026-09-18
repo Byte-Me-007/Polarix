@@ -102,12 +102,12 @@ export const STATIONS = {
       model: "procedural-parametric",
       elevationStilts: true,
       zones: [
-        { id: "Z-MTR-01", name: "MAIN BUILDING", code: "MAIN",      position: [0,    3.5, 0],    size: [34.0, 7.0, 22.0], shape: "box",      color: "#e8e4dc", status: "NOMINAL", description: "Central two-tier habitat, briefing facility, command hub, and environmental life support" },
-        { id: "Z-MTR-02", name: "ENERGY",        code: "ENERGY",    position: [0,    3.0, -30],  size: [26.0, 6.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Microgrid power conditioning, industrial battery storage banks, and solar inverters" },
-        { id: "Z-MTR-03", name: "RESEARCH",      code: "RESEARCH",  position: [38,   3.2, 0],    size: [22.0, 6.4, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Meteorological, atmospheric, optical observation, and geomagnetic research lab" },
-        { id: "Z-MTR-04", name: "STORAGE",       code: "STORAGE",   position: [32,   2.8, -30],  size: [20.0, 5.6, 18.0], shape: "box",      color: "#d6cfc3", status: "NOMINAL", description: "Deep cold provisions, spares, container logistics modules, and life-support buffer" },
-        { id: "Z-MTR-05", name: "GENERATOR",     code: "GENERATOR", position: [-30,  2.8, -30],  size: [20.0, 5.6, 18.0], shape: "box",      color: "#d9d0c2", status: "WARNING", description: "Auxiliary diesel generator plant #1 & #2, fuel day-tanks, and exhaust scrubber" },
-        { id: "Z-MTR-06", name: "COMMS",         code: "COMMS",     position: [0,    2.6, -54],  size: [14.0, 5.2, 14.0], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Primary Ku-Band satellite tracking dish, RF telemetry shelter, and 18m structural mast" }
+        { id: "Z-MTR-01", name: "MAIN BUILDING", code: "MAIN",      position: [0,    7.0, 0],    size: [34.0, 14.0, 22.0], shape: "box",      color: "#e8e4dc", status: "NOMINAL", description: "Central two-tier habitat, briefing facility, command hub, and environmental life support" },
+        { id: "Z-MTR-02", name: "ENERGY",        code: "ENERGY",    position: [0,    6.5, -30],  size: [26.0, 13.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Microgrid power conditioning, industrial battery storage banks, and solar inverters" },
+        { id: "Z-MTR-03", name: "RESEARCH",      code: "RESEARCH",  position: [38,   6.5, 0],    size: [22.0, 13.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Meteorological, atmospheric, optical observation, and geomagnetic research lab" },
+        { id: "Z-MTR-04", name: "STORAGE",       code: "STORAGE",   position: [32,   5.5, -30],  size: [20.0, 11.0, 18.0], shape: "box",      color: "#d6cfc3", status: "NOMINAL", description: "Deep cold provisions, spares, container logistics modules, and life-support buffer" },
+        { id: "Z-MTR-05", name: "GENERATOR",     code: "GENERATOR", position: [-30,  5.5, -30],  size: [20.0, 11.0, 18.0], shape: "box",      color: "#d9d0c2", status: "WARNING", description: "Auxiliary diesel generator plant #1 & #2, fuel day-tanks, and exhaust scrubber" },
+        { id: "Z-MTR-06", name: "COMMS",         code: "COMMS",     position: [0,    5.0, -54],  size: [14.0, 10.0, 14.0], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Primary Ku-Band satellite tracking dish, RF telemetry shelter, and 18m structural mast" }
       ],
       sensors: []
     },
@@ -238,12 +238,12 @@ export const STATIONS = {
       model: "procedural-parametric",
       elevationStilts: true,
       zones: [
-        { id: "Z-BHR-01", name: "MAIN BUILDING", code: "MAIN",      position: [0,    3.5, 0],    size: [34.0, 7.0, 22.0], shape: "box",      color: "#ece8df", status: "NOMINAL", description: "Integrated aerodynamic habitat pod, remote sensing ops, and expedition command" },
-        { id: "Z-BHR-02", name: "ENERGY",        code: "ENERGY",    position: [0,    3.0, -30],  size: [26.0, 6.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Clean microgrid power management, LiFePO4 battery banks, and solar array bus" },
-        { id: "Z-BHR-03", name: "RESEARCH",      code: "RESEARCH",  position: [38,   3.2, 0],    size: [22.0, 6.4, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Cryosphere, oceanography, geomagnetism, and satellite earth observation labs" },
-        { id: "Z-BHR-04", name: "STORAGE",       code: "STORAGE",   position: [32,   2.8, -30],  size: [20.0, 5.6, 18.0], shape: "box",      color: "#d6cfc3", status: "NOMINAL", description: "Scientific samples deep freezer, field equipment, and logistics container bay" },
-        { id: "Z-BHR-05", name: "GENERATOR",     code: "GENERATOR", position: [-30,  2.8, -30],  size: [20.0, 5.6, 18.0], shape: "box",      color: "#d9d0c2", status: "NOMINAL", description: "Clean emission CHP generator plant, exhaust stacks, and waste heat recovery" },
-        { id: "Z-BHR-06", name: "COMMS",         code: "COMMS",     position: [0,    2.6, -54],  size: [14.0, 5.2, 14.0], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Optical tracking radome, Starlink polar gateway, and 18m communications tower" }
+        { id: "Z-BHR-01", name: "MAIN BUILDING", code: "MAIN",      position: [0,    7.0, 0],    size: [34.0, 14.0, 22.0], shape: "box",      color: "#ece8df", status: "NOMINAL", description: "Integrated aerodynamic habitat pod, remote sensing ops, and expedition command" },
+        { id: "Z-BHR-02", name: "ENERGY",        code: "ENERGY",    position: [0,    6.5, -30],  size: [26.0, 13.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Clean microgrid power management, LiFePO4 battery banks, and solar array bus" },
+        { id: "Z-BHR-03", name: "RESEARCH",      code: "RESEARCH",  position: [38,   6.5, 0],    size: [22.0, 13.0, 18.0], shape: "box",      color: "#dfd9ce", status: "NOMINAL", description: "Cryosphere, oceanography, geomagnetism, and satellite earth observation labs" },
+        { id: "Z-BHR-04", name: "STORAGE",       code: "STORAGE",   position: [32,   5.5, -30],  size: [20.0, 11.0, 18.0], shape: "box",      color: "#d6cfc3", status: "NOMINAL", description: "Scientific samples deep freezer, field equipment, and logistics container bay" },
+        { id: "Z-BHR-05", name: "GENERATOR",     code: "GENERATOR", position: [-30,  5.5, -30],  size: [20.0, 11.0, 18.0], shape: "box",      color: "#d9d0c2", status: "NOMINAL", description: "Clean emission CHP generator plant, exhaust stacks, and waste heat recovery" },
+        { id: "Z-BHR-06", name: "COMMS",         code: "COMMS",     position: [0,    5.0, -54],  size: [14.0, 10.0, 14.0], shape: "cylinder", color: "#b65a1f", status: "NOMINAL", description: "Optical tracking radome, Starlink polar gateway, and 18m communications tower" }
       ],
       sensors: []
     },
