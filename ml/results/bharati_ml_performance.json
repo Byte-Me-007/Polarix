@@ -1,0 +1,136 @@
+{
+  "benchmark_metadata": {
+    "module": "ml.inference.benchmark_bharati_performance",
+    "benchmark_timestamp": "2026-09-18T05:49:01.838314+00:00",
+    "station_id": "BRT",
+    "station_name": "Bharati",
+    "model_version": "lstm-ae-bharati-v1",
+    "threshold": 0.013215307652775843,
+    "supported_sensors": [
+      "BRT_HUM_001",
+      "BRT_POWER_001",
+      "BRT_PRESS_001",
+      "BRT_TEMP_001",
+      "BRT_VIB_001"
+    ],
+    "python_version": "3.11.15",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "warmup_count_per_scenario": 20,
+    "measured_iterations_per_scenario": 200,
+    "random_seed": 42,
+    "benchmark_type": "synthetic_offline_benchmark_only",
+    "disclaimer": "Synthetic offline benchmark measurements only. Results are machine- and environment-dependent and do not constitute production SLAs, real-time edge hardware certifications, or claims on real Antarctic station telemetry. Model architecture, scalers, weights, and decision thresholds remain strictly frozen."
+  },
+  "initialization_benchmark": {
+    "sample_count": 10,
+    "stats": {
+      "sample_count": 10,
+      "min_latency_ms": 0.7897,
+      "max_latency_ms": 8.6988,
+      "mean_latency_ms": 1.6242,
+      "median_latency_ms": 0.8153,
+      "p50_latency_ms": 0.8153,
+      "p90_latency_ms": 1.8012,
+      "p95_latency_ms": 5.25,
+      "p99_latency_ms": 8.0091,
+      "std_latency_ms": 2.3592
+    },
+    "description": "Cold-start initialization: model weight loading, config parsing, scaler loading, threshold verification, and engine startup."
+  },
+  "scenarios": {
+    "WARM_NORMAL": {
+      "sample_count": 200,
+      "min_latency_ms": 0.3699,
+      "max_latency_ms": 0.5674,
+      "mean_latency_ms": 0.4008,
+      "median_latency_ms": 0.3992,
+      "p50_latency_ms": 0.3992,
+      "p90_latency_ms": 0.4096,
+      "p95_latency_ms": 0.4166,
+      "p99_latency_ms": 0.48,
+      "std_latency_ms": 0.0184
+    },
+    "ANOMALY": {
+      "sample_count": 200,
+      "min_latency_ms": 0.4109,
+      "max_latency_ms": 0.5548,
+      "mean_latency_ms": 0.4444,
+      "median_latency_ms": 0.4412,
+      "p50_latency_ms": 0.4412,
+      "p90_latency_ms": 0.4541,
+      "p95_latency_ms": 0.4702,
+      "p99_latency_ms": 0.5105,
+      "std_latency_ms": 0.0157
+    },
+    "MISSING_DATA": {
+      "sample_count": 200,
+      "min_latency_ms": 0.0029,
+      "max_latency_ms": 0.0204,
+      "mean_latency_ms": 0.0038,
+      "median_latency_ms": 0.0034,
+      "p50_latency_ms": 0.0034,
+      "p90_latency_ms": 0.0043,
+      "p95_latency_ms": 0.0045,
+      "p99_latency_ms": 0.0105,
+      "std_latency_ms": 0.0017
+    },
+    "INSUFFICIENT_DATA": {
+      "sample_count": 200,
+      "min_latency_ms": 0.0033,
+      "max_latency_ms": 0.009,
+      "mean_latency_ms": 0.0036,
+      "median_latency_ms": 0.0035,
+      "p50_latency_ms": 0.0035,
+      "p90_latency_ms": 0.0039,
+      "p95_latency_ms": 0.0045,
+      "p99_latency_ms": 0.0049,
+      "std_latency_ms": 0.0005
+    },
+    "MULTI_SENSOR": {
+      "sample_count": 200,
+      "min_latency_ms": 0.4105,
+      "max_latency_ms": 0.5129,
+      "mean_latency_ms": 0.4405,
+      "median_latency_ms": 0.4388,
+      "p50_latency_ms": 0.4388,
+      "p90_latency_ms": 0.4505,
+      "p95_latency_ms": 0.4586,
+      "p99_latency_ms": 0.4927,
+      "std_latency_ms": 0.012
+    },
+    "DIRECT_ENGINE_INFERENCE": {
+      "sample_count": 200,
+      "min_latency_ms": 0.3661,
+      "max_latency_ms": 0.4608,
+      "mean_latency_ms": 0.3959,
+      "median_latency_ms": 0.3955,
+      "p50_latency_ms": 0.3955,
+      "p90_latency_ms": 0.4079,
+      "p95_latency_ms": 0.4125,
+      "p99_latency_ms": 0.4444,
+      "std_latency_ms": 0.0119
+    }
+  },
+  "observability_overhead": {
+    "direct_engine_p50_ms": 0.3955,
+    "service_with_observability_p50_ms": 0.3992,
+    "estimated_overhead_ms": 0.0037,
+    "assessment": "Diagnostic instrumentation overhead is negligible and introduces no pipeline bottleneck."
+  },
+  "memory_and_state_bounds": {
+    "max_diagnostics_history_configured": 100,
+    "diagnostics_history_retained_after_150_events": 100,
+    "diagnostics_bounded": true,
+    "rolling_window_capacity_configured": 30,
+    "rolling_window_size_after_150_events": 30,
+    "rolling_window_bounded": true
+  },
+  "stability_comparison": {
+    "run1_warm_normal_p50_ms": 0.3992,
+    "run2_warm_normal_p50_ms": 0.3968,
+    "run1_warm_normal_mean_ms": 0.4008,
+    "run2_warm_normal_mean_ms": 0.3973,
+    "stability_verified": true,
+    "note": "Latency metrics vary with host CPU scheduler, operating system context switches, and thermal throttling."
+  }
+}
