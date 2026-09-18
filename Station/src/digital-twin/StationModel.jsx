@@ -4,6 +4,7 @@ import { StationZone } from './StationZone';
 import { SystemFlowOverlay } from './SystemFlowOverlay';
 import { computeDisplayPos } from './SensorMarker';
 import { getAssociatedAssetIdForSensor, ZONE_INTERNAL_ASSETS } from './stationAssets';
+import { IndianFlagPole } from './IndianFlagPole';
 
 // New station layout (all zones scaled ~1.75x from original):
 //   MAIN:      pos [0, 3.5, 0],    size [34, 7, 22]   → X: -17..+17   Z: -11..+11
@@ -659,6 +660,15 @@ export const StationModel = ({
           </mesh>
         </group>
       ))}
+
+      {/* ------------------------------------------------------------- */}
+      {/* 7. INDIAN NATIONAL FLAGPOLE & TRICOLOR (Station Forecourt)    */}
+      {/* Grounded on permafrost snowfield at x=-8.5, z=18.0             */}
+      {/* ------------------------------------------------------------- */}
+      <IndianFlagPole
+        position={[-8.5, 0, 18.0]}
+        twinMode={twinMode}
+      />
     </group>
   );
 };

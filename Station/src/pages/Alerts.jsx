@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 import { AlertSummaryCards } from '../components/alerts/AlertSummaryCards';
 import { AlertFilterBar } from '../components/alerts/AlertFilterBar';
@@ -15,6 +15,7 @@ import { StationSelector } from '../components/StationSelector';
  */
 export const Alerts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     activeStation,
     setActiveStation,
@@ -23,9 +24,15 @@ export const Alerts = () => {
     acknowledgeAlert
   } = useStationTelemetry();
 
-  const [activeSeverityFilter, setActiveSeverityFilter] = useState('ALL');
+  const [activeSeverityFilter, setActiveSeverityFilter] = useState(() => location.state?.severityFilter || 'ALL');
   const [selectedZone, setSelectedZone] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (location.state?.severityFilter) {
+      setActiveSeverityFilter(location.state.severityFilter);
+    }
+  }, [location.state]);
 
   // Total active (unacknowledged) alerts for header & summary
   const activeCount = useMemo(() => {
