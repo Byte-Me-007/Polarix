@@ -19,3 +19,5 @@ def test_init_db():
     assert "stations" in table_names
     assert "sensors" in table_names
     assert "telemetry" in table_names
+    assert "alerts" in table_names
+

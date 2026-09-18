@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from maitri.database import get_db
+from maitri.schemas.alert import AlertResponse
 from maitri.schemas.station import SensorResponse, StationResponse
 from maitri.schemas.telemetry import TelemetryResponse
+from maitri.services.alert_service import list_alerts_by_station
 from maitri.services.station_service import (
     get_sensors_by_station,
     get_station_by_id_or_code,
@@ -73,3 +75,23 @@ def get_station_latest_telemetry(
             detail=f"Station '{station_id}' not found",
         )
     return get_latest_telemetry_by_station(db, station.id)
+
+
+@router.get("/{station_id}/alerts", response_model=list[AlertResponse])
+def get_station_alerts(
+    station_id: str,
+    alert_status: str | None = Query(default=None, alias="status"),
+    limit: int = Query(default=100, ge=1, le=1000),
+    db: Session = Depends(get_db),
+):
+    try:
+        return list_alerts_by_station(
+            db, station_id_or_code=station_id, status=alert_status, limit=limit
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
+

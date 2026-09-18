@@ -90,7 +90,29 @@ Ingest and query operational telemetry connected directly to configured stations
 Quality support: `GOOD`, `WARNING`, `BAD`, `UNKNOWN`, `OFFLINE`.
 Source support: `SIMULATOR`, `MQTT`, `API`.
 
+## Station-Based Alert Endpoints
 
+Manage operational alerts across Antarctic stations:
 
+- **List Station Alerts:**
+  `GET /stations/{station_id}/alerts` (e.g. `GET /stations/MTR/alerts?status=ACTIVE&limit=50`)
+- **Acknowledge Alert:**
+  `POST /alerts/{alert_id}/ack`
+- **Resolve Alert:**
+  `POST /alerts/{alert_id}/resolve`
+- **Create Alert:**
+  `POST /alerts`
+  ```json
+  {
+    "station_code": "MTR",
+    "sensor_code": "MTR-ENG-GEN-01",
+    "severity": "HIGH",
+    "alert_type": "POWER_ANOMALY",
+    "title": "Generator Power Fluctuation",
+    "message": "Unstable generator voltage output detected"
+  }
+  ```
 
-
+Severity support: `INFO`, `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`.
+Status support: `ACTIVE`, `ACKNOWLEDGED`, `RESOLVED`.
+Automatic alert generation: Telemetry ingested with `BAD` quality automatically creates a `HIGH` severity fault alert; `OFFLINE` quality creates a `CRITICAL` severity offline alert.

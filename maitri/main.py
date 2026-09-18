@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from maitri.init_db import init_db
 from maitri.routers import (
+    alerts,
     devices,
     health,
     sensors,
@@ -26,7 +27,9 @@ app.include_router(devices.router)
 app.include_router(sensors.router)
 app.include_router(stations.router)
 app.include_router(telemetry.router)
+app.include_router(alerts.router)
 app.include_router(websocket.router)
+
 
 
 @app.get("/")

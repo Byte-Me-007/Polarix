@@ -1,5 +1,11 @@
 """Maitri Schemas Package."""
 
+from maitri.schemas.alert import (
+    AlertCreate,
+    AlertResponse,
+    AlertSeverity,
+    AlertStatus,
+)
 from maitri.schemas.device import DeviceBase, DeviceCreate, DeviceResponse
 from maitri.schemas.sensor_reading import (
     SensorIngestRequest,
@@ -19,6 +25,10 @@ from maitri.schemas.station import (
 from maitri.schemas.telemetry import TelemetryCreate, TelemetryResponse
 
 __all__ = [
+    "AlertCreate",
+    "AlertResponse",
+    "AlertSeverity",
+    "AlertStatus",
     "DeviceBase",
     "DeviceCreate",
     "DeviceResponse",

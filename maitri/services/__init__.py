@@ -1,5 +1,12 @@
 """Maitri Services Package."""
 
+from maitri.services.alert_service import (
+    acknowledge_alert,
+    create_alert,
+    get_alert_by_id,
+    list_alerts_by_station,
+    resolve_alert,
+)
 from maitri.services.device_service import (
     create_device,
     get_device_by_device_id,
@@ -25,6 +32,11 @@ from maitri.services.telemetry_service import (
 from maitri.services.websocket_manager import ConnectionManager, manager
 
 __all__ = [
+    "acknowledge_alert",
+    "create_alert",
+    "get_alert_by_id",
+    "list_alerts_by_station",
+    "resolve_alert",
     "create_device",
     "get_device_by_device_id",
     "get_device_by_id",
@@ -42,3 +54,4 @@ __all__ = [
     "get_telemetry_by_station",
     "get_latest_telemetry_by_station",
 ]
+

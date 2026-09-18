@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 from maitri.models.sensor import Sensor
 from maitri.models.station import Station
 from maitri.models.telemetry import Telemetry
+from maitri.schemas.alert import AlertCreate
 from maitri.schemas.telemetry import TelemetryCreate
+from maitri.services.alert_service import create_alert
 from maitri.services.station_service import get_station_by_id_or_code
 
 VALID_QUALITIES = {"GOOD", "WARNING", "BAD", "UNKNOWN", "OFFLINE"}
@@ -68,6 +70,35 @@ def create_telemetry(db: Session, telemetry_in: TelemetryCreate) -> Telemetry:
     db.add(telemetry_record)
     db.commit()
     db.refresh(telemetry_record)
+
+    # Optional simple alert creation for BAD or OFFLINE telemetry
+    if quality == "BAD":
+        create_alert(
+            db,
+            AlertCreate(
+                station_id=station.id,
+                sensor_id=sensor.id,
+                severity="HIGH",
+                alert_type="SENSOR_FAULT",
+                title=f"Sensor Fault: {sensor.sensor_code}",
+                message=f"Sensor '{sensor.sensor_code}' at station '{station.station_code}' reported BAD quality.",
+                anomaly_score=telemetry_in.anomaly_score,
+            ),
+        )
+    elif quality == "OFFLINE":
+        create_alert(
+            db,
+            AlertCreate(
+                station_id=station.id,
+                sensor_id=sensor.id,
+                severity="CRITICAL",
+                alert_type="SENSOR_OFFLINE",
+                title=f"Sensor Offline: {sensor.sensor_code}",
+                message=f"Sensor '{sensor.sensor_code}' at station '{station.station_code}' is OFFLINE.",
+                anomaly_score=telemetry_in.anomaly_score,
+            ),
+        )
+
     return telemetry_record
 
 
