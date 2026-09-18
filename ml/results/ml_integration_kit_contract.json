@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0.0",
+  "project": "Polarix SIH26060",
+  "author": "Person C (Machine Learning Specialist)",
+  "target_audience": "Person A (Backend Engineer)",
+  "integration_target": "FastAPI / MQTT / SQLite Backend Integration",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "service_class": "MaitriMLService",
+      "service_module": "ml.inference.maitri_ml_service",
+      "contract_module": "ml.inference.maitri_backend_contract",
+      "convenience_function": "process_backend_payload",
+      "model_version": "lstm-ae-v1",
+      "model_type": "LSTM Autoencoder (PyTorch CPU)",
+      "sequence_length": 30,
+      "decision_threshold": 0.017674,
+      "supported_sensors": [
+        "HUM_001",
+        "POWER_001",
+        "PRESS_001",
+        "TEMP_001",
+        "VIB_001"
+      ],
+      "sensor_metadata": {
+        "TEMP_001": {"unit": "C", "nominal_mean": -15.01, "nominal_std": 3.17},
+        "PRESS_001": {"unit": "hPa", "nominal_mean": 990.00, "nominal_std": 1.41},
+        "HUM_001": {"unit": "%", "nominal_mean": 54.99, "nominal_std": 5.85},
+        "VIB_001": {"unit": "mm/s", "nominal_mean": 0.86, "nominal_std": 0.12},
+        "POWER_001": {"unit": "kW", "nominal_mean": 35.08, "nominal_std": 4.44}
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "service_class": "BharatiMLService",
+      "service_module": "ml.inference.bharati_ml_service",
+      "contract_module": "ml.inference.bharati_backend_contract",
+      "convenience_function": "process_backend_payload",
+      "model_version": "lstm-ae-bharati-v1",
+      "model_type": "LSTM Autoencoder (PyTorch CPU)",
+      "sequence_length": 30,
+      "decision_threshold": 0.013215307652775843,
+      "supported_sensors": [
+        "BRT_HUM_001",
+        "BRT_POWER_001",
+        "BRT_PRESS_001",
+        "BRT_TEMP_001",
+        "BRT_VIB_001"
+      ],
+      "sensor_metadata": {
+        "BRT_TEMP_001": {"unit": "C", "nominal_mean": -10.00, "nominal_std": 2.46},
+        "BRT_PRESS_001": {"unit": "hPa", "nominal_mean": 985.01, "nominal_std": 1.76},
+        "BRT_HUM_001": {"unit": "%", "nominal_mean": 60.00, "nominal_std": 5.11},
+        "BRT_VIB_001": {"unit": "mm/s", "nominal_mean": 0.76, "nominal_std": 0.10},
+        "BRT_POWER_001": {"unit": "kW", "nominal_mean": 42.06, "nominal_std": 4.04}
+      }
+    }
+  },
+  "canonical_input_schema": {
+    "required_fields": [
+      "station_id",
+      "sensor_id",
+      "timestamp",
+      "value"
+    ],
+    "optional_fields": [
+      "unit",
+      "quality",
+      "source"
+    ],
+    "field_specifications": {
+      "station_id": {"type": "string", "allowed_values": ["MTR", "BRT"]},
+      "sensor_id": {"type": "string", "description": "Station-specific sensor ID"},
+      "timestamp": {"type": "string", "format": "ISO 8601 (e.g. 2026-09-18T10:30:00Z)"},
+      "value": {"type": "number or null", "description": "Sensor numeric reading or None for dropouts"},
+      "unit": {"type": "string or null", "default": null},
+      "quality": {"type": "string", "allowed_values": ["GOOD", "BAD", "UNCERTAIN", "MISSING", "SUSPECT"], "default": "GOOD"},
+      "source": {"type": "string or null", "default": "SIMULATOR"}
+    }
+  },
+  "canonical_output_schema": {
+    "exact_fields": [
+      "station_id",
+      "sensor_id",
+      "timestamp",
+      "value",
+      "unit",
+      "quality",
+      "source",
+      "anomaly_score",
+      "anomaly_status",
+      "anomaly_type",
+      "model_version"
+    ],
+    "field_guarantees": {
+      "station_id": "string, matching input",
+      "sensor_id": "string, matching input",
+      "timestamp": "string, matching input",
+      "value": "float or null (finite float, guaranteed no NaN or Inf)",
+      "unit": "string or null",
+      "quality": "string, matching input quality",
+      "source": "string or null",
+      "anomaly_score": "float or null (finite float, MSE reconstruction loss, rounded to 6 decimals, null if warmup/missing)",
+      "anomaly_status": "string, one of ['NORMAL', 'ANOMALY', 'INSUFFICIENT_DATA', 'MISSING_DATA']",
+      "anomaly_type": "string or null, one of ['NORMAL', 'SPIKE', 'DRIFT', 'STUCK_VALUE', 'UNKNOWN'] when scored, null when warmup/missing",
+      "model_version": "string, 'lstm-ae-v1' or 'lstm-ae-bharati-v1'"
+    }
+  },
+  "operational_behavior": {
+    "cold_start_warmup": {
+      "steps": "1 to 29 observations per sensor",
+      "anomaly_status": "INSUFFICIENT_DATA",
+      "anomaly_score": null,
+      "anomaly_type": null,
+      "neural_inference_executed": false
+    },
+    "scored_inference": {
+      "steps": "30th observation onwards",
+      "anomaly_status": "NORMAL or ANOMALY",
+      "anomaly_score": "float >= 0.0",
+      "anomaly_type": "NORMAL, SPIKE, DRIFT, STUCK_VALUE, or UNKNOWN",
+      "neural_inference_executed": true
+    },
+    "missing_data_handling": {
+      "triggers": ["quality != 'GOOD'", "value is None", "value is NaN/Inf"],
+      "anomaly_status": "MISSING_DATA",
+      "anomaly_score": null,
+      "anomaly_type": null,
+      "buffer_action": "Rolling sequence history for this sensor is immediately flushed to 0"
+    },
+    "duplicate_telemetry_handling": {
+      "trigger": "Incoming packet timestamp <= last recorded timestamp for this sensor",
+      "error_raised": "DuplicateTelemetryError or StaleTelemetryError",
+      "buffer_action": "Packet rejected, rolling sequence buffer preserved unchanged"
+    }
+  },
+  "ownership_division": {
+    "person_c_owns": [
+      "Model weights & architectures",
+      "Scalers & normalization parameters",
+      "Decision thresholds",
+      "Reconstruction error calculation",
+      "Deterministic anomaly classification",
+      "Per-sensor rolling buffer state management",
+      "ML diagnostics & observability auditing"
+    ],
+    "person_a_owns": [
+      "FastAPI application & route definitions",
+      "MQTT broker subscriber & topic ingestion",
+      "SQLite / database persistence schema",
+      "EventBus asynchronous dispatch",
+      "WebSocket streaming connection management",
+      "Operational alert severity rules (e.g. HIGH/MEDIUM/LOW)",
+      "Simulator orchestration & command handling"
+    ],
+    "person_b_owns": [
+      "React dashboard components",
+      "Three.js 3D station digital twin",
+      "Real-time telemetry charting",
+      "Alert banners & badge rendering",
+      "Station switcher (MTR vs BRT)"
+    ]
+  }
+}
