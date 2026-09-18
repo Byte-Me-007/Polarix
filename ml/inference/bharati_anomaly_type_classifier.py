@@ -208,13 +208,17 @@ class BharatiAnomalyTypeClassifier:
         noise_std = DEFAULT_BHARATI_SENSOR_NOISE_STD.get(sensor_id or "", 0.30)
 
         # 1. STUCK_VALUE Check
-        # Significant flatline at tail or across majority of window
-        if (
-            feats.tail_consecutive_stuck >= self.stuck_run_threshold
-            or feats.max_consecutive_near_stuck >= 12
-            or (feats.tail_std_10 <= self.stuck_tolerance and feats.max_consecutive_near_stuck >= 8)
-        ):
+        # Active flatline at tail or across entire window
+        is_tail_stuck = feats.tail_consecutive_stuck >= self.stuck_run_threshold
+        is_near_frozen_tail = (feats.tail_std_10 <= self.stuck_tolerance and feats.tail_consecutive_stuck >= 6)
+        is_entirely_flat = (feats.std <= self.stuck_tolerance and feats.max_consecutive_near_stuck >= 20)
+
+        if is_tail_stuck or is_near_frozen_tail or is_entirely_flat:
             return "STUCK_VALUE"
+
+        # If primary detector evaluated sequence as NORMAL and signal is not physically stuck, return NORMAL
+        if not is_known_anomaly:
+            return "NORMAL"
 
         # 2. SPIKE Check
         # Sudden shock jump: high jump_ratio, max_step significantly larger than baseline noise
@@ -247,9 +251,5 @@ class BharatiAnomalyTypeClassifier:
             and no_dominating_single_spike
         ):
             return "DRIFT"
-
-        # 4. NORMAL vs UNKNOWN
-        if not is_known_anomaly:
-            return "NORMAL"
 
         return "UNKNOWN"

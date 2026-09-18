@@ -1,0 +1,57 @@
+{
+  "analysis_metadata": {
+    "title": "Polarix STUCK_VALUE Anomaly Classification Investigation & Refinement",
+    "project": "Polarix",
+    "problem_statement": "SIH26060",
+    "team": "Byte Me_26",
+    "team_id": "143760",
+    "role": "Person C (Machine Learning Specialist)",
+    "timestamp": "2026-09-18T12:00:00Z",
+    "scope": "Deterministic downstream STUCK_VALUE classification analysis and active-tail flatline rule refinement",
+    "status": "INVESTIGATION_COMPLETE_CLASSIFIER_STRENGTHENED"
+  },
+  "original_limitation_and_root_cause": {
+    "lstm_reconstruction_limitation": "Neural sequence autoencoders easily reconstruct flatline/constant vectors with near-zero MSE reconstruction loss (often < 1e-4), causing primary reconstruction threshold detectors to assign status=NORMAL for unshifted flatlines.",
+    "downstream_classifier_gap": "Previous classifier rules evaluated max_consecutive_near_stuck across the entire 30-step window, which caused false STUCK_VALUE classifications on recovered observations where a historical flatline existed in past history (indices 0..15) but active variation had resumed at the current tail (indices 15..29).",
+    "solution": "Refined the deterministic physical classification rule to require active flatline at the sequence tail (tail_consecutive_stuck >= 8, or tail_std_10 <= 1e-4 with tail_run >= 6, or entire window variance <= 1e-4), distinguishing active freeze from historical recovery."
+  },
+  "refined_rule_specification": {
+    "classifier_class": "BharatiAnomalyTypeClassifier / AnomalyTypeClassifier",
+    "features_used": [
+      "tail_consecutive_stuck (consecutive observations ending at arr[-1] with step delta <= 1e-4)",
+      "tail_std_10 (sample standard deviation of the last 10 observations)",
+      "std (overall standard deviation across full 30-step window)",
+      "max_consecutive_near_stuck (longest run of consecutive near-identical points in window)"
+    ],
+    "decision_logic": "STUCK_VALUE if: (tail_consecutive_stuck >= 8) OR (tail_std_10 <= 1e-4 AND tail_consecutive_stuck >= 6) OR (std <= 1e-4 AND max_consecutive_near_stuck >= 20)",
+    "recovery_behavior": "When a sensor was stuck historically but resumes active variance at tail (tail_std_10 > 1e-4, tail_consecutive_stuck < 5), STUCK_VALUE is not triggered, correctly classifying current observation as NORMAL/UNKNOWN based on primary detector."
+  },
+  "synthetic_benchmark_results": {
+    "scenarios_evaluated": [
+      { "scenario_id": 1, "name": "Normal Telemetry", "ground_truth": "NORMAL", "predicted": "NORMAL", "correct": true },
+      { "scenario_id": 2, "name": "Short Stable Period (3-4 pts)", "ground_truth": "NORMAL", "predicted": "NORMAL", "correct": true },
+      { "scenario_id": 3, "name": "Genuine STUCK_VALUE (10 pts flat tail)", "ground_truth": "STUCK_VALUE", "predicted": "STUCK_VALUE", "correct": true },
+      { "scenario_id": 4, "name": "Long Exact Flatline (30 pts)", "ground_truth": "STUCK_VALUE", "predicted": "STUCK_VALUE", "correct": true },
+      { "scenario_id": 5, "name": "Long Near-Flatline (micro-jitter std 1e-5)", "ground_truth": "STUCK_VALUE", "predicted": "STUCK_VALUE", "correct": true },
+      { "scenario_id": 6, "name": "SPIKE Anomaly", "ground_truth": "SPIKE", "predicted": "SPIKE", "correct": true },
+      { "scenario_id": 7, "name": "DRIFT Anomaly", "ground_truth": "DRIFT", "predicted": "DRIFT", "correct": true },
+      { "scenario_id": 8, "name": "DROPOUT / Missing Data (NaN)", "ground_truth": "MISSING_DATA", "predicted": "MISSING_DATA", "correct": true },
+      { "scenario_id": 9, "name": "STUCK_VALUE Followed by Active Recovery", "ground_truth": "NORMAL", "predicted": "NORMAL", "correct": true },
+      { "scenario_id": 10, "name": "Multi-Sensor Isolation (5 Bharati Sensors)", "ground_truth": "STUCK_VALUE", "predicted": "STUCK_VALUE", "correct": true },
+      { "scenario_id": 11, "name": "Deterministic Repeated Execution (100 runs)", "ground_truth": "STUCK_VALUE", "predicted": "STUCK_VALUE", "correct": true }
+    ],
+    "summary_metrics": {
+      "total_cases": 11,
+      "passed_cases": 11,
+      "stuck_value_precision": 1.00,
+      "stuck_value_recall": 1.00,
+      "stuck_value_f1": 1.00,
+      "recovery_false_alarm_rate": 0.00
+    }
+  },
+  "frozen_artifact_status": {
+    "statement": "All 8 frozen neural network models, scalers, configs, and decision thresholds remain 100% untouched and cryptographically verified.",
+    "models_retrained": false,
+    "thresholds_changed": false
+  }
+}

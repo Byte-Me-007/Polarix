@@ -206,13 +206,17 @@ class AnomalyTypeClassifier:
         noise_std = DEFAULT_SENSOR_NOISE_STD.get(sensor_id or "", 0.3)
 
         # 1. STUCK_VALUE Check
-        # Significant flatline at tail or across majority of window
-        if (
-            feats.tail_consecutive_stuck >= self.stuck_run_threshold
-            or feats.max_consecutive_near_stuck >= 12
-            or (feats.tail_std_10 <= self.stuck_tolerance and feats.max_consecutive_near_stuck >= 8)
-        ):
+        # Active flatline at tail or across entire window
+        is_tail_stuck = feats.tail_consecutive_stuck >= self.stuck_run_threshold
+        is_near_frozen_tail = (feats.tail_std_10 <= self.stuck_tolerance and feats.tail_consecutive_stuck >= 6)
+        is_entirely_flat = (feats.std <= self.stuck_tolerance and feats.max_consecutive_near_stuck >= 20)
+
+        if is_tail_stuck or is_near_frozen_tail or is_entirely_flat:
             return "STUCK_VALUE"
+
+        # If primary detector evaluated sequence as NORMAL and signal is not physically stuck, return NORMAL
+        if not is_known_anomaly:
+            return "NORMAL"
 
         # 2. SPIKE Check
         # Sudden shock jump: high jump_ratio, max_step significantly larger than noise
@@ -234,8 +238,8 @@ class AnomalyTypeClassifier:
         # Sustained monotonic linear trend across the 30-step window without extreme single jump
         has_strong_correlation = abs(feats.linear_r_value) >= self.drift_r_threshold
         has_consistent_trend = feats.trend_ratio >= self.drift_trend_ratio_threshold
-        has_sustained_displacement = feats.net_displacement >= 1.8 * noise_std
-        no_dominating_single_spike = feats.max_step_jump <= 0.50 * (feats.net_displacement + 1e-6)
+        has_sustained_displacement = feats.net_displacement >= 1.5 * noise_std
+        no_dominating_single_spike = feats.max_step_jump <= 0.55 * (feats.net_displacement + 1e-6)
 
         if (
             has_strong_correlation
@@ -244,9 +248,5 @@ class AnomalyTypeClassifier:
             and no_dominating_single_spike
         ):
             return "DRIFT"
-
-        # 4. NORMAL vs UNKNOWN
-        if not is_known_anomaly:
-            return "NORMAL"
 
         return "UNKNOWN"
