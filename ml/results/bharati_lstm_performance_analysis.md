@@ -21,6 +21,8 @@ During comprehensive evaluation (Step 26 & Step 35), the frozen Bharati LSTM aut
 
 This investigation performs a controlled, evidence-based empirical analysis to diagnose the exact statistical and structural causes of the high false-positive rate and evaluate candidate calibration strategies strictly using the validation split.
 
+The Polarix ML pipeline is hybrid: LSTM reconstruction scoring provides anomaly detection/scoring, deterministic downstream classification identifies anomaly types where supported, and explicit missing-data handling covers dropout/offline telemetry.
+
 ---
 
 ## 2. V1 Baseline Metrics Summary
@@ -164,10 +166,11 @@ Total Test False Positives: 352
 - **Clean FPR is only 5.46%**: When sensors operate in truly normal stationary conditions, Candidate C3 achieves a low 5.46% false alarm rate.
 - **Trailing Window Effect**: 92.9% of remaining false positives occur during the 29 time steps immediately following an anomaly event while the buffer clears.
 
-### Anomaly Type Recall Comparison:
+### Anomaly Type Recall & Hybrid Pipeline Analysis:
 - **`SPIKE`** ($N=19$): **100.0% Recall** (19/19 detected in both V1 and C3).
 - **`DRIFT`** ($N=150$): **83.33% Recall** (125/150 detected in C3 vs 132/150 in V1).
-- **`STUCK_VALUE`** ($N=120$): **0.0% Recall** (Reconstruction loss alone does not detect flatlines; handled by deterministic physical classifier).
+- **`STUCK_VALUE`** ($N=120$): **0.0% Recall via LSTM Reconstruction Loss alone** (Reconstruction loss alone does not detect flatlines; handled by the downstream deterministic physical classifier).
+- **Hybrid Pipeline Summary**: The LSTM autoencoder provides dynamic temporal reconstruction scoring; the downstream heuristic layer classifies physical patterns (Spike, Drift, Stuck Value); and structural telemetry handling catches missing/dropout data.
 
 ---
 
@@ -176,6 +179,7 @@ Total Test False Positives: 352
 1. **Synthetic Telemetry**: Analysis is conducted exclusively on synthetic datasets generated for SIH 2026.
 2. **Point-in-Time Evaluation Metric**: Standard sequence-to-point labeling inherently penalizes sliding window models during the 29-step post-anomaly recovery buffer.
 3. **No Field Production Claims**: Performance figures represent academic prototype benchmarking, not certified Antarctic deployment accuracy.
+4. **Empirical Evaluation**: The Candidate C3 result represents an empirical evaluation on the available synthetic partitions, not a mathematical proof or guaranteed operational bounds.
 
 ---
 
@@ -185,5 +189,5 @@ Total Test False Positives: 352
 - **`lstm-ae-bharati-v1` remains the authoritative, cryptographically frozen model** for Polarix integration. Its weights, scaler, config, and threshold (`0.013215307652775843`) remain 100% untouched.
 
 ### Candidate C3 Status:
-- **Candidate C3 provides a fully documented, mathematically justified per-sensor threshold calibration** that reduces test FPR from 50.50% to 39.42% and slashes clean normal FPR to 5.46%.
-- It is cataloged in `ml/results/bharati_lstm_performance_analysis.json` as the reference candidate for future multi-sensor threshold upgrades.
+- **Candidate C3 is an empirically validated candidate calibration strategy on the available synthetic validation/test splits** that reduces test FPR from 50.50% to 39.42% and slashes clean normal FPR to 5.46%.
+- It is cataloged in `ml/results/bharati_lstm_performance_analysis.json` as a reference candidate for future multi-sensor threshold upgrades and is **NOT** integrated into the frozen v1 production path.

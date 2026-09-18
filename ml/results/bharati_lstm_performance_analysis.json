@@ -137,12 +137,12 @@
   },
   "tradeoff_and_recommendation": {
     "v1_status": "FROZEN_UNCHANGED",
-    "candidate_status": "DOCUMENTED_CANDIDATE_FOR_FUTURE_REFINEMENT",
+    "candidate_status": "EMPIRICALLY_VALIDATED_CANDIDATE_FOR_FUTURE_REFINEMENT",
     "key_findings": [
-      "Per-sensor threshold calibration (Candidate C3) cuts test FPR from 50.50% to 39.42% and slashes clean normal FPR from 29.26% to 5.46%.",
+      "Per-sensor threshold calibration (Candidate C3) is an empirically validated candidate calibration strategy on the available synthetic validation/test splits, reducing test FPR from 50.50% to 39.42% and clean normal FPR from 29.26% to 5.46%.",
       "Vibration sensor false alarms dropped from 178 (98.89% FPR) to 70 (38.89% FPR).",
-      "The remaining false positives are predominantly (93%) trailing window artifacts occurring within the 30-step recovery period after anomaly episodes.",
-      "The frozen V1 artifacts (model, scaler, config, threshold) remain unchanged and authoritative for integration."
+      "The remaining false positives are predominantly (92.9%) trailing window artifacts occurring within the 30-step recovery period after anomaly episodes.",
+      "The frozen V1 artifacts (model, scaler, config, threshold) remain unchanged and authoritative for integration; Candidate C3 is not integrated into frozen v1."
     ]
   }
 }

@@ -14,6 +14,8 @@
 
 This document constitutes the official, reproducible integration sign-off audit for the Polarix Machine Learning subsystem (Steps 1–37). It covers complete verification of both Antarctic research stations: **Maitri (`MTR`)** and **Bharati (`BRT`)**.
 
+The Polarix ML pipeline is hybrid: LSTM reconstruction scoring provides anomaly detection/scoring, deterministic downstream classification identifies anomaly types where supported, and explicit missing-data handling covers dropout/offline telemetry.
+
 ---
 
 ## 2. Repository Integrity
@@ -36,7 +38,7 @@ All ML components adhere to a clean, modular repository layout without extraneou
 | Decision Threshold | `0.017674` | Verified |
 | Sequence Length | 30 observations | Verified |
 | Supported Sensors | `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001` | Verified (5/5) |
-| Completed Steps | Steps 1–22 (Maitri Complete) | Verified |
+| Completed Steps | Steps 1–22 — Maitri Complete | Verified |
 
 ---
 
@@ -49,13 +51,13 @@ All ML components adhere to a clean, modular repository layout without extraneou
 | Decision Threshold | `0.013215307652775843` | Verified (Exact) |
 | Sequence Length | 30 observations | Verified |
 | Supported Sensors | `BRT_TEMP_001`, `BRT_PRESS_001`, `BRT_HUM_001`, `BRT_VIB_001`, `BRT_POWER_001` | Verified (5/5) |
-| Completed Steps | Steps 23–35 (Bharati Complete) | Verified |
+| Completed Steps | Steps 23–36 — Bharati ML + Handoff Complete | Verified |
 
 ---
 
 ## 5. Frozen Artifact Integrity
 
-All 8 frozen neural network artifacts, scalers, configs, and threshold manifests match repository SHA-256 digests:
+All 8 frozen ML artifacts — 2 models, 2 configs, 2 scalers, and 2 decision thresholds — match their expected SHA-256 digests:
 
 | Artifact Path | Expected SHA-256 Digest | Audit Status |
 | :--- | :--- | :---: |
@@ -95,8 +97,8 @@ Both stations have undergone comprehensive scenario evaluations across represent
 - `NORMAL_DAY`: Stable diurnal cycles with nominal reconstruction loss.
 - `SPIKE`: Instantaneous amplitude transient detection and physical classification.
 - `DRIFT`: Sustained directional trend divergence detection.
-- `STUCK_VALUE`: Flatline sensor condition detection.
-- `MISSING_DATA` / `DROPOUT`: Buffer flush and `MISSING_DATA` emission.
+- `STUCK_VALUE`: Flatline sensor condition detection via downstream deterministic classifier.
+- `MISSING_DATA` / `DROPOUT`: Buffer flush and `MISSING_DATA` emission via structured quality handling.
 - `INSUFFICIENT_DATA`: Deterministic warmup bypass for sequences < 30 observations.
 - `DUPLICATE_TELEMETRY` & `STALE_TELEMETRY`: Diagnostic rejection error tracking.
 - `MULTI_SENSOR_ISOLATION`: Zero cross-talk across interleaved telemetry streams.
@@ -132,9 +134,10 @@ Both stations have undergone comprehensive scenario evaluations across represent
 2. **No Real Antarctic Historical Data**: Field historical operational data was not accessible for training.
 3. **In-Memory Rolling State**: Sliding window buffers reside in memory and reset upon service restart.
 4. **Reconstruction False-Positive Rate**: Bharati LSTM test FPR is 50.50% on diurnal variations to maximize anomaly recall.
-5. **Deterministic Physical Classifier**: Flatline and drift classification handled via deterministic heuristic layer.
-6. **Anomaly Score Interpretation**: MSE reconstruction loss is an anomaly severity index, not a calibrated Bayesian probability.
-7. **Prototype Scope**: Designed for SIH 2026 integration demonstration; not certified for physical Antarctic mission deployment.
+5. **STUCK_VALUE / Flatline Reconstruction Limitation**: STUCK_VALUE/flatline conditions may not always produce sufficiently high LSTM reconstruction error; the downstream deterministic classifier identifies some STUCK_VALUE patterns independently of the LSTM anomaly decision.
+6. **Hybrid Pipeline Scope**: The LSTM model itself does not detect all SPIKE, DRIFT, STUCK_VALUE, and DROPOUT cases alone; no claim of perfect anomaly-type classification is made.
+7. **Anomaly Score Interpretation**: MSE reconstruction loss is an anomaly severity index, not a calibrated Bayesian probability.
+8. **Prototype Scope**: Designed for SIH 2026 integration demonstration; not certified for physical Antarctic mission deployment.
 
 ---
 

@@ -49,6 +49,7 @@ AUTHORITATIVE_BHARATI_METRICS = {
         "true_negatives": 442,
         "false_positives": 451,
         "false_negatives": 124,
+        "accuracy": 0.5135,
         "precision": 0.2679,
         "recall": 0.5709,
         "f1": 0.3646,
@@ -218,9 +219,19 @@ def run_full_readiness_audit() -> Dict[str, Any]:
             "role": "Person C (Machine Learning Specialist)",
             "audit_timestamp": "2026-09-18T12:00:00Z",
             "branch_observed": "Rex",
-            "step": "Step 37 of 37 (Final)",
+            "step": "Step 37 of 37 (Final Audit)",
             "overall_status": overall_status,
             "integration_ready": overall_ready,
+        },
+        "pipeline_architecture": {
+            "description": (
+                "The Polarix ML pipeline is hybrid: LSTM reconstruction scoring provides anomaly detection/scoring, "
+                "deterministic downstream classification identifies anomaly types where supported, and explicit "
+                "missing-data handling covers dropout/offline telemetry."
+            ),
+            "anomaly_scoring_layer": "PyTorch LSTM Autoencoder sequence reconstruction loss (MSE)",
+            "type_classification_layer": "Deterministic post-processing heuristics (Spike, Drift, Stuck Value, Unknown)",
+            "missing_data_layer": "Structural input validation & buffer flush on non-GOOD or non-finite telemetry",
         },
         "station_specifications": {
             "MTR": {
@@ -229,7 +240,7 @@ def run_full_readiness_audit() -> Dict[str, Any]:
                 "threshold": 0.017674,
                 "sequence_length": 30,
                 "sensors": ["TEMP_001", "PRESS_001", "HUM_001", "VIB_001", "POWER_001"],
-                "steps_completed": "Steps 1–22 (Maitri Complete)",
+                "steps_completed": "Steps 1–22 — Maitri Complete",
             },
             "BRT": {
                 "station_name": "Bharati",
@@ -237,11 +248,12 @@ def run_full_readiness_audit() -> Dict[str, Any]:
                 "threshold": 0.013215307652775843,
                 "sequence_length": 30,
                 "sensors": ["BRT_TEMP_001", "BRT_PRESS_001", "BRT_HUM_001", "BRT_VIB_001", "BRT_POWER_001"],
-                "steps_completed": "Steps 23–35 (Bharati Complete)",
+                "steps_completed": "Steps 23–36 — Bharati ML + Handoff Complete",
             },
         },
         "frozen_artifact_integrity": {
             "all_passed": artifacts_ok,
+            "inventory_summary": "All 8 frozen ML artifacts — 2 models, 2 configs, 2 scalers, and 2 decision thresholds — match their expected SHA-256 digests.",
             "artifacts": artifact_results,
         },
         "contract_and_handoff_audit": {
@@ -263,7 +275,8 @@ def run_full_readiness_audit() -> Dict[str, Any]:
             "No Real Antarctic Historical Data: Field historical operational data was not accessible for training.",
             "In-Memory Rolling State: Sliding window buffers reside in memory and reset upon service restart.",
             "Reconstruction False-Positive Rate: Bharati LSTM test FPR is 50.50% on diurnal variations to maximize anomaly recall.",
-            "Deterministic Physical Classifier: Flatline and drift classification handled via deterministic heuristic layer.",
+            "STUCK_VALUE / Flatline Reconstruction Limitation: STUCK_VALUE/flatline conditions may not always produce sufficiently high LSTM reconstruction error; the downstream deterministic classifier identifies some STUCK_VALUE patterns independently of the LSTM anomaly decision.",
+            "Hybrid Pipeline Scope: The LSTM model itself does not detect all SPIKE, DRIFT, STUCK_VALUE, and DROPOUT cases alone; no claim of perfect anomaly-type classification is made.",
             "Anomaly Score Interpretation: MSE reconstruction loss is an anomaly severity index, not a calibrated Bayesian probability.",
             "Prototype Scope: Designed for SIH 2026 integration demonstration; not certified for physical Antarctic mission deployment.",
         ],
@@ -298,6 +311,8 @@ def generate_markdown_report(audit_data: Dict[str, Any]) -> str:
     md.append("")
     md.append("This document constitutes the official, reproducible integration sign-off audit for the Polarix Machine Learning subsystem (Steps 1–37). It covers complete verification of both Antarctic research stations: **Maitri (`MTR`)** and **Bharati (`BRT`)**.")
     md.append("")
+    md.append("The Polarix ML pipeline is hybrid: LSTM reconstruction scoring provides anomaly detection/scoring, deterministic downstream classification identifies anomaly types where supported, and explicit missing-data handling covers dropout/offline telemetry.")
+    md.append("")
     md.append("---")
     md.append("")
     md.append("## 2. Repository Integrity")
@@ -320,7 +335,7 @@ def generate_markdown_report(audit_data: Dict[str, Any]) -> str:
     md.append("| Decision Threshold | `0.017674` | Verified |")
     md.append("| Sequence Length | 30 observations | Verified |")
     md.append("| Supported Sensors | `TEMP_001`, `PRESS_001`, `HUM_001`, `VIB_001`, `POWER_001` | Verified (5/5) |")
-    md.append("| Completed Steps | Steps 1–22 (Maitri Complete) | Verified |")
+    md.append("| Completed Steps | Steps 1–22 — Maitri Complete | Verified |")
     md.append("")
     md.append("---")
     md.append("")
@@ -333,13 +348,13 @@ def generate_markdown_report(audit_data: Dict[str, Any]) -> str:
     md.append("| Decision Threshold | `0.013215307652775843` | Verified (Exact) |")
     md.append("| Sequence Length | 30 observations | Verified |")
     md.append("| Supported Sensors | `BRT_TEMP_001`, `BRT_PRESS_001`, `BRT_HUM_001`, `BRT_VIB_001`, `BRT_POWER_001` | Verified (5/5) |")
-    md.append("| Completed Steps | Steps 23–35 (Bharati Complete) | Verified |")
+    md.append("| Completed Steps | Steps 23–36 — Bharati ML + Handoff Complete | Verified |")
     md.append("")
     md.append("---")
     md.append("")
     md.append("## 5. Frozen Artifact Integrity")
     md.append("")
-    md.append("All 8 frozen neural network artifacts, scalers, configs, and threshold manifests match repository SHA-256 digests:")
+    md.append("All 8 frozen ML artifacts — 2 models, 2 configs, 2 scalers, and 2 decision thresholds — match their expected SHA-256 digests:")
     md.append("")
     md.append("| Artifact Path | Expected SHA-256 Digest | Audit Status |")
     md.append("| :--- | :--- | :---: |")
@@ -375,8 +390,8 @@ def generate_markdown_report(audit_data: Dict[str, Any]) -> str:
     md.append("- `NORMAL_DAY`: Stable diurnal cycles with nominal reconstruction loss.")
     md.append("- `SPIKE`: Instantaneous amplitude transient detection and physical classification.")
     md.append("- `DRIFT`: Sustained directional trend divergence detection.")
-    md.append("- `STUCK_VALUE`: Flatline sensor condition detection.")
-    md.append("- `MISSING_DATA` / `DROPOUT`: Buffer flush and `MISSING_DATA` emission.")
+    md.append("- `STUCK_VALUE`: Flatline sensor condition detection via downstream deterministic classifier.")
+    md.append("- `MISSING_DATA` / `DROPOUT`: Buffer flush and `MISSING_DATA` emission via structured quality handling.")
     md.append("- `INSUFFICIENT_DATA`: Deterministic warmup bypass for sequences < 30 observations.")
     md.append("- `DUPLICATE_TELEMETRY` & `STALE_TELEMETRY`: Diagnostic rejection error tracking.")
     md.append("- `MULTI_SENSOR_ISOLATION`: Zero cross-talk across interleaved telemetry streams.")
