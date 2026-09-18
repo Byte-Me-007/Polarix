@@ -16,6 +16,7 @@ from maitri.schemas.station import (
     StationDetailResponse,
     StationResponse,
 )
+from maitri.schemas.telemetry import TelemetryCreate, TelemetryResponse
 
 __all__ = [
     "DeviceBase",
@@ -32,4 +33,6 @@ __all__ = [
     "SensorBase",
     "SensorCreate",
     "SensorResponse",
+    "TelemetryCreate",
+    "TelemetryResponse",
 ]

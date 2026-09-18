@@ -66,6 +66,31 @@ Representative sensors span four core domains:
 - **`ENERGY`**: Diesel generator output, battery storage bank voltage, solar array generation.
 - **`LOGISTICS`**: Main fuel storage tank level, fresh water reservoir levels.
 
+## Station-Based Telemetry Endpoints
+
+Ingest and query operational telemetry connected directly to configured stations and sensors:
+
+- **Ingest Telemetry:**
+  `POST /telemetry`
+  ```json
+  {
+    "station_code": "MTR",
+    "sensor_code": "MTR-ENV-TMP-01",
+    "value": -18.5,
+    "quality": "GOOD",
+    "source": "SIMULATOR",
+    "anomaly_score": 0.05
+  }
+  ```
+- **Get Station Telemetry History:**
+  `GET /stations/{station_id}/telemetry` (e.g. `GET /stations/MTR/telemetry?limit=50`)
+- **Get Latest Station Telemetry (per sensor):**
+  `GET /stations/{station_id}/telemetry/latest` (e.g. `GET /stations/MTR/telemetry/latest`)
+
+Quality support: `GOOD`, `WARNING`, `BAD`, `UNKNOWN`, `OFFLINE`.
+Source support: `SIMULATOR`, `MQTT`, `API`.
+
+
 
 
 

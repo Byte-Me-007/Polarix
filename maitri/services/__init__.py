@@ -17,6 +17,11 @@ from maitri.services.station_service import (
     list_stations,
     seed_default_stations,
 )
+from maitri.services.telemetry_service import (
+    create_telemetry,
+    get_latest_telemetry_by_station,
+    get_telemetry_by_station,
+)
 from maitri.services.websocket_manager import ConnectionManager, manager
 
 __all__ = [
@@ -33,4 +38,7 @@ __all__ = [
     "get_station_by_id_or_code",
     "get_sensors_by_station",
     "seed_default_stations",
+    "create_telemetry",
+    "get_telemetry_by_station",
+    "get_latest_telemetry_by_station",
 ]

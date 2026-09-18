@@ -1,5 +1,5 @@
 from maitri.database import Base
-from maitri.models import Device, Sensor, SensorReading, Station
+from maitri.models import Device, Sensor, SensorReading, Station, Telemetry
 
 
 def test_models_metadata():
@@ -7,7 +7,9 @@ def test_models_metadata():
     assert SensorReading.__tablename__ == "sensor_readings"
     assert Station.__tablename__ == "stations"
     assert Sensor.__tablename__ == "sensors"
+    assert Telemetry.__tablename__ == "telemetry"
     assert "devices" in Base.metadata.tables
     assert "sensor_readings" in Base.metadata.tables
     assert "stations" in Base.metadata.tables
     assert "sensors" in Base.metadata.tables
+    assert "telemetry" in Base.metadata.tables
