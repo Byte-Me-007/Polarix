@@ -60,6 +60,11 @@ from ml.models.bharati_lstm_autoencoder import (
     BharatiLSTMAutoencoder,
     BharatiLSTMConfig,
 )
+from ml.models.model_registry import (
+    ModelIntegrityError,
+    ModelManifestNotFoundError,
+    validate_model_artifacts,
+)
 from ml.training.prepare_bharati_sequences import (
     BharatiSensorScaler,
     load_bharati_scalers,
@@ -69,6 +74,7 @@ DEFAULT_BHARATI_MODEL_PATH = "ml/models/lstm-ae-bharati-v1.pt"
 DEFAULT_BHARATI_CONFIG_PATH = "ml/models/lstm-ae-bharati-v1_config.json"
 DEFAULT_BHARATI_SCALER_PATH = "ml/models/lstm-ae-bharati-v1_scaler.json"
 DEFAULT_BHARATI_THRESHOLD_PATH = "ml/results/bharati_lstm_threshold.json"
+DEFAULT_BHARATI_MANIFEST_PATH = "ml/models/lstm-ae-bharati-v1_manifest.json"
 
 
 class BharatiLSTMInference:
@@ -82,6 +88,8 @@ class BharatiLSTMInference:
         config_path: Union[str, Path] = DEFAULT_BHARATI_CONFIG_PATH,
         scaler_path: Union[str, Path] = DEFAULT_BHARATI_SCALER_PATH,
         threshold_path: Union[str, Path] = DEFAULT_BHARATI_THRESHOLD_PATH,
+        manifest_path: Optional[Union[str, Path]] = None,
+        verify_manifest: bool = True,
         device: str = "cpu",
     ) -> None:
         self.device = torch.device(device)
@@ -89,6 +97,16 @@ class BharatiLSTMInference:
         self.config_path = Path(config_path)
         self.scaler_path = Path(scaler_path)
         self.threshold_path = Path(threshold_path)
+        self.manifest_path = Path(manifest_path) if manifest_path is not None else None
+        self.verify_manifest = verify_manifest
+
+        # 0. Cryptographic Artifact Integrity Verification
+        if self.verify_manifest:
+            validate_model_artifacts(
+                model_version=MODEL_VERSION,
+                manifest_path=self.manifest_path,
+                raise_on_error=True,
+            )
 
         # 1. Load Model Config
         if not self.config_path.exists():

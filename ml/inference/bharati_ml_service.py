@@ -60,6 +60,8 @@ class BharatiMLService:
         config_path: Union[str, Path] = DEFAULT_BHARATI_CONFIG_PATH,
         scaler_path: Union[str, Path] = DEFAULT_BHARATI_SCALER_PATH,
         threshold_path: Union[str, Path] = DEFAULT_BHARATI_THRESHOLD_PATH,
+        manifest_path: Optional[Union[str, Path]] = None,
+        verify_manifest: bool = True,
         device: str = "cpu",
     ) -> None:
         """
@@ -75,6 +77,10 @@ class BharatiMLService:
             Path to fitted sensor scalers JSON.
         threshold_path : Union[str, Path]
             Path to validation-selected frozen threshold JSON.
+        manifest_path : Optional[Union[str, Path]]
+            Path to model manifest JSON for integrity validation.
+        verify_manifest : bool
+            Whether to verify cryptographic integrity of artifacts on initialization.
         device : str
             PyTorch compute device ('cpu' or 'cuda').
         """
@@ -88,6 +94,8 @@ class BharatiMLService:
             config_path=config_path,
             scaler_path=scaler_path,
             threshold_path=threshold_path,
+            manifest_path=manifest_path,
+            verify_manifest=verify_manifest,
             device=device,
         )
 

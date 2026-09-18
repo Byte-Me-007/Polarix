@@ -1,0 +1,49 @@
+{
+  "model_version": "lstm-ae-bharati-v1",
+  "manifest_file": "/Users/rexjohnabraham/Documents/Polarix_C/ml/models/lstm-ae-bharati-v1_manifest.json",
+  "overall_status": "VALID",
+  "validated_at": "2026-09-18T05:03:52.527009+00:00",
+  "artifact_results": {
+    "model": {
+      "role": "Model neural network weights (PyTorch state_dict)",
+      "file": "lstm-ae-bharati-v1.pt",
+      "expected_sha256": "412b6cb782c533db6d6024b86f2cfe709e1485f888099b429d4c8a2a8bf6111a",
+      "actual_sha256": "412b6cb782c533db6d6024b86f2cfe709e1485f888099b429d4c8a2a8bf6111a",
+      "expected_size": 50757,
+      "actual_size": 50757,
+      "status": "VALID",
+      "error_message": null
+    },
+    "config": {
+      "role": "Model architecture hyperparameters",
+      "file": "lstm-ae-bharati-v1_config.json",
+      "expected_sha256": "16614a022b6508863d8476eb65d9e695cd0ceed118c142be8e740bbdf9ab3ad7",
+      "actual_sha256": "16614a022b6508863d8476eb65d9e695cd0ceed118c142be8e740bbdf9ab3ad7",
+      "expected_size": 218,
+      "actual_size": 218,
+      "status": "VALID",
+      "error_message": null
+    },
+    "scaler": {
+      "role": "Per-sensor normalization mean and standard deviation parameters",
+      "file": "lstm-ae-bharati-v1_scaler.json",
+      "expected_sha256": "b9c1d1077912743c0bd0f7046e7a9c52fd646f2e4a9c7f85773629939ef70899",
+      "actual_sha256": "b9c1d1077912743c0bd0f7046e7a9c52fd646f2e4a9c7f85773629939ef70899",
+      "expected_size": 691,
+      "actual_size": 691,
+      "status": "VALID",
+      "error_message": null
+    },
+    "threshold": {
+      "role": "Validation-selected reconstruction error threshold",
+      "file": "../results/bharati_lstm_threshold.json",
+      "expected_sha256": "95b45031504a584e582cb4c36918cfb9a22fb6c599d530f3a47cd4e21c1f1a9d",
+      "actual_sha256": "95b45031504a584e582cb4c36918cfb9a22fb6c599d530f3a47cd4e21c1f1a9d",
+      "expected_size": 853,
+      "actual_size": 853,
+      "status": "VALID",
+      "error_message": null
+    }
+  },
+  "errors": []
+}

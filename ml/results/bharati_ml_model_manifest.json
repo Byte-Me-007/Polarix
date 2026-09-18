@@ -1,0 +1,58 @@
+{
+  "model_version": "lstm-ae-bharati-v1",
+  "model_type": "LSTM_AUTOENCODER",
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "supported_sensors": [
+    "BRT_TEMP_001",
+    "BRT_PRESS_001",
+    "BRT_HUM_001",
+    "BRT_VIB_001",
+    "BRT_POWER_001"
+  ],
+  "training_metadata": {
+    "sequence_length": 30,
+    "hidden_size": 32,
+    "latent_size": 16,
+    "num_layers": 1,
+    "dropout": 0.0,
+    "loss_function": "MSELoss",
+    "optimizer": "Adam(lr=0.001)",
+    "training_dataset": "ml/data/bharati_synthetic_telemetry.csv",
+    "training_dataset_version": "10k_synthetic_v1",
+    "training_seed": 42,
+    "training_split": "70% Normal-Only (7,000 records / 6,855 sequences)",
+    "validation_split": "15% (1,500 records / 1,181 sequences)",
+    "test_split": "15% (1,500 records / 1,182 sequences)",
+    "threshold_value": 0.013215307652775843,
+    "synthetic_disclaimer": "All training and validation conducted strictly on synthetic telemetry for Bharati station. No real Antarctic telemetry used.",
+    "created_at": "2026-09-18T02:20:00Z",
+    "status": "VALIDATED"
+  },
+  "artifacts": {
+    "model": {
+      "file": "lstm-ae-bharati-v1.pt",
+      "role": "Model neural network weights (PyTorch state_dict)",
+      "sha256": "412b6cb782c533db6d6024b86f2cfe709e1485f888099b429d4c8a2a8bf6111a",
+      "size_bytes": 50757
+    },
+    "config": {
+      "file": "lstm-ae-bharati-v1_config.json",
+      "role": "Model architecture hyperparameters",
+      "sha256": "16614a022b6508863d8476eb65d9e695cd0ceed118c142be8e740bbdf9ab3ad7",
+      "size_bytes": 218
+    },
+    "scaler": {
+      "file": "lstm-ae-bharati-v1_scaler.json",
+      "role": "Per-sensor normalization mean and standard deviation parameters",
+      "sha256": "b9c1d1077912743c0bd0f7046e7a9c52fd646f2e4a9c7f85773629939ef70899",
+      "size_bytes": 691
+    },
+    "threshold": {
+      "file": "../results/bharati_lstm_threshold.json",
+      "role": "Validation-selected reconstruction error threshold",
+      "sha256": "95b45031504a584e582cb4c36918cfb9a22fb6c599d530f3a47cd4e21c1f1a9d",
+      "size_bytes": 853
+    }
+  }
+}
