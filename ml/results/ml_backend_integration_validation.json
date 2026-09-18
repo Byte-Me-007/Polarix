@@ -1,0 +1,149 @@
+{
+  "metadata": {
+    "title": "Polarix ML <-> Backend Integration Contract Validation Report",
+    "step": "Step 43",
+    "validation_timestamp": "2026-09-18T07:13:02.578080+00:00",
+    "overall_status": "INTEGRATION_CONTRACT_VALIDATED",
+    "total_checks": 10,
+    "passed_checks": 10
+  },
+  "boundary_categorization": {
+    "A_validated_directly": [
+      "Backend-style dictionary and JSON string payload ingestion (adapt_backend_input).",
+      "Canonical 11-field response serialization and JSON roundtrip (adapt_backend_output).",
+      "Cold-start warmup (< 30 observations) routing to INSUFFICIENT_DATA with null scores.",
+      "Normal stationary telemetry scored inference against frozen threshold.",
+      "SPIKE anomaly detection and physical classification.",
+      "DRIFT monotonic trend detection and trajectory classification.",
+      "STUCK_VALUE active flatline detection and zero-false-alarm recovery behavior.",
+      "MISSING_DATA ingestion on null, NaN, Inf, or bad-quality telemetry with immediate buffer flush.",
+      "DuplicateTelemetryError and StaleTelemetryError rejection boundaries.",
+      "Multi-sensor rolling buffer isolation across all 10 station channels (5 MTR, 5 BRT)."
+    ],
+    "B_validated_through_backend_code": [
+      "No backend server execution claimed on Person C branch: Person A's FastAPI, MQTT broker, and SQLite persistence are isolated on Person A branches and validated via standardized contracts."
+    ],
+    "C_not_yet_validated_person_a_scope": [
+      "Live MQTT broker subscription and network transport latency.",
+      "FastAPI REST / WebSocket route dispatch and real-time client fanout.",
+      "SQLite relational schema migration and database write throughput.",
+      "Operational multi-step escalation business rules (e.g. 3-step alarm hysteresis)."
+    ]
+  },
+  "test_results": [
+    {
+      "category": "Input Contract Parsing",
+      "description": "Validation of dictionary and JSON string payload ingestion for Maitri and Bharati.",
+      "passed": true,
+      "latency_ms": 0.0348,
+      "details": "Successfully parsed canonical TelemetryInput and BharatiTelemetryInput structures."
+    },
+    {
+      "category": "Streaming Warmup",
+      "description": "Verification of INSUFFICIENT_DATA status and null scores for sequence history < 30 observations.",
+      "passed": true,
+      "latency_ms": 0.8134,
+      "details": "Bypasses neural forward pass until 30 consecutive valid observations accumulate."
+    },
+    {
+      "category": "Normal Scored Inference",
+      "description": "Validation that 30-step nominal stationary telemetry produces NORMAL status with finite MSE score.",
+      "passed": true,
+      "latency_ms": 13.6256,
+      "details": "MTR score: 0.000259 (<= 0.017674), BRT score: 0.000452 (<= 0.013215307652775843)."
+    },
+    {
+      "category": "SPIKE Anomaly",
+      "description": "Validation that sudden high-amplitude step jumps trigger ANOMALY status and SPIKE archetype classification.",
+      "passed": true,
+      "latency_ms": 1.5505,
+      "details": "MTR spike score: 11.353759, BRT spike score: 15.882721."
+    },
+    {
+      "category": "DRIFT Anomaly",
+      "description": "Validation that sustained monotonic linear ramps trigger ANOMALY status and DRIFT classification.",
+      "passed": true,
+      "latency_ms": 1.4937,
+      "details": "MTR drift status: ANOMALY (DRIFT), BRT drift status: ANOMALY (DRIFT)."
+    },
+    {
+      "category": "STUCK_VALUE & Recovery",
+      "description": "Validation that active flatlines trigger STUCK_VALUE and resumed variance immediately releases stuck state (0 recovery FP).",
+      "passed": true,
+      "latency_ms": 42.0115,
+      "details": "Flatline detection: True, Recovery release: True."
+    },
+    {
+      "category": "MISSING_DATA Ingestion",
+      "description": "Validation that null, NaN, and non-GOOD telemetry yields MISSING_DATA and immediately clears rolling sequence buffer to 0.",
+      "passed": true,
+      "latency_ms": 0.0313,
+      "details": "Buffer lengths after dropout: MTR=0, BRT=0."
+    },
+    {
+      "category": "Duplicate & Stale Rejection",
+      "description": "Validation that duplicate timestamps raise DuplicateTelemetryError and out-of-order packets raise StaleTelemetryError without corrupting buffer state.",
+      "passed": true,
+      "latency_ms": 0.1968,
+      "details": "Duplicate errors raised: (MTR=True, BRT=True), Stale errors raised: (MTR=True, BRT=True)."
+    },
+    {
+      "category": "Multi-Sensor Isolation",
+      "description": "Validation of independent buffer isolation across interleaved multi-sensor streams with varying sequence rates.",
+      "passed": true,
+      "latency_ms": 1.1357,
+      "details": "Expected buffers: [30, 20, 10, 5, 1], Observed buffers: [30, 20, 10, 5, 1]."
+    },
+    {
+      "category": "Output Contract & JSON Roundtrip",
+      "description": "Validation that all 11 canonical contract fields are strictly serialized without non-finite float leakage.",
+      "passed": true,
+      "latency_ms": 0.4644,
+      "details": "Contract fields: ['anomaly_score', 'anomaly_status', 'anomaly_type', 'model_version', 'quality', 'sensor_id', 'source', 'station_id', 'timestamp', 'unit', 'value']."
+    }
+  ],
+  "canonical_contract_schemas": {
+    "required_input_fields": [
+      "station_id",
+      "sensor_id",
+      "timestamp",
+      "value"
+    ],
+    "optional_input_fields": [
+      "unit",
+      "quality",
+      "source"
+    ],
+    "canonical_output_fields": [
+      "value",
+      "timestamp",
+      "source",
+      "anomaly_score",
+      "station_id",
+      "unit",
+      "sensor_id",
+      "anomaly_type",
+      "model_version",
+      "anomaly_status",
+      "quality"
+    ],
+    "status_vocabulary": [
+      "NORMAL",
+      "ANOMALY",
+      "INSUFFICIENT_DATA",
+      "MISSING_DATA"
+    ],
+    "anomaly_type_vocabulary": [
+      "NORMAL",
+      "SPIKE",
+      "DRIFT",
+      "STUCK_VALUE",
+      "UNKNOWN"
+    ]
+  },
+  "ownership_boundaries": {
+    "person_c_ml": "Loads models, computes reconstruction MSE, applies deterministic physical classifiers, validates schemas, emits typed contracts.",
+    "person_a_backend": "Runs FastAPI server, manages MQTT broker, persists to SQLite, evaluates operational business rules / alerts.",
+    "person_b_frontend": "Renders React dashboard, displays alert pills, updates Three.js 3D Digital Twin mesh."
+  }
+}

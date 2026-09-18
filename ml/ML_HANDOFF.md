@@ -315,18 +315,22 @@ All artifacts are frozen and validated against SHA-256 integrity manifests:
 
 ## 14. Validation Evidence & Test Coverage
 
-The complete ML subsystem is backed by **470+ automated unit and regression tests** across development and refinement steps (Steps 1–42):
+The complete ML subsystem is backed by **499 automated unit and regression tests** across development and refinement steps (Steps 1–43):
 
 | Verification Scope | Result File | Status |
 | :--- | :--- | :---: |
 | **Maitri Scenario Evaluation** | `ml/results/maitri_ml_evaluation_report.md` | **11 / 11 Scenarios PASS** |
 | **Bharati Scenario Evaluation** | `ml/results/bharati_final_evaluation.md` | **12 / 12 Scenarios PASS** |
 | **Hybrid Classifier Re-Evaluation** | `ml/results/hybrid_anomaly_classifier_re_evaluation.md` | **100% STUCK_VALUE Precision, 100% Spike Recall** |
+| **Backend Integration Contract** | `ml/results/ml_backend_integration_validation.md` | **10 / 10 Checks PASS (ML Adapter Boundary)** |
 | **Maitri Performance Benchmark** | `ml/results/maitri_inference_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Bharati Performance Benchmark**| `ml/results/bharati_ml_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Maitri Observability & Auditing**| `ml/results/maitri_observability_validation.json`| **12 / 12 Diagnostic Tests PASS** |
 | **Bharati Observability & Auditing**| `ml/results/bharati_ml_observability.json` | **13 / 13 Diagnostic Tests PASS** |
-| **Complete Pytest Regression Suite**| `ml/tests/` | **ALL Tests PASS (100%)** |
+| **Complete Pytest Regression Suite**| `ml/tests/` | **499 / 499 Tests PASS (100%)** |
+
+> [!NOTE]
+> Backend integration contract validation exercises the full ML ingestion and emission adapter boundary (`adapt_backend_input`, `adapt_backend_output`, `process_backend_payload`). Live FastAPI endpoints, MQTT broker routing, and SQLite database persistence remain under the implementation ownership of Person A.
 
 ---
 
