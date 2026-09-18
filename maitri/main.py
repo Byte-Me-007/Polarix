@@ -7,6 +7,7 @@ from maitri.routers import (
     alerts,
     devices,
     health,
+    resources,
     sensors,
     stations,
     telemetry,
@@ -28,7 +29,9 @@ app.include_router(sensors.router)
 app.include_router(stations.router)
 app.include_router(telemetry.router)
 app.include_router(alerts.router)
+app.include_router(resources.router)
 app.include_router(websocket.router)
+
 
 
 

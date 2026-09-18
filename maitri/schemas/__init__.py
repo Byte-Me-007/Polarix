@@ -7,6 +7,15 @@ from maitri.schemas.alert import (
     AlertStatus,
 )
 from maitri.schemas.device import DeviceBase, DeviceCreate, DeviceResponse
+from maitri.schemas.resource import (
+    ResourceBase,
+    ResourceCreate,
+    ResourceForecastResponse,
+    ResourceResponse,
+    ResourceStatus,
+    ResourceType,
+    ResourceUpdate,
+)
 from maitri.schemas.sensor_reading import (
     SensorIngestRequest,
     SensorReadingBase,
@@ -32,6 +41,13 @@ __all__ = [
     "DeviceBase",
     "DeviceCreate",
     "DeviceResponse",
+    "ResourceBase",
+    "ResourceCreate",
+    "ResourceUpdate",
+    "ResourceResponse",
+    "ResourceForecastResponse",
+    "ResourceType",
+    "ResourceStatus",
     "SensorIngestRequest",
     "SensorReadingBase",
     "SensorReadingCreate",
@@ -46,3 +62,5 @@ __all__ = [
     "TelemetryCreate",
     "TelemetryResponse",
 ]
+
+

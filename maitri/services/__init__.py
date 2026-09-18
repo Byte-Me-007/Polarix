@@ -14,6 +14,16 @@ from maitri.services.device_service import (
     list_devices,
 )
 from maitri.services.mqtt_service import parse_sensor_message
+from maitri.services.resource_service import (
+    calculate_resource_forecast,
+    create_resource,
+    get_resource_by_id,
+    get_resource_forecast,
+    get_station_resources_forecast,
+    list_resources_by_station,
+    seed_default_resources,
+    update_resource,
+)
 from maitri.services.sensor_service import (
     create_sensor_reading,
     list_sensor_readings,
@@ -53,5 +63,15 @@ __all__ = [
     "create_telemetry",
     "get_telemetry_by_station",
     "get_latest_telemetry_by_station",
+    "create_resource",
+    "list_resources_by_station",
+    "get_resource_by_id",
+    "update_resource",
+    "seed_default_resources",
+    "calculate_resource_forecast",
+    "get_resource_forecast",
+    "get_station_resources_forecast",
 ]
+
+
 

@@ -116,3 +116,50 @@ Manage operational alerts across Antarctic stations:
 Severity support: `INFO`, `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`.
 Status support: `ACTIVE`, `ACKNOWLEDGED`, `RESOLVED`.
 Automatic alert generation: Telemetry ingested with `BAD` quality automatically creates a `HIGH` severity fault alert; `OFFLINE` quality creates a `CRITICAL` severity offline alert.
+
+## Station Resource Inventory Endpoints
+
+Track critical station resources across research bases (Diesel, Battery, Water, Food, Medical supplies, Spare parts):
+
+- **List Station Resources:**
+  `GET /stations/{station_id}/resources` (e.g. `GET /stations/MTR/resources`)
+- **Create Resource:**
+  `POST /resources`
+  ```json
+  {
+    "station_code": "MTR",
+    "resource_type": "WATER",
+    "current_quantity": 12000.0,
+    "capacity": 20000.0,
+    "consumption_rate": 450.0,
+    "unit": "L",
+    "status": "NORMAL"
+  }
+  ```
+- **Update Resource:**
+  `PATCH /resources/{resource_id}`
+  ```json
+  {
+    "current_quantity": 10500.0,
+    "status": "LOW",
+    "consumption_rate": 480.0
+  }
+  ```
+
+Resource types: `DIESEL`, `BATTERY`, `WATER`, `FOOD`, `MEDICAL`, `SPARE_PARTS`.
+Resource statuses: `NORMAL`, `LOW`, `WARNING`, `CRITICAL`.
+
+## Resource Forecasting Endpoints
+
+Forecast resource depletion time and assess risk levels across Antarctic station inventory:
+
+- **Get Station Resources Forecast:**
+  `GET /stations/{station_id}/resources/forecast` (e.g. `GET /stations/MTR/resources/forecast`)
+- **Get Single Resource Forecast:**
+  `GET /resources/{resource_id}/forecast`
+
+Risk Levels:
+- **`CRITICAL`**: 0 quantity or estimated days remaining $\le$ 2 days (or reserve $\le$ 10%).
+- **`WARNING`**: Estimated days remaining $\le$ 7 days (or reserve $\le$ 25%).
+- **`LOW`**: Estimated days remaining $\le$ 14 days (or reserve $\le$ 40%).
+- **`NORMAL`**: Estimated days remaining $>$ 14 days.

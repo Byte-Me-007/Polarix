@@ -3,9 +3,14 @@ from sqlalchemy.orm import Session
 
 from maitri.database import get_db
 from maitri.schemas.alert import AlertResponse
+from maitri.schemas.resource import ResourceForecastResponse, ResourceResponse
 from maitri.schemas.station import SensorResponse, StationResponse
 from maitri.schemas.telemetry import TelemetryResponse
 from maitri.services.alert_service import list_alerts_by_station
+from maitri.services.resource_service import (
+    get_station_resources_forecast,
+    list_resources_by_station,
+)
 from maitri.services.station_service import (
     get_sensors_by_station,
     get_station_by_id_or_code,
@@ -93,5 +98,40 @@ def get_station_alerts(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
+
+
+@router.get("/{station_id}/resources", response_model=list[ResourceResponse])
+def get_station_resources(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        return list_resources_by_station(db, station_id_or_code=station_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{station_id}/resources/forecast",
+    response_model=list[ResourceForecastResponse],
+)
+def get_station_resources_forecast_route(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_station_resources_forecast(
+            db, station_id_or_code=station_id
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
+
 
 
