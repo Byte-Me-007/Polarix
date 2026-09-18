@@ -1,0 +1,148 @@
+{
+  "investigation_metadata": {
+    "title": "Bharati LSTM Autoencoder Performance & False-Positive Rate Investigation",
+    "project": "Polarix",
+    "problem_statement": "SIH26060",
+    "team": "Byte Me_26",
+    "team_id": "143760",
+    "role": "Person C (Machine Learning Specialist)",
+    "timestamp": "2026-09-18T12:00:00Z",
+    "station_id": "BRT",
+    "station_name": "Bharati",
+    "target_model": "lstm-ae-bharati-v1",
+    "frozen_v1_threshold": 0.013215307652775843,
+    "investigation_scope": "Empirical analysis of high FPR (50.50% test) and evaluation of candidate per-sensor calibration strategies"
+  },
+  "root_cause_analysis": {
+    "primary_causes": [
+      {
+        "factor": "Inter-Sensor Baseline Error Disparity",
+        "description": "Clean normal reconstruction error varies dramatically across sensors (median 0.0041 for PRESS_001 vs 0.0284 for VIB_001). A single global threshold (0.0132) is below VIB_001 nominal baseline, causing 98.89% FPR on VIB_001 under V1."
+      },
+      {
+        "factor": "Trailing Window Reconstruction Lag",
+        "description": "The 30-observation rolling sequence maintains high reconstruction MSE for 29 time steps after an anomaly event resolves, producing point-in-time false alarms on trailing normal points (FPR ~75% on trailing normal)."
+      },
+      {
+        "factor": "Flatline Reconstruction Limitation",
+        "description": "LSTM autoencoder captures temporal dynamic shapes well (100% Spike recall, 83.3% Drift recall) but assigns low reconstruction error to zero-variance flatlines, necessitating downstream heuristic classification."
+      }
+    ]
+  },
+  "sensor_reconstruction_distributions": {
+    "val_split": {
+      "BRT_HUM_001": { "clean_normal_median": 0.012737, "clean_normal_p99": 0.019745, "all_normal_median": 0.014264, "anomaly_median": 0.029565 },
+      "BRT_POWER_001": { "clean_normal_median": 0.008183, "clean_normal_p99": 0.013899, "all_normal_median": 0.010001, "anomaly_median": 0.020012 },
+      "BRT_PRESS_001": { "clean_normal_median": 0.004080, "clean_normal_p99": 0.007511, "all_normal_median": 0.005523, "anomaly_median": 0.015224 },
+      "BRT_TEMP_001": { "clean_normal_median": 0.004622, "clean_normal_p99": 0.011469, "all_normal_median": 0.005324, "anomaly_median": 0.009363 },
+      "BRT_VIB_001": { "clean_normal_median": 0.028379, "clean_normal_p99": 0.054121, "all_normal_median": 0.030635, "anomaly_median": 0.059704 }
+    },
+    "test_split": {
+      "BRT_HUM_001": { "clean_normal_median": 0.009160, "all_normal_median": 0.009160, "anomaly_median": 0.013638 },
+      "BRT_POWER_001": { "clean_normal_median": 0.008064, "all_normal_median": 0.010942, "anomaly_median": 0.029741 },
+      "BRT_PRESS_001": { "clean_normal_median": 0.004467, "all_normal_median": 0.006417, "anomaly_median": 0.013274 },
+      "BRT_TEMP_001": { "clean_normal_median": 0.004126, "all_normal_median": 0.004995, "anomaly_median": 0.008221 },
+      "BRT_VIB_001": { "clean_normal_median": 0.027159, "all_normal_median": 0.029546, "anomaly_median": 0.026432 }
+    }
+  },
+  "validation_strategy_comparison": {
+    "strategy_a_v1_global": {
+      "description": "Frozen V1 global threshold (0.013215307652775843)",
+      "threshold": 0.013215307652775843,
+      "TP": 184, "TN": 449, "FP": 440, "FN": 108,
+      "accuracy": 0.5360, "precision": 0.2949, "recall": 0.6301, "f1": 0.4017, "fpr": 0.4949
+    },
+    "strategy_b1_max_f1_global": {
+      "description": "Global threshold maximizing validation F1",
+      "threshold": 0.013676,
+      "TP": 183, "TN": 454, "FP": 435, "FN": 109,
+      "accuracy": 0.5394, "precision": 0.2961, "recall": 0.6267, "f1": 0.4022, "fpr": 0.4893
+    },
+    "strategy_b2_low_fpr_global": {
+      "description": "Global threshold constrained to FPR <= 10%",
+      "threshold": 1.880222,
+      "TP": 7, "TN": 802, "FP": 87, "FN": 285,
+      "accuracy": 0.6850, "precision": 0.0745, "recall": 0.0240, "f1": 0.0363, "fpr": 0.0979
+    },
+    "strategy_c1_per_sensor_max_f1": {
+      "description": "Independent per-sensor thresholds maximizing per-sensor validation F1",
+      "thresholds": {
+        "BRT_HUM_001": 0.017251, "BRT_POWER_001": 0.012973, "BRT_PRESS_001": 0.007412,
+        "BRT_TEMP_001": 0.001830, "BRT_VIB_001": 0.033881
+      },
+      "TP": 192, "TN": 472, "FP": 417, "FN": 100,
+      "accuracy": 0.5622, "precision": 0.3153, "recall": 0.6575, "f1": 0.4262, "fpr": 0.4691
+    },
+    "strategy_c2_p99_clean_normal": {
+      "description": "Per-sensor 99th percentile of clean normal validation error",
+      "thresholds": {
+        "BRT_HUM_001": 0.019745, "BRT_POWER_001": 0.013899, "BRT_PRESS_001": 0.007511,
+        "BRT_TEMP_001": 0.011469, "BRT_VIB_001": 0.054121
+      },
+      "TP": 155, "TN": 594, "FP": 295, "FN": 137,
+      "accuracy": 0.6342, "precision": 0.3444, "recall": 0.5308, "f1": 0.4178, "fpr": 0.3318
+    },
+    "strategy_c3_constrained_per_sensor": {
+      "description": "Candidate C3: Per-sensor threshold maximizing F1 with FPR <= 35% on validation",
+      "thresholds": {
+        "BRT_HUM_001": 0.017266, "BRT_POWER_001": 0.013177, "BRT_PRESS_001": 0.007405,
+        "BRT_TEMP_001": 0.012522, "BRT_VIB_001": 0.050735
+      },
+      "TP": 159, "TN": 588, "FP": 301, "FN": 133,
+      "accuracy": 0.6325, "precision": 0.3457, "recall": 0.5445, "f1": 0.4229, "fpr": 0.3386
+    }
+  },
+  "unbiased_test_evaluation": {
+    "baseline_v1_test": {
+      "threshold": 0.013215307652775843,
+      "TP": 165, "TN": 442, "FP": 451, "FN": 124,
+      "accuracy": 0.5135, "precision": 0.2679, "recall": 0.5709, "f1": 0.3646, "fpr": 0.5050,
+      "clean_normal_fp": 134, "clean_normal_fpr": 0.2926,
+      "trailing_normal_fp": 317, "trailing_normal_fpr": 0.7287,
+      "per_sensor": {
+        "BRT_HUM_001": { "TP": 32, "TN": 98, "FP": 81, "FN": 25, "prec": 0.2832, "rec": 0.5614, "f1": 0.3765, "fpr": 0.4525 },
+        "BRT_POWER_001": { "TP": 35, "TN": 102, "FP": 76, "FN": 24, "prec": 0.3153, "rec": 0.5932, "f1": 0.4118, "fpr": 0.4270 },
+        "BRT_PRESS_001": { "TP": 29, "TN": 118, "FP": 58, "FN": 29, "prec": 0.3333, "rec": 0.5000, "f1": 0.4000, "fpr": 0.3295 },
+        "BRT_TEMP_001": { "TP": 28, "TN": 122, "FP": 58, "FN": 29, "prec": 0.3256, "rec": 0.4912, "f1": 0.3916, "fpr": 0.3222 },
+        "BRT_VIB_001": { "TP": 41, "TN": 2, "FP": 178, "FN": 17, "prec": 0.1872, "rec": 0.7069, "f1": 0.2960, "fpr": 0.9889 }
+      },
+      "anomaly_type_recall": {
+        "DRIFT": { "detected": 132, "total": 150, "recall": 0.8800 },
+        "SPIKE": { "detected": 19, "total": 19, "recall": 1.0000 },
+        "STUCK_VALUE": { "detected": 14, "total": 120, "recall": 0.1167 }
+      }
+    },
+    "candidate_c3_test": {
+      "thresholds": {
+        "BRT_HUM_001": 0.017266, "BRT_POWER_001": 0.013177, "BRT_PRESS_001": 0.007405,
+        "BRT_TEMP_001": 0.012522, "BRT_VIB_001": 0.050735
+      },
+      "TP": 144, "TN": 541, "FP": 352, "FN": 145,
+      "accuracy": 0.5795, "precision": 0.2903, "recall": 0.4983, "f1": 0.3669, "fpr": 0.3942,
+      "clean_normal_fp": 25, "clean_normal_fpr": 0.0546,
+      "trailing_normal_fp": 327, "trailing_normal_fpr": 0.7517,
+      "per_sensor": {
+        "BRT_HUM_001": { "TP": 24, "TN": 115, "FP": 64, "FN": 33, "prec": 0.2727, "rec": 0.4211, "f1": 0.3310, "fpr": 0.3575 },
+        "BRT_POWER_001": { "TP": 35, "TN": 102, "FP": 76, "FN": 24, "prec": 0.3153, "rec": 0.5932, "f1": 0.4118, "fpr": 0.4270 },
+        "BRT_PRESS_001": { "TP": 32, "TN": 92, "FP": 84, "FN": 26, "prec": 0.2759, "rec": 0.5517, "f1": 0.3678, "fpr": 0.4773 },
+        "BRT_TEMP_001": { "TP": 28, "TN": 122, "FP": 58, "FN": 29, "prec": 0.3256, "rec": 0.4912, "f1": 0.3916, "fpr": 0.3222 },
+        "BRT_VIB_001": { "TP": 25, "TN": 110, "FP": 70, "FN": 33, "prec": 0.2632, "rec": 0.4310, "f1": 0.3268, "fpr": 0.3889 }
+      },
+      "anomaly_type_recall": {
+        "DRIFT": { "detected": 125, "total": 150, "recall": 0.8333 },
+        "SPIKE": { "detected": 19, "total": 19, "recall": 1.0000 },
+        "STUCK_VALUE": { "detected": 0, "total": 120, "recall": 0.0000 }
+      }
+    }
+  },
+  "tradeoff_and_recommendation": {
+    "v1_status": "FROZEN_UNCHANGED",
+    "candidate_status": "DOCUMENTED_CANDIDATE_FOR_FUTURE_REFINEMENT",
+    "key_findings": [
+      "Per-sensor threshold calibration (Candidate C3) cuts test FPR from 50.50% to 39.42% and slashes clean normal FPR from 29.26% to 5.46%.",
+      "Vibration sensor false alarms dropped from 178 (98.89% FPR) to 70 (38.89% FPR).",
+      "The remaining false positives are predominantly (93%) trailing window artifacts occurring within the 30-step recovery period after anomaly episodes.",
+      "The frozen V1 artifacts (model, scaler, config, threshold) remain unchanged and authoritative for integration."
+    ]
+  }
+}
