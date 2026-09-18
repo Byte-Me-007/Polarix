@@ -9,6 +9,7 @@ from maitri.schemas.alert import AlertCreate
 from maitri.schemas.telemetry import TelemetryCreate
 from maitri.services.alert_service import create_alert
 from maitri.services.station_service import get_station_by_id_or_code
+from maitri.services.sync_service import is_network_online
 
 VALID_QUALITIES = {"GOOD", "WARNING", "BAD", "UNKNOWN", "OFFLINE"}
 VALID_SOURCES = {"SIMULATOR", "MQTT", "API"}
@@ -56,6 +57,16 @@ def create_telemetry(db: Session, telemetry_in: TelemetryCreate) -> Telemetry:
         else datetime.now(timezone.utc)
     )
 
+    # Determine sync flag:
+    # If offline, always False (queued locally)
+    # If online, True unless explicitly set to False (e.g. SATELLITE_OUTAGE simulation)
+    if not is_network_online():
+        synced_flag = False
+    elif telemetry_in.synced is False:
+        synced_flag = False
+    else:
+        synced_flag = True
+
     telemetry_record = Telemetry(
         station_id=station.id,
         sensor_id=sensor.id,
@@ -65,7 +76,7 @@ def create_telemetry(db: Session, telemetry_in: TelemetryCreate) -> Telemetry:
         quality=quality,
         source=source,
         anomaly_score=telemetry_in.anomaly_score,
-        synced=telemetry_in.synced,
+        synced=synced_flag,
     )
     db.add(telemetry_record)
     db.commit()

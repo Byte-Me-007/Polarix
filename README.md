@@ -245,5 +245,37 @@ Backend MQTT ingestion (`ingest_mqtt_telemetry`):
    - `HIGH` severity `SENSOR_FAULT` alert on `BAD` quality telemetry.
    - `CRITICAL` severity `SENSOR_OFFLINE` alert on `OFFLINE` quality telemetry.
 
+## Offline Queue & Synchronization (Satellite Outage / Recovery)
+
+Handles network disconnection, local queueing, and backlog synchronization when satellite uplinks go down and recover.
+
+### Endpoints
+- **Get Sync Status:**
+  `GET /sync/status`
+  ```json
+  {
+    "network_status": "ONLINE",
+    "is_online": true,
+    "pending_count": 0,
+    "synced_count": 42,
+    "total_count": 42,
+    "last_sync_timestamp": "2026-09-18T23:26:00Z",
+    "message": "Network is ONLINE. All telemetry records synchronized."
+  }
+  ```
+- **Simulate Network Outage (Offline Mode):**
+  `POST /demo/network/offline`
+- **Simulate Network Recovery (Online & Sync):**
+  `POST /demo/network/online`
+
+### Queueing & Recovery Flow
+1. **Offline Mode (`OFFLINE`)**:
+   - All incoming telemetry records are stored locally in the database with `synced = False`.
+   - Critical events and operational alerts (`BAD` / `OFFLINE` quality) continue to trigger and persist without loss.
+2. **Online Recovery (`ONLINE` / `SYNCING`)**:
+   - Replays and marks all pending records as `synced = True`.
+   - Returns count of synchronized records (`synced_now`) and updates `last_sync_timestamp`.
+
+
 
 

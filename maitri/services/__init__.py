@@ -41,6 +41,15 @@ from maitri.services.station_service import (
     list_stations,
     seed_default_stations,
 )
+from maitri.services.sync_service import (
+    get_network_status,
+    get_sync_status,
+    is_network_online,
+    reset_network_state,
+    set_network_offline,
+    set_network_online_and_sync,
+    set_network_status,
+)
 from maitri.services.telemetry_service import (
     create_telemetry,
     get_latest_telemetry_by_station,
@@ -93,6 +102,13 @@ __all__ = [
     "get_supported_scenarios",
     "publish_simulated_telemetry",
     "serialize_telemetry_payload",
+    "get_network_status",
+    "set_network_status",
+    "is_network_online",
+    "reset_network_state",
+    "get_sync_status",
+    "set_network_offline",
+    "set_network_online_and_sync",
 ]
 
 

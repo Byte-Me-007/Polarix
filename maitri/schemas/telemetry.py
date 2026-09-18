@@ -13,7 +13,7 @@ class TelemetryCreate(BaseModel):
     source: str = "API"  # SIMULATOR, MQTT, API
     timestamp: datetime | None = None
     anomaly_score: float | None = None
-    synced: bool = False
+    synced: bool | None = None
 
 
 class TelemetryResponse(BaseModel):

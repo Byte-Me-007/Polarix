@@ -10,6 +10,7 @@ from maitri.routers import (
     resources,
     sensors,
     stations,
+    sync,
     telemetry,
     websocket,
 )
@@ -30,6 +31,7 @@ app.include_router(stations.router)
 app.include_router(telemetry.router)
 app.include_router(alerts.router)
 app.include_router(resources.router)
+app.include_router(sync.router)
 app.include_router(websocket.router)
 
 
