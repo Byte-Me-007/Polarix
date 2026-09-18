@@ -315,7 +315,7 @@ All artifacts are frozen and validated against SHA-256 integrity manifests:
 
 ## 14. Validation Evidence & Test Coverage
 
-The complete ML subsystem is backed by **499 automated unit and regression tests** across development and refinement steps (Steps 1–43):
+The complete ML subsystem is backed by **509 automated unit and regression tests** across development and refinement steps (Steps 1–44):
 
 | Verification Scope | Result File | Status |
 | :--- | :--- | :---: |
@@ -323,14 +323,15 @@ The complete ML subsystem is backed by **499 automated unit and regression tests
 | **Bharati Scenario Evaluation** | `ml/results/bharati_final_evaluation.md` | **12 / 12 Scenarios PASS** |
 | **Hybrid Classifier Re-Evaluation** | `ml/results/hybrid_anomaly_classifier_re_evaluation.md` | **100% STUCK_VALUE Precision, 100% Spike Recall** |
 | **Backend Integration Contract** | `ml/results/ml_backend_integration_validation.md` | **10 / 10 Checks PASS (ML Adapter Boundary)** |
+| **Backend Integration Readiness Audit**| `ml/results/backend_integration_readiness.md` | **8 / 8 Stages PASS (In-Process ML Smoke Test)** |
 | **Maitri Performance Benchmark** | `ml/results/maitri_inference_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Bharati Performance Benchmark**| `ml/results/bharati_ml_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Maitri Observability & Auditing**| `ml/results/maitri_observability_validation.json`| **12 / 12 Diagnostic Tests PASS** |
 | **Bharati Observability & Auditing**| `ml/results/bharati_ml_observability.json` | **13 / 13 Diagnostic Tests PASS** |
-| **Complete Pytest Regression Suite**| `ml/tests/` | **499 / 499 Tests PASS (100%)** |
+| **Complete Pytest Regression Suite**| `ml/tests/` | **509 / 509 Tests PASS (100%)** |
 
 > [!NOTE]
-> Backend integration contract validation exercises the full ML ingestion and emission adapter boundary (`adapt_backend_input`, `adapt_backend_output`, `process_backend_payload`). Live FastAPI endpoints, MQTT broker routing, and SQLite database persistence remain under the implementation ownership of Person A.
+> Backend integration readiness audit confirmed that the ML ingestion and emission adapter boundary (`adapt_backend_input`, `adapt_backend_output`, `process_backend_payload`) is 100% complete and validated. Live FastAPI endpoints, MQTT broker routing, SQLite database persistence, and WebSocket dispatch remain under the implementation ownership of Person A.
 
 ---
 

@@ -1,0 +1,177 @@
+{
+  "timestamp_utc": "2026-09-18T10:10:23.535018+00:00",
+  "step": 44,
+  "step_name": "Audit Actual Backend Readiness for ML Integration",
+  "smoke_test_summary": {
+    "total_stages": 8,
+    "passed_stages": 8,
+    "all_passed": true,
+    "stages": [
+      {
+        "stage": 1,
+        "name": "Schema Ingestion & Normalization",
+        "passed": true,
+        "latency_ms": 0.0329,
+        "details": "Validated dictionary and raw JSON parsing into typed TelemetryInput / BharatiTelemetryInput contracts."
+      },
+      {
+        "stage": 2,
+        "name": "Cold-Start Warmup Progression",
+        "passed": true,
+        "latency_ms": 0.677,
+        "details": "Confirmed steps 1..29 bypass neural inference and return INSUFFICIENT_DATA with null score."
+      },
+      {
+        "stage": 3,
+        "name": "Nominal Scored Inference",
+        "passed": true,
+        "latency_ms": 9.9061,
+        "details": "MTR score: 0.000259 (threshold=0.017674), BRT score: 0.000452 (threshold=0.013215307652775843)."
+      },
+      {
+        "stage": 4,
+        "name": "SPIKE Anomaly Classification",
+        "passed": true,
+        "latency_ms": 1.2687,
+        "details": "Verified sudden 60C shock jump triggers ANOMALY status and SPIKE classification on both stations."
+      },
+      {
+        "stage": 5,
+        "name": "DRIFT Ramp Anomaly Detection",
+        "passed": true,
+        "latency_ms": 1.4528,
+        "details": "MTR drift status: ANOMALY (DRIFT), BRT drift status: ANOMALY (DRIFT)."
+      },
+      {
+        "stage": 6,
+        "name": "STUCK_VALUE Detection & Recovery",
+        "passed": true,
+        "latency_ms": 41.6532,
+        "details": "Flatline STUCK_VALUE observed: (MTR=True, BRT=True), Recovery released stuck state: True."
+      },
+      {
+        "stage": 7,
+        "name": "MISSING_DATA Ingestion & Buffer Flush",
+        "passed": true,
+        "latency_ms": 0.6741,
+        "details": "MISSING quality returned MISSING_DATA and successfully flushed rolling buffer length from 30 to 0."
+      },
+      {
+        "stage": 8,
+        "name": "Multi-Sensor Stream Isolation & Output Schema",
+        "passed": true,
+        "latency_ms": 4.1158,
+        "details": "Verified individual sensor isolation (TEMP_001 anomaly does not bleed to PRESS_001) and all 11 canonical fields survive strict JSON serialization."
+      }
+    ]
+  },
+  "integration_readiness_matrix": [
+    {
+      "boundary": "Telemetry Schema Normalization",
+      "implementation": "FULLY IMPLEMENTED",
+      "testable": true,
+      "current_evidence": "ml/inference/maitri_backend_contract.py, ml/inference/bharati_backend_contract.py",
+      "owner": "Person C (ML) / Person A (Backend)",
+      "status": "VALIDATED",
+      "description": "JSON dict/str parsing, field validation, and finite float guarantees."
+    },
+    {
+      "boundary": "ML Inference Invocation",
+      "implementation": "FULLY IMPLEMENTED",
+      "testable": true,
+      "current_evidence": "MaitriMLService, BharatiMLService, process_backend_payload()",
+      "owner": "Person C (ML)",
+      "status": "VALIDATED",
+      "description": "Synchronous, thread-safe, stateful rolling buffer inference per sensor."
+    },
+    {
+      "boundary": "FastAPI HTTP Ingestion Endpoints",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No main.py or routers in branch Rex",
+      "owner": "Person A (Backend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "REST endpoints for simulator ingestion and REST queries."
+    },
+    {
+      "boundary": "MQTT Telemetry Ingestion",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No MQTT client or broker subscriber in branch Rex",
+      "owner": "Person A (Backend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "Live MQTT broker connection and topic fanout."
+    },
+    {
+      "boundary": "SQLite Persistence Layer",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No database schema or SQLite ORM in branch Rex",
+      "owner": "Person A (Backend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "Historical telemetry and anomaly event persistence."
+    },
+    {
+      "boundary": "EventBus Dispatcher",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No event bus dispatcher in branch Rex",
+      "owner": "Person A (Backend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "Internal asynchronous event distribution bus."
+    },
+    {
+      "boundary": "WebSocket Streaming",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No WebSocket router in branch Rex",
+      "owner": "Person A (Backend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "Real-time telemetry and anomaly broadcast to frontend."
+    },
+    {
+      "boundary": "Frontend 3D Digital Twin Consumption",
+      "implementation": "NOT IMPLEMENTED IN CURRENT BRANCH",
+      "testable": false,
+      "current_evidence": "No frontend components in branch Rex",
+      "owner": "Person B (Frontend)",
+      "status": "NOT IMPLEMENTED",
+      "description": "React / Three.js UI consumption of canonical ML payload."
+    }
+  ],
+  "ml_contract_specifications": {
+    "maitri": {
+      "station_id": "MTR",
+      "model_version": "lstm-ae-v1",
+      "supported_sensors": [
+        "HUM_001",
+        "POWER_001",
+        "PRESS_001",
+        "TEMP_001",
+        "VIB_001"
+      ],
+      "threshold": 0.017674,
+      "sequence_length": 30
+    },
+    "bharati": {
+      "station_id": "BRT",
+      "model_version": "lstm-ae-bharati-v1",
+      "supported_sensors": [
+        "BRT_HUM_001",
+        "BRT_POWER_001",
+        "BRT_PRESS_001",
+        "BRT_TEMP_001",
+        "BRT_VIB_001"
+      ],
+      "threshold": 0.013215307652775843,
+      "sequence_length": 30
+    }
+  },
+  "recommendations_for_person_a": [
+    "Import process_backend_payload from ml.inference.maitri_backend_contract (for MTR) and ml.inference.bharati_backend_contract (for BRT).",
+    "Instantiate MaitriMLService and BharatiMLService once as application-level singletons (e.g. in FastAPI lifespan/app state).",
+    "Route telemetry packets by station_id to the respective service instance.",
+    "Persist the 11 canonical fields emitted in the output dictionary directly to SQLite.",
+    "Broadcast the exact output dictionary over WebSockets to Person B's frontend."
+  ]
+}
