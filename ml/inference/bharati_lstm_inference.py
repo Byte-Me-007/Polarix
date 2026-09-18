@@ -37,6 +37,9 @@ if str(REPO_ROOT) not in sys.path:
 import numpy as np
 import torch
 
+from ml.inference.bharati_anomaly_type_classifier import (
+    BharatiAnomalyTypeClassifier,
+)
 from ml.inference.bharati_inference_contract import (
     DEFAULT_BHARATI_MODEL_VERSION,
     SUPPORTED_BHARATI_SENSORS,
@@ -119,6 +122,9 @@ class BharatiLSTMInference:
         self._buffers: Dict[Tuple[str, str], Deque[float]] = {}
         # Track last processed timestamp per (station_id, sensor_id)
         self._last_timestamps: Dict[Tuple[str, str], datetime] = {}
+
+        # 6. Anomaly Type Classifier
+        self.type_classifier = BharatiAnomalyTypeClassifier(min_window_len=self.config.seq_len)
 
     def _get_buffer(self, station_id: str, sensor_id: str) -> Deque[float]:
         key = (station_id, sensor_id)
@@ -228,6 +234,12 @@ class BharatiLSTMInference:
         # 4. Full Sequence Available -> Scored Inference
         window_arr = np.array(buffer, dtype=np.float32)
         score, status = self._score_window_array(input_obj.sensor_id, window_arr)
+        if status == "ANOMALY":
+            anomaly_type = self.type_classifier.classify(
+                window_arr, sensor_id=input_obj.sensor_id, is_known_anomaly=True
+            )
+        else:
+            anomaly_type = "NORMAL"
 
         return BharatiTelemetryOutput(
             station_id=input_obj.station_id,
@@ -239,6 +251,7 @@ class BharatiLSTMInference:
             source=input_obj.source,
             anomaly_score=score,
             anomaly_status=status,
+            anomaly_type=anomaly_type,
             model_version=self.model_version,
         )
 
@@ -300,6 +313,7 @@ class BharatiLSTMInference:
                 source=source,
                 anomaly_score=None,
                 anomaly_status="INSUFFICIENT_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
@@ -315,10 +329,17 @@ class BharatiLSTMInference:
                 source=source,
                 anomaly_score=None,
                 anomaly_status="MISSING_DATA",
+                anomaly_type=None,
                 model_version=self.model_version,
             )
 
         score, status = self._score_window_array(sensor_id, arr)
+        if status == "ANOMALY":
+            anomaly_type = self.type_classifier.classify(
+                arr, sensor_id=sensor_id, is_known_anomaly=True
+            )
+        else:
+            anomaly_type = "NORMAL"
 
         return BharatiTelemetryOutput(
             station_id=station_id,
@@ -330,6 +351,7 @@ class BharatiLSTMInference:
             source=source,
             anomaly_score=score,
             anomaly_status=status,
+            anomaly_type=anomaly_type,
             model_version=self.model_version,
         )
 

@@ -1,0 +1,107 @@
+{
+  "station_id": "BRT",
+  "station_name": "Bharati",
+  "model_version": "lstm-ae-bharati-v1",
+  "classifier_class": "BharatiAnomalyTypeClassifier",
+  "frozen_threshold": 0.013215307652775843,
+  "supported_anomaly_types": [
+    "NORMAL",
+    "SPIKE",
+    "DRIFT",
+    "STUCK_VALUE",
+    "UNKNOWN"
+  ],
+  "synthetic_disclaimer": "Evaluated strictly on synthetic Bharati telemetry dataset. Does not represent real Antarctic operational metrics.",
+  "overall_window_count": 9855,
+  "per_class_metrics": {
+    "NORMAL": {
+      "support": 9217,
+      "true_positives": 6194,
+      "false_positives": 0,
+      "false_negatives": 3023,
+      "precision": 1.0,
+      "recall": 0.672,
+      "f1_score": 0.8038
+    },
+    "SPIKE": {
+      "support": 41,
+      "true_positives": 41,
+      "false_positives": 934,
+      "false_negatives": 0,
+      "precision": 0.0421,
+      "recall": 1.0,
+      "f1_score": 0.0807
+    },
+    "DRIFT": {
+      "support": 300,
+      "true_positives": 146,
+      "false_positives": 1674,
+      "false_negatives": 154,
+      "precision": 0.0802,
+      "recall": 0.4867,
+      "f1_score": 0.1377
+    },
+    "STUCK_VALUE": {
+      "support": 240,
+      "true_positives": 180,
+      "false_positives": 180,
+      "false_negatives": 60,
+      "precision": 0.5,
+      "recall": 0.75,
+      "f1_score": 0.6
+    }
+  },
+  "missing_data_and_dropout_summary": {
+    "total_dropout_records": 57,
+    "handled_as_missing_data": 57,
+    "handling_rate": "100.0% (handled via missing-data rule)"
+  },
+  "unknown_rate_summary": {
+    "unknown_classification_count": 159,
+    "unknown_rate_percentage": 1.61
+  },
+  "crosstab_matrix": {
+    "DRIFT": {
+      "DRIFT": 146,
+      "DROPOUT": 0,
+      "NORMAL": 1672,
+      "SPIKE": 0,
+      "STUCK_VALUE": 2
+    },
+    "MISSING_DATA": {
+      "DRIFT": 0,
+      "DROPOUT": 57,
+      "NORMAL": 290,
+      "SPIKE": 0,
+      "STUCK_VALUE": 0
+    },
+    "NORMAL": {
+      "DRIFT": 0,
+      "DROPOUT": 0,
+      "NORMAL": 6194,
+      "SPIKE": 0,
+      "STUCK_VALUE": 0
+    },
+    "SPIKE": {
+      "DRIFT": 53,
+      "DROPOUT": 0,
+      "NORMAL": 881,
+      "SPIKE": 41,
+      "STUCK_VALUE": 0
+    },
+    "STUCK_VALUE": {
+      "DRIFT": 0,
+      "DROPOUT": 0,
+      "NORMAL": 180,
+      "SPIKE": 0,
+      "STUCK_VALUE": 180
+    },
+    "UNKNOWN": {
+      "DRIFT": 101,
+      "DROPOUT": 0,
+      "NORMAL": 0,
+      "SPIKE": 0,
+      "STUCK_VALUE": 58
+    }
+  }
+}

@@ -175,6 +175,15 @@ class BharatiTelemetryInput:
         return cls.from_dict(data)
 
 
+VALID_ANOMALY_TYPES: Set[str] = {
+    "NORMAL",
+    "SPIKE",
+    "DRIFT",
+    "STUCK_VALUE",
+    "UNKNOWN",
+}
+
+
 @dataclass(frozen=True)
 class BharatiTelemetryOutput:
     """
@@ -190,6 +199,7 @@ class BharatiTelemetryOutput:
     source: Optional[str]
     anomaly_score: Optional[float]
     anomaly_status: str
+    anomaly_type: Optional[str] = None
     model_version: str = DEFAULT_BHARATI_MODEL_VERSION
 
     def __post_init__(self) -> None:
@@ -210,6 +220,10 @@ class BharatiTelemetryOutput:
                 raise InvalidContractError(
                     f"anomaly_score must be None when status is '{self.anomaly_status}'."
                 )
+            if self.anomaly_type is not None:
+                raise InvalidContractError(
+                    f"anomaly_type must be None when status is '{self.anomaly_status}'."
+                )
         if self.anomaly_status in {"NORMAL", "ANOMALY"}:
             if self.anomaly_score is None:
                 raise InvalidContractError(
@@ -217,6 +231,11 @@ class BharatiTelemetryOutput:
                 )
             if not np.isfinite(self.anomaly_score):
                 raise InvalidContractError("anomaly_score must be a finite float.")
+
+        if self.anomaly_type is not None and self.anomaly_type not in VALID_ANOMALY_TYPES:
+            raise InvalidContractError(
+                f"Invalid anomaly_type '{self.anomaly_type}'. Valid types: {sorted(VALID_ANOMALY_TYPES)}"
+            )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert output contract to dictionary."""
@@ -255,6 +274,7 @@ class BharatiTelemetryOutput:
             source=data.get("source"),
             anomaly_score=data.get("anomaly_score"),
             anomaly_status=str(data.get("anomaly_status", "")),
+            anomaly_type=data.get("anomaly_type"),
             model_version=str(data.get("model_version", DEFAULT_BHARATI_MODEL_VERSION)),
         )
 
