@@ -16,7 +16,7 @@
     "description": "The Polarix ML pipeline is hybrid: LSTM reconstruction scoring provides anomaly detection/scoring, deterministic downstream classification identifies anomaly types where supported, and explicit missing-data handling covers dropout/offline telemetry.",
     "anomaly_scoring_layer": "PyTorch LSTM Autoencoder sequence reconstruction loss (MSE)",
     "type_classification_layer": "Deterministic post-processing heuristics (Spike, Drift, Stuck Value, Unknown)",
-    "missing_data_layer": "Structural input validation & buffer flush on non-GOOD or non-finite telemetry"
+    "missing_data_layer": "Structural input validation & buffer flush on non-GOOD, non-finite, or missing telemetry"
   },
   "station_specifications": {
     "MTR": {
@@ -45,7 +45,14 @@
         "BRT_VIB_001",
         "BRT_POWER_001"
       ],
-      "steps_completed": "Steps 23\u201336 \u2014 Bharati ML + Handoff Complete"
+      "steps_completed": "Steps 23\u201336 \u2014 Bharati ML + Handoff Complete",
+      "subsequent_refinement_and_audit_steps": [
+        "Step 38 \u2014 performance analysis and C3 calibration candidate",
+        "Step 39 \u2014 sign-off documentation correction",
+        "Step 40 \u2014 STUCK_VALUE classifier strengthening",
+        "Step 41 \u2014 hybrid classifier re-evaluation",
+        "Step 42 \u2014 final readiness audit"
+      ]
     }
   },
   "frozen_artifact_integrity": {
@@ -162,7 +169,7 @@
     "files": {
       "ml/results/maitri_ml_evaluation_report.json": {
         "exists": true,
-        "size_bytes": 12720
+        "size_bytes": 12719
       },
       "ml/results/maitri_ml_evaluation_report.md": {
         "exists": true,
@@ -170,11 +177,11 @@
       },
       "ml/results/bharati_final_evaluation.json": {
         "exists": true,
-        "size_bytes": 15510
+        "size_bytes": 15534
       },
       "ml/results/bharati_final_evaluation.md": {
         "exists": true,
-        "size_bytes": 7449
+        "size_bytes": 7452
       },
       "ml/results/maitri_end_to_end_validation.json": {
         "exists": true,
@@ -219,6 +226,22 @@
       "ml/results/ml_handoff_contract.json": {
         "exists": true,
         "size_bytes": 9953
+      },
+      "ml/results/bharati_lstm_performance_analysis.json": {
+        "exists": true,
+        "size_bytes": 8889
+      },
+      "ml/results/stuck_value_classifier_analysis.json": {
+        "exists": true,
+        "size_bytes": 4516
+      },
+      "ml/results/hybrid_anomaly_classifier_re_evaluation.json": {
+        "exists": true,
+        "size_bytes": 24020
+      },
+      "ml/results/hybrid_anomaly_classifier_re_evaluation.md": {
+        "exists": true,
+        "size_bytes": 7897
       }
     }
   },

@@ -52,6 +52,7 @@ All ML components adhere to a clean, modular repository layout without extraneou
 | Sequence Length | 30 observations | Verified |
 | Supported Sensors | `BRT_TEMP_001`, `BRT_PRESS_001`, `BRT_HUM_001`, `BRT_VIB_001`, `BRT_POWER_001` | Verified (5/5) |
 | Completed Steps | Steps 23–36 — Bharati ML + Handoff Complete | Verified |
+| Refinements & Audits | Steps 38–42 (Refinements, Re-Evaluation & Final Readiness) | Verified |
 
 ---
 

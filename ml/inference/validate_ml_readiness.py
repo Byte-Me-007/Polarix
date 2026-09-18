@@ -79,6 +79,10 @@ REQUIRED_RESULT_FILES = [
     "ml/results/maitri_inference_performance.json",
     "ml/results/bharati_ml_performance.json",
     "ml/results/ml_handoff_contract.json",
+    "ml/results/bharati_lstm_performance_analysis.json",
+    "ml/results/stuck_value_classifier_analysis.json",
+    "ml/results/hybrid_anomaly_classifier_re_evaluation.json",
+    "ml/results/hybrid_anomaly_classifier_re_evaluation.md",
 ]
 
 
@@ -231,7 +235,7 @@ def run_full_readiness_audit() -> Dict[str, Any]:
             ),
             "anomaly_scoring_layer": "PyTorch LSTM Autoencoder sequence reconstruction loss (MSE)",
             "type_classification_layer": "Deterministic post-processing heuristics (Spike, Drift, Stuck Value, Unknown)",
-            "missing_data_layer": "Structural input validation & buffer flush on non-GOOD or non-finite telemetry",
+            "missing_data_layer": "Structural input validation & buffer flush on non-GOOD, non-finite, or missing telemetry",
         },
         "station_specifications": {
             "MTR": {
@@ -249,6 +253,13 @@ def run_full_readiness_audit() -> Dict[str, Any]:
                 "sequence_length": 30,
                 "sensors": ["BRT_TEMP_001", "BRT_PRESS_001", "BRT_HUM_001", "BRT_VIB_001", "BRT_POWER_001"],
                 "steps_completed": "Steps 23–36 — Bharati ML + Handoff Complete",
+                "subsequent_refinement_and_audit_steps": [
+                    "Step 38 — performance analysis and C3 calibration candidate",
+                    "Step 39 — sign-off documentation correction",
+                    "Step 40 — STUCK_VALUE classifier strengthening",
+                    "Step 41 — hybrid classifier re-evaluation",
+                    "Step 42 — final readiness audit",
+                ],
             },
         },
         "frozen_artifact_integrity": {
@@ -349,6 +360,7 @@ def generate_markdown_report(audit_data: Dict[str, Any]) -> str:
     md.append("| Sequence Length | 30 observations | Verified |")
     md.append("| Supported Sensors | `BRT_TEMP_001`, `BRT_PRESS_001`, `BRT_HUM_001`, `BRT_VIB_001`, `BRT_POWER_001` | Verified (5/5) |")
     md.append("| Completed Steps | Steps 23–36 — Bharati ML + Handoff Complete | Verified |")
+    md.append("| Refinements & Audits | Steps 38–42 (Refinements, Re-Evaluation & Final Readiness) | Verified |")
     md.append("")
     md.append("---")
     md.append("")

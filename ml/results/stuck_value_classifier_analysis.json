@@ -50,7 +50,7 @@
     }
   },
   "frozen_artifact_status": {
-    "statement": "All 8 frozen neural network models, scalers, configs, and decision thresholds remain 100% untouched and cryptographically verified.",
+    "statement": "All 8 frozen ML artifacts — 2 models, 2 configs, 2 scalers, and 2 decision thresholds — remain 100% untouched and cryptographically verified.",
     "models_retrained": false,
     "thresholds_changed": false
   }

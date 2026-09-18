@@ -315,17 +315,18 @@ All artifacts are frozen and validated against SHA-256 integrity manifests:
 
 ## 14. Validation Evidence & Test Coverage
 
-The complete ML subsystem is backed by **439 automated unit and regression tests** across 36 development steps:
+The complete ML subsystem is backed by **470+ automated unit and regression tests** across development and refinement steps (Steps 1–42):
 
 | Verification Scope | Result File | Status |
 | :--- | :--- | :---: |
 | **Maitri Scenario Evaluation** | `ml/results/maitri_ml_evaluation_report.md` | **11 / 11 Scenarios PASS** |
 | **Bharati Scenario Evaluation** | `ml/results/bharati_final_evaluation.md` | **12 / 12 Scenarios PASS** |
+| **Hybrid Classifier Re-Evaluation** | `ml/results/hybrid_anomaly_classifier_re_evaluation.md` | **100% STUCK_VALUE Precision, 100% Spike Recall** |
 | **Maitri Performance Benchmark** | `ml/results/maitri_inference_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Bharati Performance Benchmark**| `ml/results/bharati_ml_performance.json` | **~0.40 ms P50 Scored Latency** |
 | **Maitri Observability & Auditing**| `ml/results/maitri_observability_validation.json`| **12 / 12 Diagnostic Tests PASS** |
 | **Bharati Observability & Auditing**| `ml/results/bharati_ml_observability.json` | **13 / 13 Diagnostic Tests PASS** |
-| **Complete Pytest Regression Suite**| `ml/tests/` | **439 / 439 Tests PASS (100%)** |
+| **Complete Pytest Regression Suite**| `ml/tests/` | **ALL Tests PASS (100%)** |
 
 ---
 
@@ -334,8 +335,9 @@ The complete ML subsystem is backed by **439 automated unit and regression tests
 1. **Synthetic Telemetry Only**: All datasets and benchmarks are generated synthetically. No historical Antarctic operational telemetry was available.
 2. **Academic Prototype Scope**: This ML system represents an engineering prototype for SIH 2026 and does not claim field-certified production SLAs.
 3. **Reconstruction False-Positive Rate**: The LSTM autoencoder operates at a ~50% false-positive rate on synthetic diurnal variations to maximize temporal sensitivity.
-4. **In-Memory Buffers**: State resets to empty upon process restart.
-5. **Anomaly Score Interpretation**: `anomaly_score` is a raw MSE loss metric, not a calibrated Bayesian probability.
+4. **STUCK_VALUE / Flatline Reconstruction Limitation**: STUCK_VALUE/flatline conditions may produce low reconstruction error on neural autoencoders; the downstream deterministic classifier identifies flatlines independently.
+5. **In-Memory Buffers**: State resets to empty upon process restart.
+6. **Anomaly Score Interpretation**: `anomaly_score` is a raw MSE loss metric, not a calibrated Bayesian probability.
 
 ---
 
@@ -344,7 +346,7 @@ The complete ML subsystem is backed by **439 automated unit and regression tests
 To independently verify the complete ML package from a clean shell:
 
 ```bash
-# 1. Run all unit and regression tests (439 tests)
+# 1. Run all unit and regression tests
 .venv/bin/python -m pytest ml/tests -q
 
 # 2. Run Maitri final scenario evaluation
@@ -352,6 +354,9 @@ To independently verify the complete ML package from a clean shell:
 
 # 3. Run Bharati final scenario evaluation
 .venv/bin/python ml/inference/validate_bharati_final_evaluation.py
+
+# 4. Run hybrid anomaly classifier re-evaluation
+.venv/bin/python ml/training/evaluate_hybrid_anomaly_classifier.py
 
 # 4. Run performance latency benchmarks
 .venv/bin/python ml/inference/benchmark_bharati_performance.py
