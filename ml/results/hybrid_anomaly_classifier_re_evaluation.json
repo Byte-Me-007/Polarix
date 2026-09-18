@@ -1,0 +1,821 @@
+{
+  "metadata": {
+    "report_title": "Polarix Hybrid Anomaly Classifier Re-Evaluation Report",
+    "step": "Step 41",
+    "evaluation_timestamp": "2026-09-18T06:38:50.258605+00:00",
+    "synthetic_disclaimer": "All benchmarks, evaluations, and metrics are derived strictly from synthetic Antarctic telemetry datasets. No real Antarctic station sensor telemetry was used. These results demonstrate mathematical operating characteristics on synthetic signals and do NOT claim real-world Antarctic field validation, guaranteed anomaly detection, or production SLAs.",
+    "frozen_artifacts_statement": "All 8 frozen ML model weights, scalers, configs, and decision thresholds remain strictly frozen and unmodified with SHA-256 cryptographic hashes verified."
+  },
+  "stations": {
+    "BRT": {
+      "station_id": "BRT",
+      "dataset": "ml/data/bharati_synthetic_telemetry.csv",
+      "model_version": "lstm-ae-bharati-v1",
+      "frozen_threshold": 0.013215307652775843,
+      "total_records": 10000,
+      "total_evaluated_windows": 9855,
+      "overall": {
+        "total_evaluated": 9855,
+        "class_metrics": {
+          "NORMAL": {
+            "support": 9217,
+            "true_positives": 5971,
+            "false_positives": 71,
+            "false_negatives": 3246,
+            "precision": 0.9882,
+            "recall": 0.6478,
+            "f1_score": 0.7826
+          },
+          "SPIKE": {
+            "support": 41,
+            "true_positives": 41,
+            "false_positives": 710,
+            "false_negatives": 0,
+            "precision": 0.0546,
+            "recall": 1.0,
+            "f1_score": 0.1035
+          },
+          "DRIFT": {
+            "support": 300,
+            "true_positives": 141,
+            "false_positives": 64,
+            "false_negatives": 159,
+            "precision": 0.6878,
+            "recall": 0.47,
+            "f1_score": 0.5584
+          },
+          "STUCK_VALUE": {
+            "support": 240,
+            "true_positives": 180,
+            "false_positives": 0,
+            "false_negatives": 60,
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1_score": 0.8571
+          }
+        },
+        "confusion_matrix": {
+          "NORMAL": {
+            "NORMAL": 5971,
+            "SPIKE": 660,
+            "DRIFT": 64,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 2232,
+            "MISSING_DATA": 290
+          },
+          "SPIKE": {
+            "NORMAL": 0,
+            "SPIKE": 41,
+            "DRIFT": 0,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 0,
+            "MISSING_DATA": 0
+          },
+          "DRIFT": {
+            "NORMAL": 30,
+            "SPIKE": 50,
+            "DRIFT": 141,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 79,
+            "MISSING_DATA": 0
+          },
+          "STUCK_VALUE": {
+            "NORMAL": 41,
+            "SPIKE": 0,
+            "DRIFT": 0,
+            "STUCK_VALUE": 180,
+            "UNKNOWN": 19,
+            "MISSING_DATA": 0
+          },
+          "DROPOUT": {
+            "NORMAL": 0,
+            "SPIKE": 0,
+            "DRIFT": 0,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 0,
+            "MISSING_DATA": 57
+          }
+        },
+        "dropout_handling": {
+          "support": 57,
+          "handled_as_missing_data": 57,
+          "handling_rate": 1.0
+        },
+        "unknown_rate": {
+          "count": 2330,
+          "rate": 0.2364,
+          "percentage": 23.64
+        }
+      },
+      "splits": {
+        "train": {
+          "total_evaluated": 6855,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 6855,
+              "true_positives": 4861,
+              "false_positives": 0,
+              "false_negatives": 1994,
+              "precision": 1.0,
+              "recall": 0.7091,
+              "f1_score": 0.8298
+            },
+            "SPIKE": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 68,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            },
+            "DRIFT": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 54,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            },
+            "STUCK_VALUE": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 4861,
+              "SPIKE": 68,
+              "DRIFT": 54,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 1872,
+              "MISSING_DATA": 0
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            }
+          },
+          "dropout_handling": {
+            "support": 0,
+            "handled_as_missing_data": 0,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 1872,
+            "rate": 0.2731,
+            "percentage": 27.31
+          }
+        },
+        "val": {
+          "total_evaluated": 1500,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 1179,
+              "true_positives": 565,
+              "false_positives": 34,
+              "false_negatives": 614,
+              "precision": 0.9432,
+              "recall": 0.4792,
+              "f1_score": 0.6355
+            },
+            "SPIKE": {
+              "support": 22,
+              "true_positives": 22,
+              "false_positives": 291,
+              "false_negatives": 0,
+              "precision": 0.0703,
+              "recall": 1.0,
+              "f1_score": 0.1313
+            },
+            "DRIFT": {
+              "support": 150,
+              "true_positives": 109,
+              "false_positives": 7,
+              "false_negatives": 41,
+              "precision": 0.9397,
+              "recall": 0.7267,
+              "f1_score": 0.8195
+            },
+            "STUCK_VALUE": {
+              "support": 120,
+              "true_positives": 90,
+              "false_positives": 0,
+              "false_negatives": 30,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1_score": 0.8571
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 565,
+              "SPIKE": 291,
+              "DRIFT": 7,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 171,
+              "MISSING_DATA": 145
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 22,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 12,
+              "SPIKE": 0,
+              "DRIFT": 109,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 29,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 22,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 90,
+              "UNKNOWN": 8,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 29
+            }
+          },
+          "dropout_handling": {
+            "support": 29,
+            "handled_as_missing_data": 29,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 208,
+            "rate": 0.1387,
+            "percentage": 13.87
+          }
+        },
+        "test": {
+          "total_evaluated": 1500,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 1183,
+              "true_positives": 545,
+              "false_positives": 37,
+              "false_negatives": 638,
+              "precision": 0.9364,
+              "recall": 0.4607,
+              "f1_score": 0.6176
+            },
+            "SPIKE": {
+              "support": 19,
+              "true_positives": 19,
+              "false_positives": 351,
+              "false_negatives": 0,
+              "precision": 0.0514,
+              "recall": 1.0,
+              "f1_score": 0.0977
+            },
+            "DRIFT": {
+              "support": 150,
+              "true_positives": 32,
+              "false_positives": 3,
+              "false_negatives": 118,
+              "precision": 0.9143,
+              "recall": 0.2133,
+              "f1_score": 0.3459
+            },
+            "STUCK_VALUE": {
+              "support": 120,
+              "true_positives": 90,
+              "false_positives": 0,
+              "false_negatives": 30,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1_score": 0.8571
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 545,
+              "SPIKE": 301,
+              "DRIFT": 3,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 189,
+              "MISSING_DATA": 145
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 19,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 18,
+              "SPIKE": 50,
+              "DRIFT": 32,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 50,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 19,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 90,
+              "UNKNOWN": 11,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 28
+            }
+          },
+          "dropout_handling": {
+            "support": 28,
+            "handled_as_missing_data": 28,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 250,
+            "rate": 0.1667,
+            "percentage": 16.67
+          }
+        }
+      }
+    },
+    "MTR": {
+      "station_id": "MTR",
+      "dataset": "ml/data/maitri_synthetic_telemetry.csv",
+      "model_version": "lstm-ae-v1",
+      "frozen_threshold": 0.017674,
+      "total_records": 10000,
+      "total_evaluated_windows": 9855,
+      "overall": {
+        "total_evaluated": 9855,
+        "class_metrics": {
+          "NORMAL": {
+            "support": 9217,
+            "true_positives": 6391,
+            "false_positives": 89,
+            "false_negatives": 2826,
+            "precision": 0.9863,
+            "recall": 0.6934,
+            "f1_score": 0.8143
+          },
+          "SPIKE": {
+            "support": 41,
+            "true_positives": 41,
+            "false_positives": 712,
+            "false_negatives": 0,
+            "precision": 0.0544,
+            "recall": 1.0,
+            "f1_score": 0.1033
+          },
+          "DRIFT": {
+            "support": 300,
+            "true_positives": 95,
+            "false_positives": 6,
+            "false_negatives": 205,
+            "precision": 0.9406,
+            "recall": 0.3167,
+            "f1_score": 0.4738
+          },
+          "STUCK_VALUE": {
+            "support": 240,
+            "true_positives": 180,
+            "false_positives": 0,
+            "false_negatives": 60,
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1_score": 0.8571
+          }
+        },
+        "confusion_matrix": {
+          "NORMAL": {
+            "NORMAL": 6391,
+            "SPIKE": 653,
+            "DRIFT": 6,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 1877,
+            "MISSING_DATA": 290
+          },
+          "SPIKE": {
+            "NORMAL": 0,
+            "SPIKE": 41,
+            "DRIFT": 0,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 0,
+            "MISSING_DATA": 0
+          },
+          "DRIFT": {
+            "NORMAL": 41,
+            "SPIKE": 59,
+            "DRIFT": 95,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 105,
+            "MISSING_DATA": 0
+          },
+          "STUCK_VALUE": {
+            "NORMAL": 48,
+            "SPIKE": 0,
+            "DRIFT": 0,
+            "STUCK_VALUE": 180,
+            "UNKNOWN": 12,
+            "MISSING_DATA": 0
+          },
+          "DROPOUT": {
+            "NORMAL": 0,
+            "SPIKE": 0,
+            "DRIFT": 0,
+            "STUCK_VALUE": 0,
+            "UNKNOWN": 0,
+            "MISSING_DATA": 57
+          }
+        },
+        "dropout_handling": {
+          "support": 57,
+          "handled_as_missing_data": 57,
+          "handling_rate": 1.0
+        },
+        "unknown_rate": {
+          "count": 1994,
+          "rate": 0.2023,
+          "percentage": 20.23
+        }
+      },
+      "splits": {
+        "train": {
+          "total_evaluated": 6855,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 6855,
+              "true_positives": 5210,
+              "false_positives": 0,
+              "false_negatives": 1645,
+              "precision": 1.0,
+              "recall": 0.76,
+              "f1_score": 0.8637
+            },
+            "SPIKE": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 70,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            },
+            "DRIFT": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 1,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            },
+            "STUCK_VALUE": {
+              "support": 0,
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1_score": 0.0
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 5210,
+              "SPIKE": 70,
+              "DRIFT": 1,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 1574,
+              "MISSING_DATA": 0
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            }
+          },
+          "dropout_handling": {
+            "support": 0,
+            "handled_as_missing_data": 0,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 1574,
+            "rate": 0.2296,
+            "percentage": 22.96
+          }
+        },
+        "val": {
+          "total_evaluated": 1500,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 1179,
+              "true_positives": 602,
+              "false_positives": 42,
+              "false_negatives": 577,
+              "precision": 0.9348,
+              "recall": 0.5106,
+              "f1_score": 0.6604
+            },
+            "SPIKE": {
+              "support": 22,
+              "true_positives": 22,
+              "false_positives": 301,
+              "false_negatives": 0,
+              "precision": 0.0681,
+              "recall": 1.0,
+              "f1_score": 0.1275
+            },
+            "DRIFT": {
+              "support": 150,
+              "true_positives": 68,
+              "false_positives": 1,
+              "false_negatives": 82,
+              "precision": 0.9855,
+              "recall": 0.4533,
+              "f1_score": 0.621
+            },
+            "STUCK_VALUE": {
+              "support": 120,
+              "true_positives": 90,
+              "false_positives": 0,
+              "false_negatives": 30,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1_score": 0.8571
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 602,
+              "SPIKE": 291,
+              "DRIFT": 1,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 140,
+              "MISSING_DATA": 145
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 22,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 18,
+              "SPIKE": 10,
+              "DRIFT": 68,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 54,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 24,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 90,
+              "UNKNOWN": 6,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 29
+            }
+          },
+          "dropout_handling": {
+            "support": 29,
+            "handled_as_missing_data": 29,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 200,
+            "rate": 0.1333,
+            "percentage": 13.33
+          }
+        },
+        "test": {
+          "total_evaluated": 1500,
+          "class_metrics": {
+            "NORMAL": {
+              "support": 1183,
+              "true_positives": 579,
+              "false_positives": 47,
+              "false_negatives": 604,
+              "precision": 0.9249,
+              "recall": 0.4894,
+              "f1_score": 0.6401
+            },
+            "SPIKE": {
+              "support": 19,
+              "true_positives": 19,
+              "false_positives": 341,
+              "false_negatives": 0,
+              "precision": 0.0528,
+              "recall": 1.0,
+              "f1_score": 0.1003
+            },
+            "DRIFT": {
+              "support": 150,
+              "true_positives": 27,
+              "false_positives": 4,
+              "false_negatives": 123,
+              "precision": 0.871,
+              "recall": 0.18,
+              "f1_score": 0.2983
+            },
+            "STUCK_VALUE": {
+              "support": 120,
+              "true_positives": 90,
+              "false_positives": 0,
+              "false_negatives": 30,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1_score": 0.8571
+            }
+          },
+          "confusion_matrix": {
+            "NORMAL": {
+              "NORMAL": 579,
+              "SPIKE": 292,
+              "DRIFT": 4,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 163,
+              "MISSING_DATA": 145
+            },
+            "SPIKE": {
+              "NORMAL": 0,
+              "SPIKE": 19,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 0
+            },
+            "DRIFT": {
+              "NORMAL": 23,
+              "SPIKE": 49,
+              "DRIFT": 27,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 51,
+              "MISSING_DATA": 0
+            },
+            "STUCK_VALUE": {
+              "NORMAL": 24,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 90,
+              "UNKNOWN": 6,
+              "MISSING_DATA": 0
+            },
+            "DROPOUT": {
+              "NORMAL": 0,
+              "SPIKE": 0,
+              "DRIFT": 0,
+              "STUCK_VALUE": 0,
+              "UNKNOWN": 0,
+              "MISSING_DATA": 28
+            }
+          },
+          "dropout_handling": {
+            "support": 28,
+            "handled_as_missing_data": 28,
+            "handling_rate": 1.0
+          },
+          "unknown_rate": {
+            "count": 220,
+            "rate": 0.1467,
+            "percentage": 14.67
+          }
+        }
+      }
+    }
+  },
+  "stuck_value_comparison": {
+    "description": "Comparison of STUCK_VALUE classification before and after Step 40 tail-flatline rule update.",
+    "bharati": {
+      "pre_step_40": {
+        "support": 240,
+        "true_positives": 180,
+        "false_positives": 180,
+        "false_negatives": 60,
+        "precision": 0.5,
+        "recall": 0.75,
+        "f1_score": 0.6,
+        "root_cause_of_fp": "Classifier flagged historical flatlines in window during recovery after normal telemetry resumed."
+      },
+      "post_step_40": {
+        "support": 240,
+        "true_positives": 180,
+        "false_positives": 0,
+        "false_negatives": 60,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1_score": 0.8571,
+        "improvement": "180 recovery false positives eliminated (FP 180 -> 0); precision improved 50.00% -> 100.00%; F1 improved 0.6000 -> 0.8571."
+      }
+    },
+    "maitri": {
+      "post_step_40": {
+        "support": 240,
+        "true_positives": 180,
+        "false_positives": 0,
+        "false_negatives": 60,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1_score": 0.8571
+      }
+    }
+  },
+  "hybrid_pipeline_division_of_labor": {
+    "lstm_reconstruction_scoring": "Continuous sequence reconstruction error (MSE) evaluated against the frozen threshold (BRT: 0.013215, MTR: 0.017674) to produce binary anomaly status (NORMAL vs ANOMALY).",
+    "deterministic_anomaly_type_classification": "Post-scoring rule engine analyzing explainable signal features (variance, tail runs, first difference jumps, slopes, correlation) to assign archetypes (SPIKE, DRIFT, STUCK_VALUE, UNKNOWN).",
+    "explicit_missing_data_handling": "Null, non-finite (NaN/inf), or BAD quality telemetry is routed directly to MISSING_DATA upstream, safely resetting sequence buffers."
+  },
+  "limitations": [
+    "Synthetic data distribution: Evaluated on synthetic diurnal patterns and injected synthetic anomaly archetypes.",
+    "Cold-start buffer requirement: 30 consecutive observations required before scored inference begins (first 29 yield INSUFFICIENT_DATA).",
+    "Stationary vs dynamic flatline: Detects constant frozen sensor telemetry; naturally low variance normal signals with minor fluctuation are preserved as NORMAL."
+  ]
+}

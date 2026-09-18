@@ -5,7 +5,7 @@
     "station_name": "Bharati",
     "model_version": "lstm-ae-bharati-v1",
     "threshold": 0.013215307652775843,
-    "evaluation_timestamp": "2026-09-18T06:02:29.695919+00:00",
+    "evaluation_timestamp": "2026-09-18T06:39:48.907888+00:00",
     "overall_scenario_status": "PASSED",
     "total_scenarios_evaluated": 12,
     "passed_scenarios": 12
@@ -30,7 +30,7 @@
       "pass_fail_criterion": "All 5 sensors complete 30-step warmup and produce scored NORMAL status with MSE <= threshold.",
       "passed": true,
       "notes_and_limitations": "Evaluated on stationary baseline telemetry with normal synthetic variance.",
-      "processing_time_ms": 11.609
+      "processing_time_ms": 13.2847
     },
     {
       "scenario": "SPIKE",
@@ -47,7 +47,7 @@
       "pass_fail_criterion": "anomaly_status == 'ANOMALY', anomaly_score > threshold, and anomaly_type == 'SPIKE'.",
       "passed": true,
       "notes_and_limitations": "Isolated transient extreme spike reliably detected by both LSTM autoencoder and heuristic classifier.",
-      "processing_time_ms": 0.7859
+      "processing_time_ms": 0.8123
     },
     {
       "scenario": "DRIFT",
@@ -64,7 +64,7 @@
       "pass_fail_criterion": "anomaly_status == 'ANOMALY' and anomaly_type in {'DRIFT', 'UNKNOWN'}.",
       "passed": true,
       "notes_and_limitations": "Demonstrates temporal memory advantage over static baseline which adapts trailing mean.",
-      "processing_time_ms": 0.6959
+      "processing_time_ms": 0.8057
     },
     {
       "scenario": "STUCK_VALUE",
@@ -81,7 +81,7 @@
       "pass_fail_criterion": "Contract executes successfully and anomaly_status in {'NORMAL', 'ANOMALY'}.",
       "passed": true,
       "notes_and_limitations": "Mid-range flatlines produce low autoencoder reconstruction loss; classification relies on secondary variance heuristics.",
-      "processing_time_ms": 0.5333
+      "processing_time_ms": 0.5573
     },
     {
       "scenario": "DROPOUT_MISSING_DATA",
@@ -98,7 +98,7 @@
       "pass_fail_criterion": "anomaly_status == 'MISSING_DATA', anomaly_score is None, and buffer length resets to 0.",
       "passed": true,
       "notes_and_limitations": "Prevents corrupted, discontinuous windows from poisoning downstream LSTM evaluations.",
-      "processing_time_ms": 0.0053
+      "processing_time_ms": 0.0051
     },
     {
       "scenario": "INSUFFICIENT_DATA",
@@ -115,7 +115,7 @@
       "pass_fail_criterion": "anomaly_status == 'INSUFFICIENT_DATA', anomaly_score is None, and buffer length == 1.",
       "passed": true,
       "notes_and_limitations": "Model forward pass is completely bypassed until sequence buffer is full.",
-      "processing_time_ms": 0.0057
+      "processing_time_ms": 0.0054
     },
     {
       "scenario": "DUPLICATE_TELEMETRY",
@@ -132,7 +132,7 @@
       "pass_fail_criterion": "DuplicateTelemetryError raised, buffer preserved at 1, and diagnostic event == 'DUPLICATE'.",
       "passed": true,
       "notes_and_limitations": "Guarantees chronological uniqueness across all sensor streams.",
-      "processing_time_ms": 0.0078
+      "processing_time_ms": 0.007
     },
     {
       "scenario": "STALE_TELEMETRY",
@@ -149,7 +149,7 @@
       "pass_fail_criterion": "StaleTelemetryError raised, buffer preserved at 1, and diagnostic event == 'STALE'.",
       "passed": true,
       "notes_and_limitations": "Protects temporal LSTM sequence ordering against network transport reordering.",
-      "processing_time_ms": 0.0063
+      "processing_time_ms": 0.0061
     },
     {
       "scenario": "INVALID_INPUT",
@@ -167,7 +167,7 @@
       "pass_fail_criterion": "UnsupportedStationError & UnsupportedSensorError raised; NaN value routed to MISSING_DATA with null score.",
       "passed": true,
       "notes_and_limitations": "Comprehensive guardrails protect pipeline boundary against malformed backend traffic.",
-      "processing_time_ms": 0.0232
+      "processing_time_ms": 0.0226
     },
     {
       "scenario": "MULTI_SENSOR_ISOLATION",
@@ -188,7 +188,7 @@
       "pass_fail_criterion": "Buffers exactly match input counts (TEMP=30, PRESS=30, HUM=20, VIB=10, POWER=5).",
       "passed": true,
       "notes_and_limitations": "Ensures concurrent sensor stream safety in multi-threaded or asynchronous orchestrators.",
-      "processing_time_ms": 1.1696
+      "processing_time_ms": 1.1778
     },
     {
       "scenario": "RECOVERY_AFTER_MISSING_DATA",
@@ -205,7 +205,7 @@
       "pass_fail_criterion": "Post-dropout warmup returns INSUFFICIENT_DATA, 30th resumed point returns NORMAL with buffer=30.",
       "passed": true,
       "notes_and_limitations": "Verifies state machine recovery lifecycle without manual service re-instantiation.",
-      "processing_time_ms": 1.0814
+      "processing_time_ms": 1.0279
     },
     {
       "scenario": "REPEATED_DETERMINISTIC_RUN",
@@ -222,7 +222,7 @@
       "pass_fail_criterion": "100% agreement across all 34 sequence steps between service instance 1 and instance 2.",
       "passed": true,
       "notes_and_limitations": "Demonstrates pure deterministic execution without random initialization or non-deterministic inference states.",
-      "processing_time_ms": 4.672
+      "processing_time_ms": 4.6525
     }
   ],
   "quantitative_evaluation": {
@@ -295,31 +295,31 @@
     "anomaly_type_classifier_synthetic_eval": {
       "NORMAL": {
         "support": 9217,
-        "tp": 6194,
-        "precision": 1.0,
-        "recall": 0.672,
-        "f1": 0.8038
+        "tp": 5971,
+        "precision": 0.9882,
+        "recall": 0.6478,
+        "f1": 0.7826
       },
       "SPIKE": {
         "support": 41,
         "tp": 41,
-        "precision": 0.0421,
+        "precision": 0.0546,
         "recall": 1.0,
-        "f1": 0.0807
+        "f1": 0.1035
       },
       "DRIFT": {
         "support": 300,
-        "tp": 146,
-        "precision": 0.0802,
-        "recall": 0.4867,
-        "f1": 0.1377
+        "tp": 141,
+        "precision": 0.6878,
+        "recall": 0.47,
+        "f1": 0.5584
       },
       "STUCK_VALUE": {
         "support": 240,
         "tp": 180,
-        "precision": 0.5,
+        "precision": 1.0,
         "recall": 0.75,
-        "f1": 0.6
+        "f1": 0.8571
       },
       "DROPOUT": {
         "support": 57,
@@ -329,14 +329,14 @@
         "f1": 1.0
       },
       "UNKNOWN_windows": {
-        "count": 159,
-        "percentage": 1.61
+        "count": 2330,
+        "percentage": 23.64
       }
     },
     "comparative_tradeoff_summary": [
       "Z-Score Baseline: High precision (71.67%) and very low false alarm rate (1.44%), but low recall (13.56%) due to rolling mean adaptation during gradual drift.",
       "LSTM Autoencoder: High temporal sensitivity and strong recall (57.09% overall; 100% on sharp spikes, 48.7% on drifts), but higher false alarm rate (50.50%) on synthetic diurnal cycles.",
-      "Heuristic Classifier: Isolates stuck values (75% recall) and missing telemetry (100% recall) via dedicated feature rules where reconstruction loss is uninformative."
+      "Heuristic Classifier: Isolates stuck values (100% precision, 75% recall) and missing telemetry (100% recall) via dedicated feature rules where reconstruction loss is uninformative."
     ]
   },
   "limitations": {

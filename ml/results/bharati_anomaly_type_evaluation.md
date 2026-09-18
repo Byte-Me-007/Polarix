@@ -5,7 +5,7 @@
 **Underlying Model Version:** `lstm-ae-bharati-v1`  
 **Decision Threshold:** `0.013215307652775843`  
 **Window Length:** `30` observations  
-**Status:** VALIDATED & INTEGRATED WITH INFERENCE SERVICE  
+**Status:** VALIDATED & INTEGRATED WITH INFERENCE SERVICE (Re-evaluated after Step 40 STUCK_VALUE refinement)  
 
 ---
 
@@ -35,16 +35,16 @@ The `BharatiAnomalyTypeClassifier` serves as an interpretable, deterministic pos
 
 *Evaluated across 9,855 sequential 30-step windows in `ml/data/bharati_synthetic_telemetry.csv`:*
 
-| Anomaly Class | Support (Windows) | True Positives | Precision | Recall | F1-Score | Detection & Characteristic Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`NORMAL`** | 9,217 | 6,194 | `1.0000` | `0.6720` | `0.8038` | When LSTM flags NORMAL, guaranteed 100% precision. |
-| **`SPIKE`** | 41 | 41 | `0.0421` | `1.0000` | `0.0807` | **100% recall** on high-magnitude sudden jumps. |
-| **`DRIFT`** | 300 | 146 | `0.0802` | `0.4867` | `0.1377` | Captures steady monotonic ramps; early steps classify as SPIKE/UNKNOWN. |
-| **`STUCK_VALUE`** | 240 | 180 | `0.5000` | `0.7500` | `0.6000` | **75% recall** on frozen sensor flatlines. |
+| Anomaly Class | Support (Windows) | True Positives | False Positives | False Negatives | Precision | Recall | F1-Score | Detection & Characteristic Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`NORMAL`** | 9,217 | 5,971 | 71 | 3,246 | `0.9882` | `0.6478` | `0.7826` | High precision; normal non-anomalous telemetry correctly classified. |
+| **`SPIKE`** | 41 | 41 | 710 | 0 | `0.0546` | `1.0000` | `0.1035` | **100% recall** on high-magnitude sudden jumps. |
+| **`DRIFT`** | 300 | 141 | 64 | 159 | `0.6878` | `0.4700` | `0.5584` | Captures steady monotonic ramps with high directional slope consistency. |
+| **`STUCK_VALUE`** | 240 | 180 | 0 | 60 | `1.0000` | `0.7500` | `0.8571` | **100% precision and 75% recall** on frozen sensor flatlines (0 recovery false alarms). |
 
 ### Summary on DROPOUT & UNKNOWN Rates:
 - **`DROPOUT` Handling:** 57 / 57 instances (100.0%) correctly routed to `MISSING_DATA` ingestion handler.
-- **`UNKNOWN` Attribution:** 159 windows (1.61% of total evaluated sequences) classified as `UNKNOWN` when multi-modal noise prevented confident archetype attribution.
+- **`UNKNOWN` Attribution:** 2,330 windows (23.64% of total evaluated sequences) classified as `UNKNOWN` when multi-modal noise or unclassified diurnal shifts prevented confident archetype attribution.
 
 ---
 

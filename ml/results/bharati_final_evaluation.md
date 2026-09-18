@@ -3,7 +3,7 @@
 **Smart India Hackathon 2026 — Team Byte Me_26 (Team ID: 143760)**  
 **Role:** Person C — Machine Learning Specialist (Step 35)  
 **Station Scope:** Bharati (`BRT`)  
-**Evaluation Timestamp:** 2026-09-18T06:02:29.695919+00:00  
+**Evaluation Timestamp:** 2026-09-18T06:39:48.907888+00:00  
 **Model Version:** `lstm-ae-bharati-v1` | **Frozen Threshold:** `0.013215307652775843`  
 
 ---
@@ -64,12 +64,12 @@ The table below presents side-by-side quantitative performance on the untouched 
 
 | Anomaly Type | Support Windows | True Positives | Precision | Recall | F1-Score |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `NORMAL` | 9,217 | 6,194 | 1.0000 | 0.6720 | 0.8038 |
-| `SPIKE` | 41 | 41 | 0.0421 | 1.0000 | 0.0807 |
-| `DRIFT` | 300 | 146 | 0.0802 | 0.4867 | 0.1377 |
-| `STUCK_VALUE` | 240 | 180 | 0.5000 | 0.7500 | 0.6000 |
+| `NORMAL` | 9,217 | 5,971 | 0.9882 | 0.6478 | 0.7826 |
+| `SPIKE` | 41 | 41 | 0.0546 | 1.0000 | 0.1035 |
+| `DRIFT` | 300 | 141 | 0.6878 | 0.4700 | 0.5584 |
+| `STUCK_VALUE` | 240 | 180 | 1.0000 | 0.7500 | 0.8571 |
 | `DROPOUT` | 57 | 57 | 1.0000 | 1.0000 | 1.0000 |
-| `UNKNOWN` | 159 (1.61%) | — | — | — | — |
+| `UNKNOWN` | 2,330 (23.64%) | — | — | — | — |
 
 ---
 

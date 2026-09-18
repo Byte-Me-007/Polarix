@@ -557,17 +557,17 @@ def run_scenario_evaluation(save_artifacts: bool = True) -> Dict[str, Any]:
             },
         },
         "anomaly_type_classifier_synthetic_eval": {
-            "NORMAL": {"support": 9217, "tp": 6194, "precision": 1.0000, "recall": 0.6720, "f1": 0.8038},
-            "SPIKE": {"support": 41, "tp": 41, "precision": 0.0421, "recall": 1.0000, "f1": 0.0807},
-            "DRIFT": {"support": 300, "tp": 146, "precision": 0.0802, "recall": 0.4867, "f1": 0.1377},
-            "STUCK_VALUE": {"support": 240, "tp": 180, "precision": 0.5000, "recall": 0.7500, "f1": 0.6000},
+            "NORMAL": {"support": 9217, "tp": 5971, "precision": 0.9882, "recall": 0.6478, "f1": 0.7826},
+            "SPIKE": {"support": 41, "tp": 41, "precision": 0.0546, "recall": 1.0000, "f1": 0.1035},
+            "DRIFT": {"support": 300, "tp": 141, "precision": 0.6878, "recall": 0.4700, "f1": 0.5584},
+            "STUCK_VALUE": {"support": 240, "tp": 180, "precision": 1.0000, "recall": 0.7500, "f1": 0.8571},
             "DROPOUT": {"support": 57, "tp": 57, "precision": 1.0000, "recall": 1.0000, "f1": 1.0000},
-            "UNKNOWN_windows": {"count": 159, "percentage": 1.61},
+            "UNKNOWN_windows": {"count": 2330, "percentage": 23.64},
         },
         "comparative_tradeoff_summary": [
             "Z-Score Baseline: High precision (71.67%) and very low false alarm rate (1.44%), but low recall (13.56%) due to rolling mean adaptation during gradual drift.",
             "LSTM Autoencoder: High temporal sensitivity and strong recall (57.09% overall; 100% on sharp spikes, 48.7% on drifts), but higher false alarm rate (50.50%) on synthetic diurnal cycles.",
-            "Heuristic Classifier: Isolates stuck values (75% recall) and missing telemetry (100% recall) via dedicated feature rules where reconstruction loss is uninformative.",
+            "Heuristic Classifier: Isolates stuck values (100% precision, 75% recall) and missing telemetry (100% recall) via dedicated feature rules where reconstruction loss is uninformative.",
         ],
     }
 
@@ -663,12 +663,12 @@ def run_scenario_evaluation(save_artifacts: bool = True) -> Dict[str, Any]:
             f.write("## 4. Anomaly-Type Classification Performance (Sequential Windows)\n\n")
             f.write("| Anomaly Type | Support Windows | True Positives | Precision | Recall | F1-Score |\n")
             f.write("| :--- | :---: | :---: | :---: | :---: | :---: |\n")
-            f.write("| `NORMAL` | 9,217 | 6,194 | 1.0000 | 0.6720 | 0.8038 |\n")
-            f.write("| `SPIKE` | 41 | 41 | 0.0421 | 1.0000 | 0.0807 |\n")
-            f.write("| `DRIFT` | 300 | 146 | 0.0802 | 0.4867 | 0.1377 |\n")
-            f.write("| `STUCK_VALUE` | 240 | 180 | 0.5000 | 0.7500 | 0.6000 |\n")
+            f.write("| `NORMAL` | 9,217 | 5,971 | 0.9882 | 0.6478 | 0.7826 |\n")
+            f.write("| `SPIKE` | 41 | 41 | 0.0546 | 1.0000 | 0.1035 |\n")
+            f.write("| `DRIFT` | 300 | 141 | 0.6878 | 0.4700 | 0.5584 |\n")
+            f.write("| `STUCK_VALUE` | 240 | 180 | 1.0000 | 0.7500 | 0.8571 |\n")
             f.write("| `DROPOUT` | 57 | 57 | 1.0000 | 1.0000 | 1.0000 |\n")
-            f.write("| `UNKNOWN` | 159 (1.61%) | — | — | — | — |\n\n")
+            f.write("| `UNKNOWN` | 2,330 (23.64%) | — | — | — | — |\n\n")
 
             f.write("---\n\n")
 
