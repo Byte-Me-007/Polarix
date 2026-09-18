@@ -24,7 +24,8 @@ export const Energy = () => {
     activeStation,
     telemetry,
     activeAlerts,
-    scenario
+    scenario,
+    thresholds
   } = useStationTelemetry();
 
   const navigate = useNavigate();
@@ -210,6 +211,7 @@ export const Energy = () => {
           remainingHours={batteryRuntime}
           health={batteryHealth}
           cycles={batteryCycles}
+          batteryLowThreshold={thresholds?.batteryLowPct ?? 45}
         />
 
         <FuelReserveCard

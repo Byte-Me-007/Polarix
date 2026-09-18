@@ -23,6 +23,7 @@ export const useMissionReadiness = () => {
     activeAlerts = [],
     activeStation,
     activeScenario,
+    thresholds,
     config
   } = useStationTelemetry();
 
@@ -50,15 +51,21 @@ export const useMissionReadiness = () => {
     let powerReason = 'Microgrid generation & battery bank nominal';
     let powerRating = 95; // For meter bar
 
+    const batteryLowThreshold = thresholds?.batteryLowPct ?? 45;
     const batteryPct = typeof battery.percentage === 'number' ? battery.percentage : null;
     const batteryState = String(battery.state || '').toUpperCase();
-    const isCriticalDischarge = batteryState.includes('CRITICAL') || (batteryPct !== null && batteryPct < 45);
+    const isCriticalDischarge = batteryState.includes('CRITICAL') || (batteryPct !== null && batteryPct < batteryLowThreshold);
     const isDischarging = batteryState.includes('DISCHARGING');
     const generatorTripped = power.dieselGeneration !== undefined && parseFloat(power.dieselGeneration) === 0 && (activeScenario === 'POWER_CRISIS');
 
-    // Check if generator vibration sensor is critical
+    // Check if generator vibration sensor is critical or exceeds threshold
+    const genVibCritThreshold = thresholds?.generatorVibrationCrit ?? 4.8;
     const genVibrationSensor = sensors.find(s => s.id === 'ENG-MTR-002' || (s.type === 'VIBRATION' && s.zone === 'GENERATOR'));
-    const isGenVibrating = genVibrationSensor && (genVibrationSensor.status === 'CRITICAL' || (genVibrationSensor.anomalyScore || 0) > 0.85);
+    const isGenVibrating = genVibrationSensor && (
+      genVibrationSensor.status === 'CRITICAL' ||
+      (typeof genVibrationSensor.value === 'number' && genVibrationSensor.value >= genVibCritThreshold) ||
+      (genVibrationSensor.anomalyScore || 0) > 0.85
+    );
 
     if (isCriticalDischarge) {
       powerStatus = 'CRITICAL';
@@ -223,8 +230,10 @@ export const useMissionReadiness = () => {
 
     const fuelLevel = typeof fuel.currentLevel === 'number' ? fuel.currentLevel : 64;
     const remainingDays = typeof fuel.remainingDays === 'number' ? fuel.remainingDays : 18;
+    const fuelCritLimit = thresholds?.fuelReserveCriticalDays ?? 10;
+    const fuelLowLimit = thresholds?.fuelReserveDays ?? 20;
 
-    if (fuelLevel < 25 || remainingDays < 10) {
+    if (fuelLevel < 25 || remainingDays < fuelCritLimit) {
       suppliesStatus = 'CRITICAL';
       suppliesRating = 25;
       suppliesReason = `Fuel reserves critical (${fuelLevel}% / ${remainingDays} days)`;
@@ -239,7 +248,7 @@ export const useMissionReadiness = () => {
         twinZone: 'STORAGE',
         sensorId: 'LOG-MTR-001'
       });
-    } else if (fuelLevel < 40 || remainingDays < 20) {
+    } else if (fuelLevel < 40 || remainingDays < fuelLowLimit) {
       suppliesStatus = 'LOW';
       suppliesRating = 55;
       suppliesReason = `Fuel below operational threshold (${fuelLevel}% / ${remainingDays} days)`;
@@ -486,5 +495,5 @@ export const useMissionReadiness = () => {
       unackCriticalCount: unackCriticalAlerts.length,
       unackWarningCount: unackWarningAlerts.length
     };
-  }, [telemetry, sensors, allAlerts, activeStation, activeScenario, config]);
+  }, [telemetry, sensors, allAlerts, activeStation, activeScenario, thresholds, config]);
 };

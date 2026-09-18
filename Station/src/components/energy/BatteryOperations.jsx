@@ -12,9 +12,10 @@ export const BatteryOperations = ({
   current = '+38.4 A',
   remainingHours = '38.5 hrs',
   health = '98.2%',
-  cycles = 1420
+  cycles = 1420,
+  batteryLowThreshold = 45
 }) => {
-  const isCrit = batterySoc <= 45 || batteryState.includes('CRITICAL');
+  const isCrit = batterySoc <= batteryLowThreshold || batteryState.includes('CRITICAL');
   const isWarn = batterySoc <= 60 && !isCrit;
   const isCharging = batteryState.includes('CHARGING');
   const isDischarging = batteryState.includes('DISCHARGING');

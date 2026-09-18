@@ -21,6 +21,13 @@ export const useStationTelemetry = () => {
     acknowledgeAlert: station.acknowledgeAlert,
     scenario: station.activeScenario,
     setScenario: station.setScenario,
+    thresholds: station.thresholds,
+    updateThreshold: station.updateThreshold,
+    updateThresholds: station.updateThresholds,
+    resetThresholds: station.resetThresholds,
+    resetStationState: station.resetStationState,
+    demoModeEnabled: station.demoModeEnabled,
+    setDemoModeEnabled: station.setDemoModeEnabled,
     lastUpdated: station.lastUpdated,
     refresh: station.refreshTelemetry,
     isOnline: station.telemetry.connectivity?.status === 'ONLINE'

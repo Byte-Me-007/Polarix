@@ -8464,3 +8464,581 @@ body {
   background: var(--polaris-border-subtle);
 }
 
+/* ==========================================================================
+   SETTINGS — MISSION CONTROL CONFIGURATION CONSOLE
+   Restrained scientific Polaris aesthetic — warm neutral, graphite, copper
+   ========================================================================== */
+
+.settings-viewport {
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 2rem 2rem 5rem;
+}
+
+.settings-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--polaris-border);
+  padding-bottom: 1.5rem;
+}
+
+.settings-kicker-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.settings-kicker-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--polaris-text-muted);
+}
+
+.settings-env-badge {
+  font-family: var(--font-mono);
+  font-size: 0.5875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid;
+}
+
+.settings-env-badge.badge-demo {
+  background: #fdf6ec;
+  border-color: rgba(178, 104, 20, 0.35);
+  color: #9c580c;
+}
+
+.settings-env-badge.badge-live {
+  background: #f0f6f2;
+  border-color: rgba(63, 110, 74, 0.35);
+  color: #2e5b38;
+}
+
+.settings-title {
+  font-family: var(--font-sans);
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--polaris-text-primary);
+  margin: 0 0 0.4rem 0;
+}
+
+.settings-subtitle {
+  font-size: 0.8125rem;
+  color: var(--polaris-text-secondary);
+  margin: 0;
+  max-width: 780px;
+  line-height: 1.45;
+}
+
+.settings-reset-all-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--polaris-text-primary);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.settings-reset-all-btn:hover {
+  background: var(--polaris-border-subtle);
+  border-color: var(--polaris-border-strong);
+}
+
+.settings-feedback-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: #edf6ef;
+  border: 1px solid rgba(63, 110, 74, 0.3);
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #24572f;
+  margin-bottom: 1.5rem;
+  animation: readiness-fadein 0.2s ease-out;
+}
+
+.feedback-check {
+  font-weight: 800;
+}
+
+/* Settings Grid */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-card {
+  background: var(--polaris-bg-surface);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-subtle);
+  overflow: hidden;
+}
+
+.settings-card-header {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-subtle);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.settings-card-desc {
+  font-size: 0.75rem;
+  color: var(--polaris-text-muted);
+}
+
+.settings-status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.settings-status-pill.pill-normal,
+.settings-status-pill.pill-online {
+  background: #f0f6f2;
+  border-color: rgba(63, 110, 74, 0.3);
+  color: #2e5b38;
+}
+
+.settings-status-pill.pill-demo,
+.settings-status-pill.pill-degraded {
+  background: #fdf6ec;
+  border-color: rgba(178, 104, 20, 0.35);
+  color: #9c580c;
+}
+
+.settings-status-pill.pill-offline {
+  background: #fbeeed;
+  border-color: rgba(181, 56, 43, 0.4);
+  color: #9e271c;
+}
+
+.settings-card-body {
+  padding: 1.5rem;
+}
+
+/* Station Switcher */
+.settings-station-selector-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+}
+
+.settings-field-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--polaris-text-muted);
+}
+
+.settings-field-sub {
+  font-size: 0.725rem;
+  color: var(--polaris-text-muted);
+  margin: 0.15rem 0 0 0;
+}
+
+.settings-station-pills {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.settings-station-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--polaris-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.settings-station-pill:hover {
+  border-color: var(--polaris-border-strong);
+  background: var(--polaris-bg-surface);
+}
+
+.settings-station-pill.active {
+  background: var(--polaris-bg-surface);
+  border-color: var(--polaris-copper);
+  color: var(--polaris-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.pill-flag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Specs Table */
+.settings-specs-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.spec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-xs);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border-subtle);
+  font-size: 0.75rem;
+}
+
+.spec-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--polaris-text-muted);
+}
+
+.spec-val {
+  color: var(--polaris-text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tag-inline-demo {
+  font-size: 0.625rem;
+  padding: 0.1rem 0.35rem;
+  background: #fdf6ec;
+  border: 1px solid rgba(178, 104, 20, 0.3);
+  border-radius: 2px;
+  color: #9c580c;
+}
+
+.tag-inline-live {
+  font-size: 0.625rem;
+  padding: 0.1rem 0.35rem;
+  background: #f0f6f2;
+  border: 1px solid rgba(63, 110, 74, 0.3);
+  border-radius: 2px;
+  color: #2e5b38;
+}
+
+/* Thresholds Inputs Grid */
+.thresholds-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.threshold-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border-subtle);
+  border-radius: var(--radius-xs);
+}
+
+.field-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.field-name {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--polaris-text-primary);
+}
+
+.field-unit {
+  font-family: var(--font-mono);
+  font-size: 0.5875rem;
+  color: var(--polaris-text-muted);
+}
+
+.field-input-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.4rem 2.25rem 0.4rem 0.6rem;
+  border-radius: 2px;
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-surface);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--polaris-text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field-input:focus {
+  border-color: var(--polaris-copper);
+}
+
+.field-input-adornment {
+  position: absolute;
+  right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--polaris-text-muted);
+  pointer-events: none;
+}
+
+.field-hint {
+  font-size: 0.625rem;
+  color: var(--polaris-text-muted);
+  line-height: 1.3;
+}
+
+.thresholds-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--polaris-border);
+  flex-wrap: wrap;
+}
+
+.footer-persistence-note {
+  font-size: 0.625rem;
+  color: var(--polaris-text-muted);
+}
+
+.thresholds-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.btn-form-secondary {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--polaris-text-secondary);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  padding: 0.45rem 0.85rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-form-secondary:hover {
+  background: var(--polaris-border-subtle);
+  color: var(--polaris-text-primary);
+}
+
+.btn-form-primary {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--polaris-copper);
+  border: 1px solid var(--polaris-copper);
+  padding: 0.45rem 1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-form-primary:hover {
+  background: #9c4b17;
+  border-color: #9c4b17;
+}
+
+/* Secure Deployment Box */
+.settings-secure-box {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-left: 3px solid var(--polaris-copper);
+  border-radius: var(--radius-xs);
+}
+
+.secure-box-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.secure-icon {
+  font-size: 0.85rem;
+}
+
+.secure-title {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--polaris-copper);
+}
+
+.secure-desc {
+  font-size: 0.725rem;
+  color: var(--polaris-text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Demo Mode Section */
+.settings-demo-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--polaris-border-subtle);
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.settings-toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--polaris-border);
+  background: var(--polaris-bg-subtle);
+  color: var(--polaris-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.settings-toggle-btn.active {
+  background: #fdf6ec;
+  border-color: rgba(178, 104, 20, 0.4);
+  color: #9c580c;
+}
+
+.settings-scenario-controls-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.scenario-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.65rem;
+}
+
+.scenario-choice-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.scenario-choice-btn:hover {
+  background: var(--polaris-bg-surface);
+  border-color: var(--polaris-border-strong);
+}
+
+.scenario-choice-btn.active {
+  background: var(--polaris-bg-surface);
+  border-color: var(--polaris-copper);
+  box-shadow: 0 1px 4px rgba(182, 90, 31, 0.15);
+}
+
+.scenario-btn-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--polaris-text-primary);
+}
+
+.scenario-btn-desc {
+  font-size: 0.625rem;
+  color: var(--polaris-text-muted);
+}
+
+.scenario-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-scenario-action {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--polaris-text-primary);
+  background: var(--polaris-bg-subtle);
+  border: 1px solid var(--polaris-border);
+  padding: 0.4rem 0.75rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-scenario-action:hover {
+  background: var(--polaris-border-subtle);
+  border-color: var(--polaris-border-strong);
+}
+
+

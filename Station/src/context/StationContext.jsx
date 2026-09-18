@@ -1,12 +1,30 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { STATIONS, BASE_TELEMETRY, INITIAL_ALERTS, DEMO_SCENARIOS } from '../data/stationData';
 
+export const DEFAULT_THRESHOLDS = {
+  batteryLowPct: 45,             // % SOC critical threshold
+  batteryWarnPct: 70,            // % SOC warning threshold
+  fuelReserveDays: 20,           // Days: low operational threshold
+  fuelReserveCriticalDays: 10,   // Days: critical reserve threshold
+  generatorVibrationWarn: 3.5,   // mm/s warning threshold
+  generatorVibrationCrit: 4.8,   // mm/s emergency threshold
+  tempWarningC: -30.0,           // °C exterior warning threshold
+  tempCriticalC: -45.0,          // °C exterior critical threshold
+  sensorTimeoutSec: 180,         // Sec telemetry timeout threshold
+  minBatterySocPct: 20,          // % absolute BMS safety floor
+  maxBatterySocPct: 95,          // % charge absorption cutoff
+  criticalLoadKw: 65.0,          // kW priority life-support load
+  renewableContributionPct: 30   // % minimum renewable target mix
+};
+
 const StationContext = createContext(null);
 
 export const StationProvider = ({ children }) => {
   const [activeStation, setActiveStation] = useState('MAITRI');
   const [activeScenario, setActiveScenario] = useState('NORMAL');
   const [alerts, setAlerts] = useState(INITIAL_ALERTS);
+  const [thresholds, setThresholds] = useState(DEFAULT_THRESHOLDS);
+  const [demoModeEnabled, setDemoModeEnabled] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Clock tick to keep timestamp fresh every 10 seconds
@@ -248,6 +266,36 @@ export const StationProvider = ({ children }) => {
     }
   };
 
+  const updateThreshold = (key, val) => {
+    setThresholds((prev) => ({
+      ...prev,
+      [key]: Number(val)
+    }));
+    setLastUpdated(new Date());
+  };
+
+  const updateThresholds = (newObj) => {
+    setThresholds((prev) => ({
+      ...prev,
+      ...newObj
+    }));
+    setLastUpdated(new Date());
+  };
+
+  const resetThresholds = () => {
+    setThresholds(DEFAULT_THRESHOLDS);
+    setLastUpdated(new Date());
+  };
+
+  const resetStationState = () => {
+    setActiveScenario('NORMAL');
+    setSensorManualOverrides({});
+    setThresholds(DEFAULT_THRESHOLDS);
+    setAcknowledgedAlertIds(new Set());
+    setAlerts(INITIAL_ALERTS);
+    setLastUpdated(new Date());
+  };
+
   const value = {
     activeStation,
     setActiveStation: handleStationChange,
@@ -263,6 +311,13 @@ export const StationProvider = ({ children }) => {
     acknowledgeAlert,
     activeScenario,
     setScenario: applyScenario,
+    thresholds,
+    updateThreshold,
+    updateThresholds,
+    resetThresholds,
+    resetStationState,
+    demoModeEnabled,
+    setDemoModeEnabled,
     lastUpdated,
     refreshTelemetry: () => setLastUpdated(new Date())
   };

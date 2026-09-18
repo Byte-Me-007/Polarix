@@ -9,6 +9,7 @@ import { Alerts } from './pages/Alerts';
 import { Energy } from './pages/Energy';
 import { Logistics } from './pages/Logistics';
 import { Events } from './pages/Events';
+import { Settings } from './pages/Settings';
 import { ModulePlaceholder } from './pages/ModulePlaceholder';
 import './styles/dashboard.css';
 
@@ -26,7 +27,7 @@ export function App() {
             <Route path="/logistics" element={<Logistics />} />
             <Route path="/sensors" element={<Sensors />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/settings" element={<ModulePlaceholder />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
