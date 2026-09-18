@@ -211,10 +211,39 @@ A deterministic time-series telemetry generator designed for Antarctic station r
 
 ### Programmatic Usage:
 ```python
-from maitri.simulator import generate_telemetry_batch
+from maitri.simulator import generate_telemetry_batch, publish_simulated_telemetry
 
 # Generate a storm telemetry batch for Maitri
 batch = generate_telemetry_batch("MTR", scenario="STORM", step=0)
+
+# Publish batch to MQTT broker topic antarctic/MTR/telemetry
+published = publish_simulated_telemetry("MTR", scenario="STORM", step=0, client=mqtt_client)
 ```
+
+## MQTT Telemetry Ingestion & Publishing
+
+Antarctic station telemetry can be published by simulators or field devices and ingested directly by the backend via MQTT.
+
+### Topic Format
+- `antarctic/{station_id}/telemetry`
+  - Examples:
+    - `antarctic/MTR/telemetry` (Maitri station telemetry)
+    - `antarctic/BHR/telemetry` (Bharati station telemetry)
+
+### MQTT Broker Configuration
+Configurable via environment variables or `.env`:
+- `MQTT_BROKER_HOST` (Default: `localhost`)
+- `MQTT_BROKER_PORT` (Default: `1883`)
+- `MQTT_TOPIC_PREFIX` (Default: `antarctic`)
+
+### Ingestion Flow & Validations
+Backend MQTT ingestion (`ingest_mqtt_telemetry`):
+1. **Station Validation**: Verifies station code extracted from topic or payload exists in SQLite DB.
+2. **Sensor Validation**: Verifies sensor code exists and belongs to the specified station.
+3. **Storage**: Persists telemetry records with source `MQTT` or `SIMULATOR`.
+4. **Alerts**: Automatically creates:
+   - `HIGH` severity `SENSOR_FAULT` alert on `BAD` quality telemetry.
+   - `CRITICAL` severity `SENSOR_OFFLINE` alert on `OFFLINE` quality telemetry.
+
 
 

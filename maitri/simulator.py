@@ -1,3 +1,4 @@
+import json
 import math
 from datetime import datetime, timezone
 from typing import Any
@@ -259,3 +260,64 @@ def generate_telemetry_batch(
         batch.append(record)
 
     return batch
+
+
+def serialize_telemetry_payload(record: dict[str, Any]) -> str:
+    """Serialize a telemetry record dict to a JSON string with ISO timestamps."""
+    data = dict(record)
+    if isinstance(data.get("timestamp"), datetime):
+        data["timestamp"] = data["timestamp"].isoformat()
+    return json.dumps(data)
+
+
+def publish_simulated_telemetry(
+    station_code: str,
+    scenario: str = "NORMAL_DAY",
+    step: int = 0,
+    timestamp: datetime | None = None,
+    client: Any = None,
+    broker_host: str | None = None,
+    broker_port: int | None = None,
+    topic_prefix: str | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Generates telemetry batch for a station under a given scenario,
+    and publishes each record to the MQTT topic 'antarctic/{station_code}/telemetry'.
+    Returns the list of generated payload dictionaries.
+    """
+    from maitri.services.mqtt_service import build_station_telemetry_topic
+
+    topic = build_station_telemetry_topic(station_code, prefix=topic_prefix)
+    batch = generate_telemetry_batch(
+        station_code=station_code,
+        scenario=scenario,
+        step=step,
+        timestamp=timestamp,
+    )
+
+    if client is not None:
+        for record in batch:
+            payload_str = serialize_telemetry_payload(record)
+            client.publish(topic, payload_str)
+    elif broker_host is not None:
+        try:
+            import paho.mqtt.client as paho_mqtt
+            port = broker_port or 1883
+            try:
+                mqtt_client = paho_mqtt.Client(
+                    paho_mqtt.CallbackAPIVersion.VERSION2
+                )
+            except AttributeError:
+                mqtt_client = paho_mqtt.Client()
+            mqtt_client.connect(broker_host, port, 60)
+            for record in batch:
+                payload_str = serialize_telemetry_payload(record)
+                mqtt_client.publish(topic, payload_str)
+            mqtt_client.disconnect()
+        except Exception as exc:
+            raise ConnectionError(
+                f"Failed to publish to MQTT broker {broker_host}:{broker_port}: {exc}"
+            ) from exc
+
+    return batch
+

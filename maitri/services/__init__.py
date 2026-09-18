@@ -14,7 +14,13 @@ from maitri.services.device_service import (
     list_devices,
 )
 from maitri.services.energy_service import get_station_energy_optimization
-from maitri.services.mqtt_service import parse_sensor_message
+from maitri.services.mqtt_service import (
+    build_station_telemetry_topic,
+    ingest_mqtt_telemetry,
+    parse_sensor_message,
+    parse_station_telemetry_topic,
+    parse_telemetry_message,
+)
 from maitri.services.resource_service import (
     calculate_resource_forecast,
     create_resource,
@@ -41,7 +47,12 @@ from maitri.services.telemetry_service import (
     get_telemetry_by_station,
 )
 from maitri.services.websocket_manager import ConnectionManager, manager
-from maitri.simulator import generate_telemetry_batch, get_supported_scenarios
+from maitri.simulator import (
+    generate_telemetry_batch,
+    get_supported_scenarios,
+    publish_simulated_telemetry,
+    serialize_telemetry_payload,
+)
 
 __all__ = [
     "acknowledge_alert",
@@ -56,6 +67,10 @@ __all__ = [
     "create_sensor_reading",
     "list_sensor_readings",
     "parse_sensor_message",
+    "build_station_telemetry_topic",
+    "parse_station_telemetry_topic",
+    "parse_telemetry_message",
+    "ingest_mqtt_telemetry",
     "ConnectionManager",
     "manager",
     "list_stations",
@@ -76,7 +91,10 @@ __all__ = [
     "get_station_energy_optimization",
     "generate_telemetry_batch",
     "get_supported_scenarios",
+    "publish_simulated_telemetry",
+    "serialize_telemetry_payload",
 ]
+
 
 
 
