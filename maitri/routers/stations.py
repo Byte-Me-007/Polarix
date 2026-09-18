@@ -3,10 +3,13 @@ from sqlalchemy.orm import Session
 
 from maitri.database import get_db
 from maitri.schemas.alert import AlertResponse
+from maitri.schemas.energy import EnergyOptimizationResponse
+
 from maitri.schemas.resource import ResourceForecastResponse, ResourceResponse
 from maitri.schemas.station import SensorResponse, StationResponse
 from maitri.schemas.telemetry import TelemetryResponse
 from maitri.services.alert_service import list_alerts_by_station
+from maitri.services.energy_service import get_station_energy_optimization
 from maitri.services.resource_service import (
     get_station_resources_forecast,
     list_resources_by_station,
@@ -131,6 +134,26 @@ def get_station_resources_forecast_route(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
         )
+
+
+@router.get(
+    "/{station_id}/energy/optimization",
+    response_model=EnergyOptimizationResponse,
+)
+def get_station_energy_optimization_route(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        return get_station_energy_optimization(
+            db, station_id_or_code=station_id
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
 
 
 

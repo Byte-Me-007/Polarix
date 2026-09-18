@@ -7,6 +7,7 @@ from maitri.schemas.alert import (
     AlertStatus,
 )
 from maitri.schemas.device import DeviceBase, DeviceCreate, DeviceResponse
+from maitri.schemas.energy import EnergyOptimizationResponse
 from maitri.schemas.resource import (
     ResourceBase,
     ResourceCreate,
@@ -41,6 +42,7 @@ __all__ = [
     "DeviceBase",
     "DeviceCreate",
     "DeviceResponse",
+    "EnergyOptimizationResponse",
     "ResourceBase",
     "ResourceCreate",
     "ResourceUpdate",
@@ -62,5 +64,6 @@ __all__ = [
     "TelemetryCreate",
     "TelemetryResponse",
 ]
+
 
 

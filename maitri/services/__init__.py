@@ -13,6 +13,7 @@ from maitri.services.device_service import (
     get_device_by_id,
     list_devices,
 )
+from maitri.services.energy_service import get_station_energy_optimization
 from maitri.services.mqtt_service import parse_sensor_message
 from maitri.services.resource_service import (
     calculate_resource_forecast,
@@ -71,7 +72,9 @@ __all__ = [
     "calculate_resource_forecast",
     "get_resource_forecast",
     "get_station_resources_forecast",
+    "get_station_energy_optimization",
 ]
+
 
 
 

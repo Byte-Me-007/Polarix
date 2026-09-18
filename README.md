@@ -163,3 +163,37 @@ Risk Levels:
 - **`WARNING`**: Estimated days remaining $\le$ 7 days (or reserve $\le$ 25%).
 - **`LOW`**: Estimated days remaining $\le$ 14 days (or reserve $\le$ 40%).
 - **`NORMAL`**: Estimated days remaining $>$ 14 days.
+
+## Station Energy Optimization Endpoints
+
+Generates deterministic station-level recommendations for generator load, battery reserve buffers, and renewable solar prioritization:
+
+- **Get Station Energy Optimization Recommendations:**
+  `GET /stations/{station_id}/energy/optimization` (e.g. `GET /stations/MTR/energy/optimization`)
+
+Example Response:
+```json
+{
+  "station_id": 1,
+  "current_energy_status": "OPTIMAL",
+  "risk_level": "NORMAL",
+  "recommended_mode": "STANDARD_BALANCED",
+  "actions": [
+    "Maintain standard dual-generator load-sharing profile",
+    "Float charge battery storage banks at nominal maintenance voltage",
+    "Maintain nominal baseline power distribution across all station sectors"
+  ],
+  "reason": "Energy reserves operating within nominal Antarctic parameters: Diesel reserve at 75.0% (128.6 days remaining), Battery storage at 85.0%.",
+  "diesel_reserve_pct": 75.0,
+  "battery_reserve_pct": 85.0,
+  "solar_output_kw": 0.0,
+  "estimated_diesel_days": 128.6
+}
+```
+
+Recommended Modes:
+- **`STANDARD_BALANCED`**: Nominal baseline generator load and battery maintenance.
+- **`SOLAR_PRIORITY`**: High renewable solar available; throttles generator to standby and prioritizes battery storage charging.
+- **`FUEL_CONSERVATION`**: Sub-nominal diesel buffer; sheds non-essential HVAC/lab loads and reduces generator base load.
+- **`POWER_CRISIS_MINIMAL`**: Critical fuel/battery depletion; activates life-support-only power shedding.
+
