@@ -17,8 +17,9 @@ Design Principles:
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Set, Union
 
 import numpy as np
@@ -77,7 +78,7 @@ class StaleTelemetryError(InvalidContractError):
 
 def parse_iso_timestamp(ts: str) -> datetime:
     """
-    Parse an ISO-8601 formatted timestamp string into a datetime object.
+    Parse an ISO-8601 formatted timestamp string into a UTC-normalized datetime object.
 
     Raises:
     -------
@@ -88,7 +89,12 @@ def parse_iso_timestamp(ts: str) -> datetime:
 
     clean_ts = ts.strip().replace("Z", "+00:00")
     try:
-        return datetime.fromisoformat(clean_ts)
+        dt = datetime.fromisoformat(clean_ts)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt = dt.astimezone(timezone.utc)
+        return dt
     except Exception as exc:
         raise InvalidContractError(f"Invalid timestamp format '{ts}': {exc}") from exc
 
@@ -238,8 +244,13 @@ class BharatiTelemetryOutput:
             )
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert output contract to dictionary."""
-        return asdict(self)
+        """Convert output contract to dictionary, sanitizing non-finite values to None for clean JSON compliance."""
+        d = asdict(self)
+        if d.get("value") is not None and isinstance(d["value"], (int, float)) and not math.isfinite(d["value"]):
+            d["value"] = None
+        if d.get("anomaly_score") is not None and isinstance(d["anomaly_score"], (int, float)) and not math.isfinite(d["anomaly_score"]):
+            d["anomaly_score"] = None
+        return d
 
     def to_json(self, indent: Optional[int] = None) -> str:
         """Serialize output contract to JSON string."""
