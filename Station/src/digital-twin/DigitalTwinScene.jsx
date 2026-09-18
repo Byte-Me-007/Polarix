@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { StationModel } from './StationModel';
 import { SensorMarker, computeDisplayPos } from './SensorMarker';
 import { SpatialHeatmap } from './SpatialHeatmap';
+import { IncidentGraph } from './IncidentGraph';
 
 // Elevated perspective overview — calibrated to match authentic station angle
 const DEFAULT_CAMERA_POS = [18, 65, 75];
@@ -32,7 +33,11 @@ export const DigitalTwinScene = ({
   twinMode = 'NORMAL',
   focusZone = null,
   onSelectAsset,
-  selectedAssetId = null
+  selectedAssetId = null,
+  // Incident visualization
+  incidentGraph = null,
+  onIncidentNodeClick = null,
+  selectedIncidentNodeId = null,
 }) => {
   const controlsRef = useRef();
   const zones = station?.digitalTwin?.zones || [];
@@ -68,6 +73,19 @@ export const DigitalTwinScene = ({
     controlsRef.current.target.set(...focus.target);
     controlsRef.current.update();
   }, [focusZone]);
+
+  // Camera focus when an incident node is clicked
+  useEffect(() => {
+    if (!controlsRef.current || !selectedIncidentNodeId || !incidentGraph?.isActive) return;
+    const node = incidentGraph.nodes?.find(n => n.id === selectedIncidentNodeId);
+    if (!node) return;
+    const focus = ZONE_FOCUS[node.zoneCode];
+    if (focus) {
+      controlsRef.current.object.position.set(...focus.pos);
+      controlsRef.current.target.set(...focus.target);
+      controlsRef.current.update();
+    }
+  }, [selectedIncidentNodeId]);
 
   // Determine effective heatmap: HEATMAP mode always shows it; others use prop
   const effectiveHeatmap = twinMode === 'HEATMAP' ? true : (twinMode === 'NORMAL' ? false : showHeatmap);
@@ -118,6 +136,10 @@ export const DigitalTwinScene = ({
         telemetry={telemetry}
         onSelectAsset={onSelectAsset}
         selectedAssetId={selectedAssetId}
+        incidentAffectedZones={incidentGraph?.affectedZones}
+        incidentPrimaryZones={incidentGraph?.primaryZones}
+        incidentActive={incidentGraph?.isActive || false}
+        incidentGraph={incidentGraph}
       />
 
       {/* Spatial Sensor Condition Heatmap Overlay (HEATMAP mode only) */}
@@ -140,6 +162,15 @@ export const DigitalTwinScene = ({
             onSelect={onSelectSensor}
           />
         ))}
+
+      {/* Incident Cause → Impact 3D Graph (all modes when incident is active) */}
+      {incidentGraph?.isActive && (
+        <IncidentGraph
+          incidentGraph={incidentGraph}
+          onSelectNode={onIncidentNodeClick}
+          selectedNodeId={selectedIncidentNodeId}
+        />
+      )}
     </Canvas>
   );
 };

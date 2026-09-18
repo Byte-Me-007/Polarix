@@ -62,7 +62,12 @@ export const StationModel = ({
   focusZone = null,
   telemetry = {},
   onSelectAsset,
-  selectedAssetId = null
+  selectedAssetId = null,
+  // Incident visualization
+  incidentAffectedZones = null,
+  incidentPrimaryZones  = null,
+  incidentActive        = false,
+  incidentGraph         = null,
 }) => {
   const zones = station?.digitalTwin?.zones || [];
 
@@ -166,6 +171,12 @@ export const StationModel = ({
         const status = zoneHealth[code] || 'NORMAL';
         const meta = ZONE_STATUS_CONFIG[status] || ZONE_STATUS_CONFIG.NORMAL;
         const isSelectedZone = Boolean(selectedZone && (code === selectedZone));
+
+        // Incident visual emphasis — unaffected zones quieted, primary zones kept prominent
+        const isIncidentAffected = incidentActive && incidentAffectedZones?.has(code);
+        const isIncidentPrimary  = incidentActive && incidentPrimaryZones?.has(code);
+        const isIncidentDimmed   = incidentActive && incidentAffectedZones?.size > 0 && !isIncidentAffected;
+
         return (
           <StationZone
             key={zone.id}
@@ -183,6 +194,8 @@ export const StationModel = ({
             onSelectAsset={onSelectAsset}
             selectedAssetId={selectedAssetId}
             selectedSensor={selectedSensor}
+            incidentDimmed={isIncidentDimmed}
+            incidentHighlighted={isIncidentPrimary}
           />
         );
       })}
@@ -195,6 +208,7 @@ export const StationModel = ({
           selectedAssetId={selectedAssetId}
           selectedSensor={selectedSensor}
           onSelectAsset={onSelectAsset}
+          incidentGraph={incidentGraph}
         />
       )}
 

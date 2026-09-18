@@ -422,7 +422,8 @@ export const SystemFlowOverlay = ({
   station,
   selectedAssetId = null,
   selectedSensor = null,
-  onSelectAsset
+  onSelectAsset,
+  incidentGraph = null,
 }) => {
   const power     = telemetry?.power     || {};
   const battery   = telemetry?.battery   || {};
@@ -871,11 +872,33 @@ export const SystemFlowOverlay = ({
     }
   };
 
+  // ─── Circuit emphasis: from asset/sensor selection OR incident ───────────────
+  const incidentNodeIds = useMemo(() => {
+    if (!incidentGraph?.isActive) return new Set();
+    const s = new Set();
+    (incidentGraph.nodes || []).forEach(n => s.add(n.id));
+    return s;
+  }, [incidentGraph]);
+
+  // Determine which circuit categories the incident involves
+  const incidentCategories = useMemo(() => {
+    const cats = new Set();
+    if (!incidentGraph?.isActive) return cats;
+    if (incidentNodeIds.has('SOLAR'))     cats.add('solar');
+    if (incidentNodeIds.has('WIND'))      cats.add('wind');
+    if (incidentNodeIds.has('DIESEL'))    cats.add('generation');
+    if (incidentNodeIds.has('BATTERY'))   cats.add('battery');
+    if (incidentNodeIds.has('MICROGRID')) cats.add('load');
+    if (incidentNodeIds.has('STATION'))   cats.add('load');
+    return cats;
+  }, [incidentGraph, incidentNodeIds]);
+
   return (
     <group name="system-flow-overlay">
       {/* 1. Multi-Circuit Technical Power Grid Conduits */}
       {circuits.map((circuit) => {
-        const isEmphasized = focusedNodeId
+        // Asset/sensor-based emphasis
+        const assetBased = focusedNodeId
           ? (
               (focusedNodeId === 'BATTERY'   && circuit.category === 'battery') ||
               (focusedNodeId === 'DIESEL'    && circuit.category === 'generation') ||
@@ -885,7 +908,13 @@ export const SystemFlowOverlay = ({
               (focusedNodeId === 'MICROGRID' && (circuit.category === 'load' || circuit.id.includes('bus')))
             )
           : false;
-        const isDimmed = focusedNodeId ? !isEmphasized : false;
+
+        // Incident-based emphasis: highlight circuits involved in the incident chain
+        const incidentBased = incidentGraph?.isActive && incidentCategories.has(circuit.category);
+
+        const isEmphasized = assetBased || incidentBased;
+        const isDimmed = (focusedNodeId ? !assetBased : false) ||
+                         (incidentGraph?.isActive && incidentCategories.size > 0 && !incidentBased && !focusedNodeId);
 
         return (
           <ConduitSegment

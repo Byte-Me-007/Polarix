@@ -7,6 +7,9 @@ import { SensorDetailsPanel } from '../digital-twin/SensorDetailsPanel';
 import { AssetInspectPanel } from '../digital-twin/AssetInspectPanel';
 import { ReplayController } from '../digital-twin/ReplayController';
 import { StationStatusHUD, EnvironmentalFeedHUD, RealtimeEventLogHUD } from '../digital-twin/StationHUDOverlays';
+import { IncidentBanner } from '../digital-twin/IncidentBanner';
+import { IncidentSummaryPanel } from '../digital-twin/IncidentSummaryPanel';
+import { useIncidentGraph } from '../digital-twin/useIncidentGraph';
 import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
 import { useStation } from '../context/StationContext';
@@ -35,14 +38,33 @@ export const DigitalTwin = () => {
 
   const { telemetry } = useStation();
 
-  const [twinMode, setTwinMode]         = useState('NORMAL');
-  const [selectedSensorId, setSelectedSensorId] = useState(null);
-  const [selectedAsset, setSelectedAsset]       = useState(null);
-  const [showSensors, setShowSensors]           = useState(true);
-  const [showLabels, setShowLabels]             = useState(true);
-  const [resetTrigger, setResetTrigger]         = useState(0);
-  const [focusZone, setFocusZone]               = useState(null);
-  const [activeTestNum, setActiveTestNum]       = useState(null);
+  // ── Derived incident graph (state-based, no fake data) ───────────────────
+  const incidentGraph = useIncidentGraph();
+
+  const [twinMode, setTwinMode]                     = useState('NORMAL');
+  const [selectedSensorId, setSelectedSensorId]     = useState(null);
+  const [selectedAsset, setSelectedAsset]           = useState(null);
+  const [showSensors, setShowSensors]               = useState(true);
+  const [showLabels, setShowLabels]                 = useState(true);
+  const [resetTrigger, setResetTrigger]             = useState(0);
+  const [focusZone, setFocusZone]                   = useState(null);
+  const [activeTestNum, setActiveTestNum]           = useState(null);
+  const [selectedIncidentNodeId, setSelectedIncidentNodeId] = useState(null);
+  const [incidentBannerDismissed, setIncidentBannerDismissed] = useState(false);
+
+  // Clear incident focus & banner state when station changes
+  useEffect(() => {
+    setSelectedIncidentNodeId(null);
+    setIncidentBannerDismissed(false);
+  }, [activeStation]);
+
+  // Clear incident focus when scenario returns to NORMAL/RECOVERY
+  useEffect(() => {
+    if (!incidentGraph.isActive) {
+      setSelectedIncidentNodeId(null);
+      setIncidentBannerDismissed(false);
+    }
+  }, [incidentGraph.isActive]);
 
   // ── Cross-module navigation state handling ───────────────────────────────
   useEffect(() => {
@@ -83,6 +105,7 @@ export const DigitalTwin = () => {
   const handleResetView = () => {
     setResetTrigger(prev => prev + 1);
     setFocusZone(null);
+    setSelectedIncidentNodeId(null);
   };
 
   const handleModeChange = (modeId) => {
@@ -115,6 +138,35 @@ export const DigitalTwin = () => {
   const handleCloseSensorPanel = useCallback(() => {
     setSelectedSensorId(null);
   }, []);
+
+  // ── Incident node click handler ──────────────────────────────────────────
+  // Clicking an incident node focuses the camera on the zone,
+  // then opens the asset inspect panel for the associated asset.
+  const handleIncidentNodeClick = useCallback((node) => {
+    setSelectedIncidentNodeId(node.id);
+    setSelectedSensorId(null);
+
+    if (node.asset) {
+      // Open asset inspection — reuse existing panel
+      setSelectedAsset(node.asset);
+      setTwinMode(prev => (prev === 'NORMAL' ? 'XRAY' : prev));
+    }
+    if (node.zoneCode) {
+      setFocusZone(node.zoneCode);
+    }
+  }, []);
+
+  // ── Incident sensor click handler ────────────────────────────────────────
+  // Clicking a sensor ID in the IncidentSummaryPanel opens SensorDetailsPanel
+  const handleIncidentSensorClick = useCallback((sensorId) => {
+    if (!sensorId) return;
+    setSelectedSensorId(sensorId);
+    setSelectedAsset(null);
+    setShowSensors(true);
+    // Find the sensor to derive its zone for camera focus
+    const sensor = sensors.find(s => s.id === sensorId);
+    if (sensor?.zone) setFocusZone(sensor.zone);
+  }, [sensors]);
 
   // Scenario-based test sequence (T1–T7, preserved from original)
   const handleRunTest = (testNum) => {
@@ -169,6 +221,11 @@ export const DigitalTwin = () => {
   };
 
   const currentModeDesc = MODES.find(m => m.id === twinMode)?.desc || '';
+
+  // Whether both side panels are closed (controls whether HUDs are visible)
+  const noPanelOpen = !selectedAsset && !selectedSensor;
+  // Incident panel is compact when a sensor/asset panel is open
+  const incidentPanelCompact = Boolean(selectedAsset || selectedSensor);
 
   return (
     <main className="main-viewport digital-twin-page">
@@ -279,11 +336,19 @@ export const DigitalTwin = () => {
           />
 
           {/* Top-Right & Bottom-Right HUDs (Visible when inspect panel is not open) */}
-          {!selectedAsset && !selectedSensor && (
+          {noPanelOpen && (
             <>
               <EnvironmentalFeedHUD telemetry={telemetry} />
               <RealtimeEventLogHUD telemetry={telemetry} alerts={config?.alerts} />
             </>
+          )}
+
+          {/* ── INCIDENT BANNER — top-center when incident active ── */}
+          {incidentGraph.isActive && !incidentBannerDismissed && (
+            <IncidentBanner
+              incidentGraph={incidentGraph}
+              onDismiss={() => setIncidentBannerDismissed(true)}
+            />
           )}
 
           {/* Heatmap inspection badge (HEATMAP mode only) */}
@@ -325,6 +390,9 @@ export const DigitalTwin = () => {
             focusZone={focusZone}
             onSelectAsset={handleSelectAsset}
             selectedAssetId={selectedAsset?.id}
+            incidentGraph={incidentGraph}
+            onIncidentNodeClick={handleIncidentNodeClick}
+            selectedIncidentNodeId={selectedIncidentNodeId}
           />
 
           {/* Legend */}
@@ -341,6 +409,14 @@ export const DigitalTwin = () => {
           <div className="twin-nav-hint">
             L-CLICK: ROTATE &nbsp;|&nbsp; R-CLICK: PAN &nbsp;|&nbsp; SCROLL: ZOOM
           </div>
+
+          {/* ── INCIDENT SUMMARY PANEL — bottom-left when incident active ── */}
+          <IncidentSummaryPanel
+            incidentGraph={incidentGraph}
+            onSelectNode={handleIncidentNodeClick}
+            onSelectSensor={handleIncidentSensorClick}
+            isCompact={incidentPanelCompact}
+          />
         </div>
 
         {/* Sensor Detail Panel */}
@@ -410,3 +486,4 @@ export const DigitalTwin = () => {
 };
 
 export default DigitalTwin;
+

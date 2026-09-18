@@ -54,7 +54,10 @@ export const StationZone = ({
   telemetry = {},
   onSelectAsset,
   selectedAssetId = null,
-  selectedSensor = null
+  selectedSensor = null,
+  // Incident visual emphasis
+  incidentDimmed      = false,
+  incidentHighlighted = false,
 }) => {
   const [px, py, pz] = zone.position;
   const [sx, sy, sz] = zone.size;
@@ -100,17 +103,17 @@ export const StationZone = ({
   const isSystem = twinMode === 'SYSTEM';
   const isSemiTransparent = showHeatmap || isXray || isSystem;
 
-  const wallOpacity     = showHeatmap ? 0.32 : isXray ? 0.20 : isSystem ? 0.48 : 1.0;
+  const wallOpacity     = (showHeatmap ? 0.32 : isXray ? 0.20 : isSystem ? 0.48 : 1.0) * (incidentDimmed ? 0.72 : 1.0);
   const wallDepthWrite  = !isSemiTransparent;
 
-  const roofOpacity     = showHeatmap ? 0.08 : isXray ? 0.04 : isSystem ? 0.22 : 1.0;
+  const roofOpacity     = (showHeatmap ? 0.08 : isXray ? 0.04 : isSystem ? 0.22 : 1.0) * (incidentDimmed ? 0.72 : 1.0);
   const roofColor       = isSemiTransparent ? '#f4efe6' : '#1e242d';
   const roofDepthWrite  = !isSemiTransparent;
 
-  const parapetOpacity  = isXray ? 0.04 : isSystem ? 0.25 : isSemiTransparent ? 0.12 : 1.0;
+  const parapetOpacity  = (isXray ? 0.04 : isSystem ? 0.25 : isSemiTransparent ? 0.12 : 1.0) * (incidentDimmed ? 0.72 : 1.0);
   const parapetColor    = isSemiTransparent ? '#e2e8f0' : '#334155';
 
-  const equipOpacity    = showHeatmap ? 0.18 : isXray ? 0.06 : isSystem ? 0.20 : 1.0;
+  const equipOpacity    = (showHeatmap ? 0.18 : isXray ? 0.06 : isSystem ? 0.20 : 1.0) * (incidentDimmed ? 0.72 : 1.0);
   const equipDepthWrite = !isSemiTransparent;
 
   // Primary architectural cladding color palette (clean off-white polar insulated panels)
