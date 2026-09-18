@@ -67,14 +67,65 @@ export const StationProvider = ({ children }) => {
     };
   }, [activeStation, activeScenario]);
 
-  // Combined alerts: station-specific alerts + scenario additions
-  const activeAlertsList = useMemo(() => {
+  // Track acknowledged alert IDs across baseline and scenario alerts
+  const [acknowledgedAlertIds, setAcknowledgedAlertIds] = useState(() => {
+    const initial = new Set();
+    INITIAL_ALERTS.forEach((a) => {
+      if (a.acknowledged) initial.add(a.id);
+    });
+    return initial;
+  });
+
+  // Combined full alerts list (Active + Acknowledged) for active station
+  const allStationAlerts = useMemo(() => {
     const scenario = DEMO_SCENARIOS[activeScenario];
     const scenarioAlerts = scenario?.addedAlerts || [];
-    return [...scenarioAlerts, ...alerts].filter(
-      (a) => a.station === activeStation || a.station === 'ALL'
-    );
-  }, [activeStation, activeScenario, alerts]);
+
+    const mergedMap = new Map();
+
+    alerts.forEach((a) => {
+      const matches =
+        a.station === activeStation ||
+        a.station === 'ALL' ||
+        a.station_id === activeStation ||
+        a.station_id === 'ALL';
+      if (matches) {
+        const isAck = acknowledgedAlertIds.has(a.id) || a.acknowledged;
+        mergedMap.set(a.id, {
+          ...a,
+          station_id: a.station_id || a.station,
+          sensor_id: a.sensor_id || a.sensorId,
+          acknowledged: isAck,
+          status: isAck ? 'ACKNOWLEDGED' : (a.status || 'ACTIVE')
+        });
+      }
+    });
+
+    scenarioAlerts.forEach((a) => {
+      const matches =
+        a.station === activeStation ||
+        a.station === 'ALL' ||
+        a.station_id === activeStation ||
+        a.station_id === 'ALL';
+      if (matches) {
+        const isAck = acknowledgedAlertIds.has(a.id) || a.acknowledged;
+        mergedMap.set(a.id, {
+          ...a,
+          station_id: a.station_id || a.station,
+          sensor_id: a.sensor_id || a.sensorId,
+          acknowledged: isAck,
+          status: isAck ? 'ACKNOWLEDGED' : (a.status || 'ACTIVE')
+        });
+      }
+    });
+
+    return Array.from(mergedMap.values());
+  }, [activeStation, activeScenario, alerts, acknowledgedAlertIds]);
+
+  // Active (unacknowledged) alerts for Dashboard and badge counts
+  const activeAlerts = useMemo(() => {
+    return allStationAlerts.filter((a) => !a.acknowledged);
+  }, [allStationAlerts]);
 
   // Optional sensor-level overrides for manual test sequences (e.g. TEST 1 - TEST 6)
   const [sensorManualOverrides, setSensorManualOverrides] = useState({});
@@ -168,9 +219,25 @@ export const StationProvider = ({ children }) => {
   };
 
   const acknowledgeAlert = (id) => {
+    setAcknowledgedAlertIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+
     setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, acknowledged: true } : a))
+      prev.map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              acknowledged: true,
+              status: 'ACKNOWLEDGED',
+              acknowledgedAt: 'Just now'
+            }
+          : a
+      )
     );
+    setLastUpdated(new Date());
   };
 
   const handleStationChange = (newStation) => {
@@ -190,7 +257,9 @@ export const StationProvider = ({ children }) => {
     updateSensor,
     clearSensorOverrides,
     telemetry,
-    alerts: activeAlertsList,
+    alerts: activeAlerts, // Active unacknowledged alerts for Dashboard
+    activeAlerts,
+    allAlerts: allStationAlerts, // Full alerts list (Active + Acknowledged) for Alerts page
     acknowledgeAlert,
     activeScenario,
     setScenario: applyScenario,

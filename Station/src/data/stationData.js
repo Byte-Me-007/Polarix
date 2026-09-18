@@ -308,64 +308,144 @@ export const INITIAL_ALERTS = [
   {
     id: "ALT-MTR-01",
     station: "MAITRI",
+    station_id: "MAITRI",
     severity: "CRITICAL",
+    type: "ENERGY",
+    subsystem: "ENERGY",
+    sensor_id: "ENG-MTR-002",
+    sensorId: "ENG-MTR-002",
+    zone: "GENERATOR",
     title: "Generator vibration anomaly",
     message: "DG Unit #2 harmonic vibration exceeds 4.8 mm/s threshold on primary rotor bearing.",
-    subsystem: "ENERGY",
+    anomaly_score: 0.94,
     timestamp: "12m ago",
-    acknowledged: false
+    acknowledged: false,
+    status: "ACTIVE"
   },
   {
     id: "ALT-MTR-02",
     station: "MAITRI",
+    station_id: "MAITRI",
     severity: "WARNING",
+    type: "ENVIRONMENT",
+    subsystem: "ENVIRONMENT",
+    sensor_id: "ENV-MTR-002",
+    sensorId: "ENV-MTR-002",
+    zone: "COMMS",
     title: "High wind speed alert",
     message: "Anemometer Mast Alpha recorded sustained gusts reaching 68 km/h. Wind turbine pitch dampening auto-engaged.",
-    subsystem: "ENVIRONMENT",
+    anomaly_score: 0.68,
     timestamp: "38m ago",
-    acknowledged: false
+    acknowledged: false,
+    status: "ACTIVE"
   },
   {
     id: "ALT-MTR-03",
     station: "MAITRI",
-    severity: "WARNING",
-    title: "Battery discharge rate elevated",
-    message: "Substation Block 3 reporting momentary discharge current jump of 18A due to HVAC zone 2 defrost cycle.",
-    subsystem: "BATTERY",
-    timestamp: "1h 14m ago",
-    acknowledged: true
+    station_id: "MAITRI",
+    severity: "OFFLINE",
+    type: "LOGISTICS",
+    subsystem: "LOGISTICS",
+    sensor_id: "LOG-MTR-002",
+    sensorId: "LOG-MTR-002",
+    zone: "GENERATOR",
+    title: "Day Tank Flow Transducer Offline",
+    message: "Signal loss detected on RS-485 telemetry loop for Day Tank Flow Transducer. No carrier signal.",
+    anomaly_score: null,
+    timestamp: "52m ago",
+    acknowledged: false,
+    status: "ACTIVE"
   },
   {
     id: "ALT-MTR-04",
     station: "MAITRI",
+    station_id: "MAITRI",
+    severity: "WARNING",
+    type: "ENERGY",
+    subsystem: "ENERGY",
+    sensor_id: "ENG-MTR-003",
+    sensorId: "ENG-MTR-003",
+    zone: "ENERGY",
+    title: "Battery discharge rate elevated",
+    message: "Substation Block 3 reporting momentary discharge current jump of 18A due to HVAC zone 2 defrost cycle.",
+    anomaly_score: 0.54,
+    timestamp: "1h 14m ago",
+    acknowledged: true,
+    status: "ACKNOWLEDGED",
+    acknowledgedAt: "45m ago"
+  },
+  {
+    id: "ALT-MTR-05",
+    station: "MAITRI",
+    station_id: "MAITRI",
     severity: "INFO",
+    type: "CONNECTIVITY",
+    subsystem: "CONNECTIVITY",
+    sensor_id: "COM-MTR-001",
+    sensorId: "COM-MTR-001",
+    zone: "COMMS",
     title: "Scheduled GSAT telemetry sync completed",
     message: "64 telemetry packets transmitted to NCPOR Goa mission operations ground terminal.",
-    subsystem: "CONNECTIVITY",
+    anomaly_score: null,
     timestamp: "2h 05m ago",
-    acknowledged: true
+    acknowledged: true,
+    status: "ACKNOWLEDGED",
+    acknowledgedAt: "1h 30m ago"
   },
 
   // BHARATI Alerts
   {
     id: "ALT-BHR-01",
     station: "BHARATI",
-    severity: "INFO",
-    title: "Fuel transfer pump cycle completed",
-    message: "Automated fuel replenishment from Bulk Tank B to Day Tank completed nominally (1,200 L).",
-    subsystem: "LOGISTICS",
-    timestamp: "45m ago",
-    acknowledged: true
+    station_id: "BHARATI",
+    severity: "WARNING",
+    type: "STRUCTURE",
+    subsystem: "STRUCTURE",
+    sensor_id: "STR-BHR-003",
+    sensorId: "STR-BHR-003",
+    zone: "MAIN BUILDING",
+    title: "Aerodynamic Stilt Torsion Fluctuation",
+    message: "Dynamic ice-drift pressure causing lateral torsion variance on North-East aerodynamic stilt foundation.",
+    anomaly_score: 0.62,
+    timestamp: "24m ago",
+    acknowledged: false,
+    status: "ACTIVE"
   },
   {
     id: "ALT-BHR-02",
     station: "BHARATI",
+    station_id: "BHARATI",
     severity: "INFO",
+    type: "LOGISTICS",
+    subsystem: "LOGISTICS",
+    sensor_id: "LOG-BHR-001",
+    sensorId: "LOG-BHR-001",
+    zone: "STORAGE",
+    title: "Fuel transfer pump cycle completed",
+    message: "Automated fuel replenishment from Bulk Tank B to Day Tank completed nominally (1,200 L).",
+    anomaly_score: null,
+    timestamp: "45m ago",
+    acknowledged: true,
+    status: "ACKNOWLEDGED",
+    acknowledgedAt: "30m ago"
+  },
+  {
+    id: "ALT-BHR-03",
+    station: "BHARATI",
+    station_id: "BHARATI",
+    severity: "INFO",
+    type: "CONNECTIVITY",
+    subsystem: "CONNECTIVITY",
+    sensor_id: "COM-BHR-001",
+    sensorId: "COM-BHR-001",
+    zone: "COMMS",
     title: "Larsemann optical radome calibrated",
     message: "Starlink gateway RF signal-to-noise ratio tested at 24 dB. Uplink channel cleared.",
-    subsystem: "CONNECTIVITY",
+    anomaly_score: null,
     timestamp: "2h 10m ago",
-    acknowledged: true
+    acknowledged: true,
+    status: "ACKNOWLEDGED",
+    acknowledgedAt: "1h 50m ago"
   }
 ];
 
@@ -460,12 +540,19 @@ export const DEMO_SCENARIOS = {
       {
         id: "ALT-SCN-01",
         station: "ALL",
+        station_id: "ALL",
         severity: "CRITICAL",
+        type: "ENVIRONMENT",
+        subsystem: "ENVIRONMENT",
+        sensor_id: "ENV-MTR-002",
+        sensorId: "ENV-MTR-002",
+        zone: "COMMS",
         title: "Severe Blizzard Warning — 118 km/h gusts",
         message: "External shelter lockdown protocol active. Optical visibility < 50m. Solar array auto-stowed.",
-        subsystem: "ENVIRONMENT",
+        anomaly_score: 0.92,
         timestamp: "Just now",
-        acknowledged: false
+        acknowledged: false,
+        status: "ACTIVE"
       }
     ]
   },
@@ -499,12 +586,19 @@ export const DEMO_SCENARIOS = {
       {
         id: "ALT-SCN-02",
         station: "ALL",
-        severity: "WARNING",
+        station_id: "ALL",
+        severity: "OFFLINE",
+        type: "SENSORS",
+        subsystem: "SENSORS",
+        sensor_id: "ENV-MTR-004",
+        sensorId: "ENV-MTR-004",
+        zone: "RESEARCH",
         title: "Telemetry Array Bus Offline",
         message: "RS-485 bus heartbeat lost on Humidity Sensor Node #4. Fallback estimation active.",
-        subsystem: "SENSORS",
+        anomaly_score: null,
         timestamp: "Just now",
-        acknowledged: false
+        acknowledged: false,
+        status: "ACTIVE"
       }
     ]
   },
@@ -546,12 +640,19 @@ export const DEMO_SCENARIOS = {
       {
         id: "ALT-SCN-03",
         station: "ALL",
+        station_id: "ALL",
         severity: "CRITICAL",
+        type: "ENERGY",
+        subsystem: "ENERGY",
+        sensor_id: "ENG-MTR-002",
+        sensorId: "ENG-MTR-002",
+        zone: "GENERATOR",
         title: "Microgrid Generator Trip & Battery Drain",
         message: "Auxiliary power active. Non-essential scientific heating disabled to conserve battery bank.",
-        subsystem: "ENERGY",
+        anomaly_score: 0.95,
         timestamp: "Just now",
-        acknowledged: false
+        acknowledged: false,
+        status: "ACTIVE"
       }
     ]
   },
@@ -595,12 +696,19 @@ export const DEMO_SCENARIOS = {
       {
         id: "ALT-SCN-04",
         station: "ALL",
+        station_id: "ALL",
         severity: "CRITICAL",
+        type: "CONNECTIVITY",
+        subsystem: "CONNECTIVITY",
+        sensor_id: "COM-MTR-001",
+        sensorId: "COM-MTR-001",
+        zone: "COMMS",
         title: "Satellite Uplink Lost — Comms Blackout",
         message: "Telemetry buffering to local solid-state logger. Auto-switching to emergency HF radio packet burst.",
-        subsystem: "CONNECTIVITY",
+        anomaly_score: 0.90,
         timestamp: "Just now",
-        acknowledged: false
+        acknowledged: false,
+        status: "ACTIVE"
       }
     ]
   },
@@ -616,12 +724,20 @@ export const DEMO_SCENARIOS = {
       {
         id: "ALT-SCN-REC",
         station: "ALL",
+        station_id: "ALL",
         severity: "INFO",
+        type: "SYSTEM",
+        subsystem: "SYSTEM",
+        sensor_id: "ENV-MTR-001",
+        sensorId: "ENV-MTR-001",
+        zone: "MAIN BUILDING",
         title: "Diagnostic Self-Test Completed",
         message: "Microgrid and satellite uplink verified nominal on active station bus.",
-        subsystem: "SYSTEM",
+        anomaly_score: null,
         timestamp: "Just now",
-        acknowledged: true
+        acknowledged: true,
+        status: "ACKNOWLEDGED",
+        acknowledgedAt: "Just now"
       }
     ]
   }

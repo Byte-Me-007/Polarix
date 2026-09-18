@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useStationTelemetry } from '../hooks/useStationTelemetry';
 import { DigitalTwinScene } from '../digital-twin/DigitalTwinScene';
 import { TwinLegend } from '../digital-twin/TwinLegend';
@@ -7,6 +8,7 @@ import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
 
 export const DigitalTwin = () => {
+  const location = useLocation();
   const {
     config,
     sensors,
@@ -23,6 +25,15 @@ export const DigitalTwin = () => {
   const [showHeatmap, setShowHeatmap] = useState(true); // Default to ON for quick heatmap inspection
   const [resetTrigger, setResetTrigger] = useState(0);
   const [activeTestNum, setActiveTestNum] = useState(null);
+
+  // Handle incoming alert location intent: /alerts -> Digital Twin (Section 11)
+  useEffect(() => {
+    if (location.state?.locateSensorId) {
+      setSelectedSensorId(location.state.locateSensorId);
+      setShowSensors(true);
+      setShowHeatmap(true);
+    }
+  }, [location.state?.locateSensorId]);
 
   // Dynamically resolve selected sensor to react to telemetry updates & scenario changes
   const selectedSensor = React.useMemo(() => {
