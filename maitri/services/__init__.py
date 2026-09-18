@@ -41,6 +41,7 @@ from maitri.services.telemetry_service import (
     get_telemetry_by_station,
 )
 from maitri.services.websocket_manager import ConnectionManager, manager
+from maitri.simulator import generate_telemetry_batch, get_supported_scenarios
 
 __all__ = [
     "acknowledge_alert",
@@ -73,7 +74,10 @@ __all__ = [
     "get_resource_forecast",
     "get_station_resources_forecast",
     "get_station_energy_optimization",
+    "generate_telemetry_batch",
+    "get_supported_scenarios",
 ]
+
 
 
 

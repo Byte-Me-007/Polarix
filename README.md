@@ -197,3 +197,24 @@ Recommended Modes:
 - **`FUEL_CONSERVATION`**: Sub-nominal diesel buffer; sheds non-essential HVAC/lab loads and reduces generator base load.
 - **`POWER_CRISIS_MINIMAL`**: Critical fuel/battery depletion; activates life-support-only power shedding.
 
+## Python Telemetry Simulator & Scenario Engine
+
+A deterministic time-series telemetry generator designed for Antarctic station research nodes (`MTR`, `BHR`):
+
+### Supported Scenarios:
+- **`NORMAL_DAY`**: Nominal operational readings with realistic cyclic environmental variations.
+- **`STORM`**: Extreme wind spikes ($> 45$ m/s), temperature plunge, elevated structural strain/vibration, and near-zero solar output.
+- **`POWER_CRISIS`**: Generator output collapse, depleted battery levels, critical fuel drop.
+- **`SENSOR_FAILURE`**: Injects `BAD` or `OFFLINE` sensor readings with anomaly scores $\ge 0.95$.
+- **`SATELLITE_OUTAGE`**: Generates valid readings marked with `synced = False` for offline queue verification.
+- **`RECOVERY`**: Exponentially decays perturbed values back to nominal baseline levels.
+
+### Programmatic Usage:
+```python
+from maitri.simulator import generate_telemetry_batch
+
+# Generate a storm telemetry batch for Maitri
+batch = generate_telemetry_batch("MTR", scenario="STORM", step=0)
+```
+
+
