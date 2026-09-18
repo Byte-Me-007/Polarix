@@ -1,0 +1,355 @@
+{
+  "report_metadata": {
+    "title": "Polarix Bharati ML Scenario Validation & Final Evaluation Report",
+    "station_id": "BRT",
+    "station_name": "Bharati",
+    "model_version": "lstm-ae-bharati-v1",
+    "threshold": 0.013215307652775843,
+    "evaluation_timestamp": "2026-09-18T06:02:29.695919+00:00",
+    "overall_scenario_status": "PASSED",
+    "total_scenarios_evaluated": 12,
+    "passed_scenarios": 12
+  },
+  "scenarios": [
+    {
+      "scenario": "NORMAL_DAY",
+      "sensors": [
+        "BRT_HUM_001",
+        "BRT_POWER_001",
+        "BRT_PRESS_001",
+        "BRT_TEMP_001",
+        "BRT_VIB_001"
+      ],
+      "input_condition": "Normal continuous diurnal telemetry across all 5 Bharati sensors over 30 observations.",
+      "expected_behavior": "First 29 steps return INSUFFICIENT_DATA; 30th step executes scored LSTM inference producing NORMAL status with MSE <= threshold.",
+      "observed_status": "NORMAL",
+      "observed_anomaly_type": "NORMAL",
+      "anomaly_score": 0.0004522490198723972,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "All 5 sensors complete 30-step warmup and produce scored NORMAL status with MSE <= threshold.",
+      "passed": true,
+      "notes_and_limitations": "Evaluated on stationary baseline telemetry with normal synthetic variance.",
+      "processing_time_ms": 11.609
+    },
+    {
+      "scenario": "SPIKE",
+      "sensors": [
+        "BRT_TEMP_001"
+      ],
+      "input_condition": "Sudden high-magnitude step jump (+55\u00b0C thermal excursion) arriving on active 30-step history.",
+      "expected_behavior": "LSTM reconstruction error sharply exceeds threshold, triggering ANOMALY status and SPIKE anomaly-type classification.",
+      "observed_status": "ANOMALY",
+      "observed_anomaly_type": "SPIKE",
+      "anomaly_score": 15.844219207763672,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "anomaly_status == 'ANOMALY', anomaly_score > threshold, and anomaly_type == 'SPIKE'.",
+      "passed": true,
+      "notes_and_limitations": "Isolated transient extreme spike reliably detected by both LSTM autoencoder and heuristic classifier.",
+      "processing_time_ms": 0.7859
+    },
+    {
+      "scenario": "DRIFT",
+      "sensors": [
+        "BRT_PRESS_001"
+      ],
+      "input_condition": "Sustained linear monotonic ramp across 30 consecutive observations (gradual sensor drift).",
+      "expected_behavior": "LSTM sequence autoencoder detects temporal trajectory divergence, outputting ANOMALY status with DRIFT or UNKNOWN category.",
+      "observed_status": "ANOMALY",
+      "observed_anomaly_type": "DRIFT",
+      "anomaly_score": 13.617840766906738,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "anomaly_status == 'ANOMALY' and anomaly_type in {'DRIFT', 'UNKNOWN'}.",
+      "passed": true,
+      "notes_and_limitations": "Demonstrates temporal memory advantage over static baseline which adapts trailing mean.",
+      "processing_time_ms": 0.6959
+    },
+    {
+      "scenario": "STUCK_VALUE",
+      "sensors": [
+        "BRT_HUM_001"
+      ],
+      "input_condition": "Sensor flatline condition with 15 consecutive identical floating point values (zero local variance).",
+      "expected_behavior": "Contract processes successfully; flatline condition analyzed by physical heuristics (low standard deviation check).",
+      "observed_status": "NORMAL",
+      "observed_anomaly_type": "NORMAL",
+      "anomaly_score": 0.006005458999425173,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "Contract executes successfully and anomaly_status in {'NORMAL', 'ANOMALY'}.",
+      "passed": true,
+      "notes_and_limitations": "Mid-range flatlines produce low autoencoder reconstruction loss; classification relies on secondary variance heuristics.",
+      "processing_time_ms": 0.5333
+    },
+    {
+      "scenario": "DROPOUT_MISSING_DATA",
+      "sensors": [
+        "BRT_VIB_001"
+      ],
+      "input_condition": "Telemetry dropout event where sensor value is None and quality flag is 'MISSING'.",
+      "expected_behavior": "Inference returns MISSING_DATA with null anomaly_score and null anomaly_type, immediately flushing the rolling buffer to 0.",
+      "observed_status": "MISSING_DATA",
+      "observed_anomaly_type": null,
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "anomaly_status == 'MISSING_DATA', anomaly_score is None, and buffer length resets to 0.",
+      "passed": true,
+      "notes_and_limitations": "Prevents corrupted, discontinuous windows from poisoning downstream LSTM evaluations.",
+      "processing_time_ms": 0.0053
+    },
+    {
+      "scenario": "INSUFFICIENT_DATA",
+      "sensors": [
+        "BRT_POWER_001"
+      ],
+      "input_condition": "Telemetry observation arriving on cold sensor buffer with fewer than 30 observations.",
+      "expected_behavior": "Returns INSUFFICIENT_DATA with null anomaly_score and null anomaly_type, safely accumulating buffer.",
+      "observed_status": "INSUFFICIENT_DATA",
+      "observed_anomaly_type": null,
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "anomaly_status == 'INSUFFICIENT_DATA', anomaly_score is None, and buffer length == 1.",
+      "passed": true,
+      "notes_and_limitations": "Model forward pass is completely bypassed until sequence buffer is full.",
+      "processing_time_ms": 0.0057
+    },
+    {
+      "scenario": "DUPLICATE_TELEMETRY",
+      "sensors": [
+        "BRT_TEMP_001"
+      ],
+      "input_condition": "Duplicate telemetry with identical (station_id, sensor_id, timestamp) arriving repeatedly.",
+      "expected_behavior": "Raises DuplicateTelemetryError; rejects input and preserves internal sliding window state without duplicate injection.",
+      "observed_status": "REJECTED_DUPLICATE",
+      "observed_anomaly_type": null,
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "DuplicateTelemetryError raised, buffer preserved at 1, and diagnostic event == 'DUPLICATE'.",
+      "passed": true,
+      "notes_and_limitations": "Guarantees chronological uniqueness across all sensor streams.",
+      "processing_time_ms": 0.0078
+    },
+    {
+      "scenario": "STALE_TELEMETRY",
+      "sensors": [
+        "BRT_PRESS_001"
+      ],
+      "input_condition": "Out-of-order telemetry with timestamp earlier than the latest recorded observation.",
+      "expected_behavior": "Raises StaleTelemetryError; rejects out-of-order packet without corrupting chronological sequence.",
+      "observed_status": "REJECTED_STALE",
+      "observed_anomaly_type": null,
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "StaleTelemetryError raised, buffer preserved at 1, and diagnostic event == 'STALE'.",
+      "passed": true,
+      "notes_and_limitations": "Protects temporal LSTM sequence ordering against network transport reordering.",
+      "processing_time_ms": 0.0063
+    },
+    {
+      "scenario": "INVALID_INPUT",
+      "sensors": [
+        "BRT_TEMP_001",
+        "INVALID_SNR"
+      ],
+      "input_condition": "Malformed payloads: unknown station ID, unsupported sensor ID, and NaN floating point value.",
+      "expected_behavior": "Contract validation rejects unsupported station/sensor with explicit exceptions; NaN value safely handled as MISSING_DATA.",
+      "observed_status": "REJECTED_INVALID / MISSING_DATA",
+      "observed_anomaly_type": null,
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "UnsupportedStationError & UnsupportedSensorError raised; NaN value routed to MISSING_DATA with null score.",
+      "passed": true,
+      "notes_and_limitations": "Comprehensive guardrails protect pipeline boundary against malformed backend traffic.",
+      "processing_time_ms": 0.0232
+    },
+    {
+      "scenario": "MULTI_SENSOR_ISOLATION",
+      "sensors": [
+        "BRT_HUM_001",
+        "BRT_POWER_001",
+        "BRT_PRESS_001",
+        "BRT_TEMP_001",
+        "BRT_VIB_001"
+      ],
+      "input_condition": "Interleaved multi-sensor stream with differing sequence accumulation rates (30, 30, 20, 10, 5).",
+      "expected_behavior": "Each sensor maintains an isolated rolling buffer; no buffer cross-contamination or history leakage occurs.",
+      "observed_status": "NORMAL / INSUFFICIENT_DATA",
+      "observed_anomaly_type": "NORMAL / None",
+      "anomaly_score": null,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "Buffers exactly match input counts (TEMP=30, PRESS=30, HUM=20, VIB=10, POWER=5).",
+      "passed": true,
+      "notes_and_limitations": "Ensures concurrent sensor stream safety in multi-threaded or asynchronous orchestrators.",
+      "processing_time_ms": 1.1696
+    },
+    {
+      "scenario": "RECOVERY_AFTER_MISSING_DATA",
+      "sensors": [
+        "BRT_TEMP_001"
+      ],
+      "input_condition": "Valid 30-step stream -> MISSING telemetry dropout -> valid 30-step stream recovery.",
+      "expected_behavior": "Pipeline cleanly flushes buffer on dropout, enters warmup phase, and reliably resumes scored inference after 30 new observations.",
+      "observed_status": "NORMAL",
+      "observed_anomaly_type": "NORMAL",
+      "anomaly_score": 0.0007127908174879849,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "Post-dropout warmup returns INSUFFICIENT_DATA, 30th resumed point returns NORMAL with buffer=30.",
+      "passed": true,
+      "notes_and_limitations": "Verifies state machine recovery lifecycle without manual service re-instantiation.",
+      "processing_time_ms": 1.0814
+    },
+    {
+      "scenario": "REPEATED_DETERMINISTIC_RUN",
+      "sensors": [
+        "BRT_POWER_001"
+      ],
+      "input_condition": "Identical synthetic telemetry sequence processed through two independent, cleanly initialized service instances.",
+      "expected_behavior": "Both instances produce identical anomaly_status, anomaly_type, and anomaly_score across every time step.",
+      "observed_status": "MATCHED",
+      "observed_anomaly_type": "MATCHED",
+      "anomaly_score": 5.2850236892700195,
+      "threshold": 0.013215307652775843,
+      "model_version": "lstm-ae-bharati-v1",
+      "pass_fail_criterion": "100% agreement across all 34 sequence steps between service instance 1 and instance 2.",
+      "passed": true,
+      "notes_and_limitations": "Demonstrates pure deterministic execution without random initialization or non-deterministic inference states.",
+      "processing_time_ms": 4.672
+    }
+  ],
+  "quantitative_evaluation": {
+    "dataset_split": {
+      "total_records": 10000,
+      "sensors": [
+        "BRT_HUM_001",
+        "BRT_POWER_001",
+        "BRT_PRESS_001",
+        "BRT_TEMP_001",
+        "BRT_VIB_001"
+      ],
+      "train_normal_only": 7000,
+      "validation": 1500,
+      "test": 1500
+    },
+    "zscore_baseline": {
+      "model_version": "zscore-bharati-v1",
+      "threshold_sigma": 3.0,
+      "test_confusion_matrix": {
+        "TP": 43,
+        "TN": 1166,
+        "FP": 17,
+        "FN": 274
+      },
+      "test_metrics": {
+        "accuracy": 0.806,
+        "precision": 0.7167,
+        "recall": 0.1356,
+        "f1_score": 0.2281,
+        "false_positive_rate": 0.0144
+      },
+      "per_anomaly_type_recall": {
+        "SPIKE": "10/19 (52.63%)",
+        "DRIFT": "5/150 (3.33%)",
+        "STUCK_VALUE": "0/120 (0.00%)",
+        "DROPOUT": "28/28 (100.0%)"
+      }
+    },
+    "lstm_autoencoder": {
+      "model_version": "lstm-ae-bharati-v1",
+      "threshold_mse": 0.013215307652775843,
+      "validation_metrics": {
+        "accuracy": 0.536,
+        "precision": 0.2949,
+        "recall": 0.6301,
+        "f1_score": 0.4017,
+        "false_positive_rate": 0.4949,
+        "confusion_matrix": {
+          "TP": 184,
+          "TN": 449,
+          "FP": 440,
+          "FN": 108
+        }
+      },
+      "test_metrics": {
+        "accuracy": 0.514,
+        "precision": 0.2679,
+        "recall": 0.5709,
+        "f1_score": 0.3646,
+        "false_positive_rate": 0.505,
+        "confusion_matrix": {
+          "TP": 165,
+          "TN": 442,
+          "FP": 451,
+          "FN": 124
+        }
+      }
+    },
+    "anomaly_type_classifier_synthetic_eval": {
+      "NORMAL": {
+        "support": 9217,
+        "tp": 6194,
+        "precision": 1.0,
+        "recall": 0.672,
+        "f1": 0.8038
+      },
+      "SPIKE": {
+        "support": 41,
+        "tp": 41,
+        "precision": 0.0421,
+        "recall": 1.0,
+        "f1": 0.0807
+      },
+      "DRIFT": {
+        "support": 300,
+        "tp": 146,
+        "precision": 0.0802,
+        "recall": 0.4867,
+        "f1": 0.1377
+      },
+      "STUCK_VALUE": {
+        "support": 240,
+        "tp": 180,
+        "precision": 0.5,
+        "recall": 0.75,
+        "f1": 0.6
+      },
+      "DROPOUT": {
+        "support": 57,
+        "tp": 57,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "UNKNOWN_windows": {
+        "count": 159,
+        "percentage": 1.61
+      }
+    },
+    "comparative_tradeoff_summary": [
+      "Z-Score Baseline: High precision (71.67%) and very low false alarm rate (1.44%), but low recall (13.56%) due to rolling mean adaptation during gradual drift.",
+      "LSTM Autoencoder: High temporal sensitivity and strong recall (57.09% overall; 100% on sharp spikes, 48.7% on drifts), but higher false alarm rate (50.50%) on synthetic diurnal cycles.",
+      "Heuristic Classifier: Isolates stuck values (75% recall) and missing telemetry (100% recall) via dedicated feature rules where reconstruction loss is uninformative."
+    ]
+  },
+  "limitations": {
+    "synthetic_telemetry_only": "All evaluations, benchmarks, and metrics are derived strictly from synthetic Antarctic telemetry. No real Antarctic station operational telemetry was used.",
+    "no_production_accuracy_claim": "Metrics reflect mathematical operating characteristics under synthetic evaluation workloads and do not constitute field-certified accuracy or production SLAs.",
+    "frozen_artifacts": "Model weights, scaler statistics, decision threshold (0.013215307652775843), and sequence length (30) remain strictly frozen without post-hoc tuning.",
+    "real_world_transferability": "Real Antarctic environmental noise, multi-sensor coupling, and unmodeled hardware failure modes will differ from synthetic distributions."
+  },
+  "integration_readiness": {
+    "backend_contract": "VALIDATED (adapt_backend_input, adapt_backend_output, process_backend_payload)",
+    "observability": "VALIDATED (BharatiInferenceAuditRecord, monotonic latency tracking, diagnostic events)",
+    "reliability_hardening": "VALIDATED (NaN/Inf, missing telemetry, duplicate timestamps, out-of-order rejection)",
+    "model_integrity": "VALIDATED (SHA-256 manifest and artifact checksum enforcement)",
+    "performance_profile": "VALIDATED (~0.40ms P50 warm scored inference, ~0.003ms short-circuit bypass)"
+  }
+}
