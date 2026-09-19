@@ -14,14 +14,18 @@ import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
 import { useStation } from '../context/StationContext';
 import { isSensorMatchingMetric, normalizeSensorValue } from '../digital-twin/SpatialHeatmap';
+import { ForecastController } from '../digital-twin/ForecastController';
+import { calculateStationForecast } from '../services/forecastService';
+import { AskTheTwinHUD } from '../digital-twin/AskTheTwinHUD';
 
 // Mode definitions
 const MODES = [
-  { id: 'NORMAL',  label: 'NORMAL',  desc: 'Full station view — realistic appearance' },
-  { id: 'XRAY',    label: 'X-RAY',   desc: 'Transparent shells — internal infrastructure visible' },
-  { id: 'SYSTEM',  label: 'SYSTEM',  desc: 'Energy flow relationships and infrastructure dependencies' },
-  { id: 'HEATMAP', label: 'HEAT MAP', desc: 'Spatial telemetry intensity and sensor distribution field' },
-  { id: 'REPLAY',  label: 'REPLAY',  desc: 'Incident playback timeline — backend data required' }
+  { id: 'NORMAL',   label: 'NORMAL',   desc: 'Full station view — realistic appearance' },
+  { id: 'XRAY',     label: 'X-RAY',    desc: 'Transparent shells — internal infrastructure visible' },
+  { id: 'SYSTEM',   label: 'SYSTEM',   desc: 'Energy flow relationships and infrastructure dependencies' },
+  { id: 'HEATMAP',  label: 'HEAT MAP', desc: 'Spatial telemetry intensity and sensor distribution field' },
+  { id: 'FORECAST', label: 'FORECAST', desc: 'Operational resource forward projection (7 / 30 / 90 days)' },
+  { id: 'REPLAY',   label: 'REPLAY',   desc: 'Incident playback timeline — backend data required' }
 ];
 
 export const DigitalTwin = () => {
@@ -44,6 +48,8 @@ export const DigitalTwin = () => {
 
   const [twinMode, setTwinMode]                             = useState('NORMAL');
   const [heatmapMetric, setHeatmapMetric]                   = useState('TEMPERATURE');
+  const [forecastHorizon, setForecastHorizon]               = useState(30);
+  const [forecastDayOffset, setForecastDayOffset]           = useState(0);
   const [selectedSensorId, setSelectedSensorId]             = useState(null);
   const [selectedAsset, setSelectedAsset]                   = useState(null);
   const [showSensors, setShowSensors]                       = useState(true);
@@ -53,6 +59,33 @@ export const DigitalTwin = () => {
   const [activeTestNum, setActiveTestNum]                   = useState(null);
   const [selectedIncidentNodeId, setSelectedIncidentNodeId] = useState(null);
   const [incidentBannerDismissed, setIncidentBannerDismissed] = useState(false);
+
+  // ── Forecast Calculation ────────────────────────────────────────────────
+  const forecastResult = React.useMemo(() => {
+    if (twinMode !== 'FORECAST') return null;
+    return calculateStationForecast({
+      stationId: activeStation,
+      horizonDays: forecastHorizon,
+      dayOffset: forecastDayOffset,
+      telemetry,
+      sensors
+    });
+  }, [twinMode, activeStation, forecastHorizon, forecastDayOffset, telemetry, sensors]);
+
+  // Project telemetry and sensors when in FORECAST mode
+  const effectiveTelemetry = React.useMemo(() => {
+    if (twinMode === 'FORECAST' && forecastResult && !forecastResult.isInsufficient) {
+      return forecastResult.projectedTelemetry;
+    }
+    return telemetry;
+  }, [twinMode, forecastResult, telemetry]);
+
+  const effectiveSensors = React.useMemo(() => {
+    if (twinMode === 'FORECAST' && forecastResult && !forecastResult.isInsufficient) {
+      return forecastResult.projectedSensors;
+    }
+    return sensors;
+  }, [twinMode, forecastResult, sensors]);
 
   // Dynamic metric options strictly computed from existing station sensors
   const availableHeatmapMetrics = React.useMemo(() => {
@@ -132,8 +165,8 @@ export const DigitalTwin = () => {
   // Dynamically resolve selected sensor
   const selectedSensor = React.useMemo(() => {
     if (!selectedSensorId) return null;
-    return sensors.find((s) => s.id === selectedSensorId) || null;
-  }, [selectedSensorId, sensors]);
+    return effectiveSensors.find((s) => s.id === selectedSensorId) || null;
+  }, [selectedSensorId, effectiveSensors]);
 
   const stationTitle = config.displayName || `${config.stationId || 'MAITRI'} Research Station`;
   const stationCode  = config.shortCode || config.id || 'MTR';
@@ -279,9 +312,22 @@ export const DigitalTwin = () => {
           <span className="station-badge-clean">
             {stationTitle.toUpperCase()} / {stationCode} • {config?.zones?.length || 6} MODULES • {sensors.length} SENSORS
           </span>
-          <span className="simulation-data-tag">
-            {activeScenario && activeScenario !== 'NORMAL' ? `SCENARIO: ${activeScenario}` : 'LIVE TELEMETRY'}
-          </span>
+          {twinMode === 'FORECAST' ? (
+            <span
+              className="simulation-data-tag"
+              style={{
+                background: forecastDayOffset === 0 ? 'rgba(63, 110, 74, 0.12)' : 'rgba(182, 90, 31, 0.14)',
+                color: forecastDayOffset === 0 ? 'var(--polaris-green)' : 'var(--polaris-copper)',
+                borderColor: forecastDayOffset === 0 ? 'rgba(63, 110, 74, 0.35)' : 'rgba(182, 90, 31, 0.4)'
+              }}
+            >
+              {forecastDayOffset === 0 ? '● LIVE BASELINE (T+0.0d)' : `🔮 FORECAST: +${forecastDayOffset.toFixed(1)}d (${forecastHorizon}d)`}
+            </span>
+          ) : (
+            <span className="simulation-data-tag">
+              {activeScenario && activeScenario !== 'NORMAL' ? `SCENARIO: ${activeScenario}` : 'LIVE TELEMETRY'}
+            </span>
+          )}
         </div>
       </section>
 
@@ -333,8 +379,31 @@ export const DigitalTwin = () => {
         </div>
       </div>
 
-      {/* ── Heat Map Metric Selector Strip (Visible in HEATMAP mode) ── */}
-      {twinMode === 'HEATMAP' ? (
+      {/* ── Forecast Horizon Strip (Visible in FORECAST mode) ── */}
+      {twinMode === 'FORECAST' ? (
+        <div className="twin-component-strip" role="toolbar" aria-label="Select Forecast Horizon">
+          <span className="twin-component-label">FORECAST HORIZON:</span>
+          {[7, 30, 90].map(h => (
+            <button
+              key={h}
+              type="button"
+              className={`twin-comp-chip ${forecastHorizon === h ? 'active' : ''}`}
+              onClick={() => {
+                setForecastHorizon(h);
+                if (forecastDayOffset > h) setForecastDayOffset(h);
+              }}
+            >
+              <span className="twin-comp-dot" />
+              {h} DAYS
+            </button>
+          ))}
+          <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: forecastDayOffset === 0 ? 'var(--polaris-green)' : 'var(--polaris-copper)', fontWeight: 600 }}>
+            {forecastDayOffset === 0
+              ? '● LIVE STATE (T+0.0d)'
+              : `FORECAST STATE (+${forecastDayOffset.toFixed(1)}d of ${forecastHorizon}d)`}
+          </span>
+        </div>
+      ) : twinMode === 'HEATMAP' ? (
         <div className="twin-component-strip" role="toolbar" aria-label="Select Heat Map Metric">
           <span className="twin-component-label">HEAT MAP METRIC:</span>
           {availableHeatmapMetrics.map(metric => (
@@ -384,16 +453,27 @@ export const DigitalTwin = () => {
 
           {/* Top-Left: Station Status HUD (Matching Authentic Reference Design) */}
           <StationStatusHUD
-            telemetry={telemetry}
-            sensors={sensors}
+            telemetry={effectiveTelemetry}
+            sensors={effectiveSensors}
             config={config}
           />
+
+          {/* Top-Left Mission-Control Command Bar: ASK THE TWIN */}
+          {noPanelOpen && (
+            <AskTheTwinHUD
+              stationCode={stationCode}
+              stationTitle={stationTitle}
+              telemetry={effectiveTelemetry}
+              sensors={effectiveSensors}
+              readiness={config?.readiness}
+            />
+          )}
 
           {/* Top-Right & Bottom-Right HUDs (Visible when inspect panel is not open) */}
           {noPanelOpen && (
             <>
-              <EnvironmentalFeedHUD telemetry={telemetry} />
-              <RealtimeEventLogHUD telemetry={telemetry} alerts={config?.alerts} />
+              <EnvironmentalFeedHUD telemetry={effectiveTelemetry} />
+              <RealtimeEventLogHUD telemetry={effectiveTelemetry} alerts={config?.alerts} />
             </>
           )}
 
@@ -403,6 +483,66 @@ export const DigitalTwin = () => {
               incidentGraph={incidentGraph}
               onDismiss={() => setIncidentBannerDismissed(true)}
             />
+          )}
+
+          {/* FORECAST mode state badge */}
+          {twinMode === 'FORECAST' && (
+            <div
+              className="twin-inspection-chip"
+              style={{
+                background: forecastResult?.isInsufficient
+                  ? 'rgba(217, 130, 26, 0.12)'
+                  : forecastDayOffset === 0
+                  ? 'rgba(63, 110, 74, 0.12)'
+                  : 'rgba(182, 90, 31, 0.14)',
+                color: forecastResult?.isInsufficient
+                  ? 'var(--polaris-amber)'
+                  : forecastDayOffset === 0
+                  ? 'var(--polaris-green)'
+                  : 'var(--polaris-copper)',
+                borderColor: forecastResult?.isInsufficient
+                  ? 'rgba(217, 130, 26, 0.4)'
+                  : forecastDayOffset === 0
+                  ? 'rgba(63, 110, 74, 0.35)'
+                  : 'rgba(182, 90, 31, 0.4)'
+              }}
+            >
+              {forecastResult?.isInsufficient
+                ? '⚠️ DATA INSUFFICIENT'
+                : forecastDayOffset === 0
+                ? 'LIVE STATE BASELINE — T+0.0 DAYS'
+                : `FORECAST STATE — PROJECTED T+${forecastDayOffset.toFixed(1)} DAYS (${forecastHorizon}D HORIZON)`}
+            </div>
+          )}
+
+          {/* Insufficient Data Overlay in Center of Viewport */}
+          {twinMode === 'FORECAST' && forecastResult?.isInsufficient && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '46%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(25, 28, 32, 0.94)',
+                color: '#f8f6f0',
+                padding: '14px 26px',
+                borderRadius: '6px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                border: '1px solid rgba(217, 130, 26, 0.45)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                zIndex: 35,
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <span style={{ color: '#d9821a' }}>⚠️</span>
+              DATA INSUFFICIENT FOR FORWARD PROJECTION
+            </div>
           )}
 
           {/* Heatmap inspection badge (HEATMAP mode only) */}
@@ -459,8 +599,8 @@ export const DigitalTwin = () => {
           {/* 3D Scene */}
           <DigitalTwinScene
             station={config}
-            sensors={sensors}
-            telemetry={telemetry}
+            sensors={effectiveSensors}
+            telemetry={effectiveTelemetry}
             selectedSensor={selectedSensor}
             onSelectSensor={(sensor) => {
               setSelectedSensorId(sensor ? sensor.id : null);
@@ -484,10 +624,10 @@ export const DigitalTwin = () => {
           {/* Legend */}
           {twinMode !== 'REPLAY' && (
             <TwinLegend
-              sensors={sensors}
+              sensors={effectiveSensors}
               isHeatmapActive={twinMode === 'HEATMAP'}
               isSystemActive={twinMode === 'SYSTEM'}
-              telemetry={telemetry}
+              telemetry={effectiveTelemetry}
               heatmapMetric={heatmapMetric}
             />
           )}
@@ -556,6 +696,20 @@ export const DigitalTwin = () => {
           ))}
         </div>
       </section>
+
+      {/* FORECAST mode timeline dock */}
+      {twinMode === 'FORECAST' && (
+        <section style={{ marginTop: '0.75rem' }}>
+          <ForecastController
+            stationCode={stationCode}
+            horizonDays={forecastHorizon}
+            onHorizonChange={setForecastHorizon}
+            dayOffset={forecastDayOffset}
+            onDayOffsetChange={setForecastDayOffset}
+            forecastResult={forecastResult}
+          />
+        </section>
+      )}
 
       {/* REPLAY mode timeline dock */}
       {twinMode === 'REPLAY' && (
