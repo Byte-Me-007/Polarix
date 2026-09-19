@@ -1,0 +1,167 @@
+{
+  "spec_version": "1.0.0",
+  "module": "ml.environmental.data",
+  "project": "Polarix (SIH 2026 - Problem Statement SIH26060, Team Byte Me_26 / 143760)",
+  "subsystem": "Environmental Forecasting ML Subsystem",
+  "author": "Person C — Machine Learning Specialist",
+  "date_created": "2026-09-19",
+  "station_scopes": [
+    "MTR",
+    "BRT"
+  ],
+  "station_metadata": {
+    "MTR": {
+      "station_name": "Maitri",
+      "location": "Schirmacher Oasis, Queen Maud Land, East Antarctica",
+      "coordinates": {
+        "latitude": "-70.7667 S",
+        "longitude": "11.7333 E"
+      },
+      "elevation_m": 117,
+      "climate_regime": "Inland Antarctic Oasis (Continental rock oasis, moderate katabatic nocturnal wind surges, barometric pressure ~985 hPa, lower relative humidity 40-75%)"
+    },
+    "BRT": {
+      "station_name": "Bharati",
+      "location": "Larsemann Hills, Prydz Bay, East Antarctica",
+      "coordinates": {
+        "latitude": "-69.4000 S",
+        "longitude": "76.1833 E"
+      },
+      "elevation_m": 35,
+      "climate_regime": "Coastal Promontory (Maritime boundary layer, severe katabatic blizzards up to 55 m/s, barometric pressure ~993 hPa with deep cyclonic troughs down to 930 hPa, higher humidity 60-95%)"
+    }
+  },
+  "public_datasets_investigated": [
+    {
+      "source_authority": "National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences, Govt of India",
+      "dataset_title": "Meteorological Observations from Indian Antarctic Stations (Maitri & Bharati)",
+      "provenance_category": "REAL_PUBLIC_INDIAN_ANTARCTIC_WEATHER_DATA",
+      "usage": "Calibrates empirical distributions for wind velocity, barometric pressure cycles, and humidity bounds"
+    },
+    {
+      "source_authority": "Australian Antarctic Data Centre (AADC CC BY 4.0)",
+      "dataset_title": "East Antarctic Automatic Weather Station (AWS) Meteorological Archives",
+      "provenance_category": "REAL_PUBLIC_ANTARCTIC_DATA",
+      "usage": "Provides empirical macroscopic benchmark bounds for Antarctic synoptic cyclonic systems and katabatic wind dynamics"
+    }
+  ],
+  "provenance_disclaimer": "SYNTHETIC_POLARIX_DATA. Generated deterministically from physically grounded Antarctic atmospheric transfer equations, synoptic barometric oscillations, and solar geometry conditioned on NCPOR empirical bounds. Never represented as classified real-time station SCADA telemetry.",
+  "canonical_features": [
+    {
+      "name": "timestamp",
+      "type": "string",
+      "format": "ISO-8601 UTC (YYYY-MM-DDTHH:MM:SSZ)",
+      "description": "Chronological observation timestamp at hourly resolution"
+    },
+    {
+      "name": "station_id",
+      "type": "string",
+      "enum": ["MTR", "BRT"],
+      "description": "Canonical station identifier"
+    },
+    {
+      "name": "wind_speed_mps",
+      "type": "float",
+      "unit": "m/s",
+      "bounds": [0.0, 65.0],
+      "description": "Sustained wind speed at 10-meter meteorological mast"
+    },
+    {
+      "name": "pressure_hpa",
+      "type": "float",
+      "unit": "hPa",
+      "bounds": [910.0, 1045.0],
+      "description": "Atmospheric barometric pressure"
+    },
+    {
+      "name": "humidity_percent",
+      "type": "float",
+      "unit": "%",
+      "bounds": [10.0, 100.0],
+      "description": "Relative atmospheric humidity"
+    },
+    {
+      "name": "temperature_c",
+      "type": "float",
+      "unit": "deg C",
+      "bounds": [-50.0, 15.0],
+      "description": "Ambient 2-meter air temperature (exogenous input feature)"
+    }
+  ],
+  "forecasting_targets": [
+    {
+      "name": "target_wind_speed_1h_mps",
+      "variable": "wind_speed_mps",
+      "horizon": "t + 1h",
+      "definition": "wind_speed_mps(t + 1 hour)",
+      "description": "1-hour ahead wind forecast for immediate wind turbine regulation and outdoor personnel safety"
+    },
+    {
+      "name": "target_wind_speed_6h_mps",
+      "variable": "wind_speed_mps",
+      "horizon": "t + 6h",
+      "definition": "wind_speed_mps(t + 6 hours)",
+      "description": "6-hour ahead wind forecast for storm preparation, outdoor traverse planning, and microgrid renewable scheduling"
+    },
+    {
+      "name": "target_wind_speed_24h_mps",
+      "variable": "wind_speed_mps",
+      "horizon": "t + 24h",
+      "definition": "wind_speed_mps(t + 24 hours)",
+      "description": "24-hour ahead day-ahead wind forecast for blizzard warning systems and daily operations"
+    },
+    {
+      "name": "target_pressure_1h_hpa",
+      "variable": "pressure_hpa",
+      "horizon": "t + 1h",
+      "definition": "pressure_hpa(t + 1 hour)",
+      "description": "1-hour ahead barometric pressure forecast for short-term microbarographic trend monitoring"
+    },
+    {
+      "name": "target_pressure_6h_hpa",
+      "variable": "pressure_hpa",
+      "horizon": "t + 6h",
+      "definition": "pressure_hpa(t + 6 hours)",
+      "description": "6-hour ahead barometric pressure forecast for front arrival and cyclonic depression tracking"
+    },
+    {
+      "name": "target_pressure_24h_hpa",
+      "variable": "pressure_hpa",
+      "horizon": "t + 24h",
+      "definition": "pressure_hpa(t + 24 hours)",
+      "description": "24-hour ahead barometric pressure forecast for synoptic Antarctic weather system tracking"
+    },
+    {
+      "name": "target_humidity_1h_percent",
+      "variable": "humidity_percent",
+      "horizon": "t + 1h",
+      "definition": "humidity_percent(t + 1 hour)",
+      "description": "1-hour ahead relative humidity forecast for HVAC moisture condensation control"
+    },
+    {
+      "name": "target_humidity_6h_percent",
+      "variable": "humidity_percent",
+      "horizon": "t + 6h",
+      "definition": "humidity_percent(t + 6 hours)",
+      "description": "6-hour ahead relative humidity forecast for station ventilation pre-drying and sensor icing risk"
+    },
+    {
+      "name": "target_humidity_24h_percent",
+      "variable": "humidity_percent",
+      "horizon": "t + 24h",
+      "definition": "humidity_percent(t + 24 hours)",
+      "description": "24-hour ahead relative humidity forecast for diurnal moisture dynamics"
+    }
+  ],
+  "temporal_split_strategy": {
+    "total_records_per_station": 8760,
+    "total_records_combined": 17520,
+    "coverage": "2026-01-01T00:00:00Z to 2026-12-31T23:00:00Z (365 days / 8,760 hours)",
+    "train_ratio": 0.70,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "train_period": "2026-01-01T00:00:00Z to 2026-09-13T17:00:00Z (6,132 hours/station)",
+    "val_period": "2026-09-13T18:00:00Z to 2026-11-07T05:00:00Z (1,314 hours/station)",
+    "test_period": "2026-11-07T06:00:00Z to 2026-12-31T23:00:00Z (1,314 hours/station)"
+  }
+}

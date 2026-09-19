@@ -1,0 +1,39 @@
+{
+  "manifest_version": "1.0.0",
+  "subsystem": "Environmental Forecasting ML Subsystem",
+  "data_provenance": "SYNTHETIC_POLARIX_DATA",
+  "provenance_disclaimer": "Generated deterministically from physically grounded Antarctic atmospheric transfer equations and seasonal solar geometry conditioned on NCPOR empirical bounds.",
+  "random_seed": 42,
+  "stations": {
+    "MTR": {
+      "records": 8760,
+      "filename": "maitri_environmental_telemetry.csv",
+      "sha256": "c56cafa396e289d93fcacede5e1fb0ea667a242981ddbc794c213b8375d1bf2d",
+      "stats": {
+        "wind_mean_mps": 11.587075342465754,
+        "pressure_mean_hpa": 984.963892694064,
+        "humidity_mean_pct": 63.467648401826494
+      }
+    },
+    "BRT": {
+      "records": 8760,
+      "filename": "bharati_environmental_telemetry.csv",
+      "sha256": "69015681982fa5c59fa48c82bd3ccd69a7fec4e756bbc70d6dfe5ae2e830a232",
+      "stats": {
+        "wind_mean_mps": 13.194368721461185,
+        "pressure_mean_hpa": 993.1319178082191,
+        "humidity_mean_pct": 75.75103881278538
+      }
+    },
+    "COMBINED": {
+      "records": 17520,
+      "filename": "polarix_environmental_telemetry.csv",
+      "sha256": "c233ff3a0c88d929db78cb74081bed758e07ec4db2e2779d549b8ea26800aaf5"
+    }
+  },
+  "chronological_splits": {
+    "train_period": "2026-01-01T00:00:00Z to 2026-09-13T17:00:00Z (6,132 records / station)",
+    "val_period": "2026-09-13T18:00:00Z to 2026-11-07T05:00:00Z (1,314 records / station)",
+    "test_period": "2026-11-07T06:00:00Z to 2026-12-31T23:00:00Z (1,314 records / station)"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "contract_name": "polarix-environmental-ml-contract-v1",
+  "subsystem": "ml/environmental",
+  "model_version": "environmental-lstm-v1",
+  "provenance": "SYNTHETIC_POLARIX_DATA",
+  "status_codes": [
+    "PREDICTION_AVAILABLE",
+    "INSUFFICIENT_HISTORY",
+    "INVALID_INPUT"
+  ],
+  "required_lookback_hours": 24,
+  "input_schema": {
+    "station_id": {
+      "type": "string",
+      "enum": [
+        "MTR",
+        "BRT"
+      ]
+    },
+    "telemetry": {
+      "type": "array",
+      "min_items": 24,
+      "item_fields": [
+        "timestamp",
+        "wind_speed_mps",
+        "pressure_hpa",
+        "humidity_percent",
+        "temperature_c"
+      ]
+    }
+  },
+  "output_schema": {
+    "station_id": "string",
+    "timestamp": "string (ISO-8601 UTC)",
+    "status": "string",
+    "model_version": "string",
+    "forecasts": {
+      "wind_speed_mps": {
+        "1h": "float (m/s)",
+        "6h": "float (m/s)",
+        "24h": "float (m/s)"
+      },
+      "pressure_hpa": {
+        "1h": "float (hPa)",
+        "6h": "float (hPa)",
+        "24h": "float (hPa)"
+      },
+      "humidity_percent": {
+        "1h": "float (%)",
+        "6h": "float (%)",
+        "24h": "float (%)"
+      }
+    },
+    "provenance": {
+      "source": "string",
+      "model_status": "string",
+      "disclaimer": "string"
+    }
+  }
+}

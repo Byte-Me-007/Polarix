@@ -1,0 +1,43 @@
+{
+  "model_name": "environmental-lstm-v1",
+  "model_type": "EnvironmentalLSTM",
+  "provenance": "SYNTHETIC_POLARIX_DATA",
+  "random_seed": 42,
+  "input_dim": 9,
+  "feature_cols": [
+    "wind_speed_mps",
+    "pressure_hpa",
+    "humidity_percent",
+    "temperature_c",
+    "sin_hour",
+    "cos_hour",
+    "sin_day",
+    "cos_day",
+    "is_bharati"
+  ],
+  "target_cols": [
+    "target_wind_speed_1h_mps",
+    "target_wind_speed_6h_mps",
+    "target_wind_speed_24h_mps",
+    "target_pressure_1h_hpa",
+    "target_pressure_6h_hpa",
+    "target_pressure_24h_hpa",
+    "target_humidity_1h_percent",
+    "target_humidity_6h_percent",
+    "target_humidity_24h_percent"
+  ],
+  "lookback_hours": 24,
+  "hidden_dim": 64,
+  "num_layers": 2,
+  "dropout": 0.1,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "best_epoch": 6,
+  "best_val_loss_normalized": 0.350669573747216,
+  "parameter_counts": {
+    "total_parameters": 56041,
+    "trainable_parameters": 56041
+  },
+  "training_samples": 12218,
+  "validation_samples": 2582
+}

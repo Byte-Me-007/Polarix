@@ -1,0 +1,33 @@
+{
+  "milestone_name": "ENVIRONMENTAL_FORECASTING_ML_FOUNDATION",
+  "status": "VALIDATED_STANDALONE_MODULE",
+  "author": "Person C \u2014 ML Specialist",
+  "model_version": "environmental-lstm-v1",
+  "created_at": "2026-09-19",
+  "files_and_hashes": {
+    "model_weights": {
+      "path": "ml/environmental/models/environmental_lstm_v1.pt",
+      "sha256": "30ec5d07b6e8059b48a8290c8bba48f507b77f8958686c4791136330036d747c"
+    },
+    "model_config": {
+      "path": "ml/environmental/models/environmental_lstm_v1_config.json",
+      "sha256": "a93dc729fa34f4115c52a6d4f42cec957aa18867a4c6b40ec35d7064f7c1cf48"
+    },
+    "model_scaler": {
+      "path": "ml/environmental/models/environmental_lstm_v1_scaler.json",
+      "sha256": "fd9d2510c09676fa6c09a7c0f94efba6b20772a9a76394345f733276401a4627"
+    },
+    "metrics_json": {
+      "path": "ml/environmental/results/environmental_metrics.json",
+      "sha256": "a97a74ead70a9265e5dd104ae219b63239f835e4fb0111cbb5aefce7c857d6b7"
+    },
+    "evaluation_report": {
+      "path": "ml/environmental/results/environmental_evaluation_report.md",
+      "sha256": "c8cf3a77e60fde518d3c7927b0235ba9704d1ce091846d70a1c77a8922079de2"
+    },
+    "inference_contract": {
+      "path": "ml/environmental/results/environmental_ml_inference_contract.json",
+      "sha256": "8ea55d181d1bf8d1a5f33fd582e7f64807a4fb4dcf5eb4a7dacc9aa31f4f7fc4"
+    }
+  }
+}
