@@ -353,6 +353,41 @@ Judge-friendly orchestration controller that coordinates full operational scenar
     4. **`SATELLITE_OUTAGE`**: Uplink severed, offline queueing activated, critical alerts preserved.
     5. **`RECOVERY`**: Network restored, pending backlog replayed and synchronized.
 
+## Integration Contracts & Team Handoff
+
+For the exhaustive specification with all schemas, models, and payloads, see [docs/INTEGRATION_CONTRACT.md](file:///Users/parthipan/Documents/Polarix_A/Polarix/docs/INTEGRATION_CONTRACT.md).
+
+### Quick Handoff for Person B (Frontend Dashboard)
+- **Dashboard Telemetry & Sensors**:
+  - Stations list: `GET /stations`
+  - Latest readings per station: `GET /stations/{station_id}/telemetry/latest`
+  - Live sensor stream: WebSocket `ws://127.0.0.1:8000/ws/sensor-readings`
+- **Resource Depletion Meters**:
+  - Resource forecasts: `GET /stations/{station_id}/resources/forecast`
+- **Energy Optimization Recommendations**:
+  - Optimization mode & load actions: `GET /stations/{station_id}/energy/optimization`
+- **Alert Center**:
+  - Active alerts: `GET /stations/{station_id}/alerts?status=ACTIVE`
+  - Acknowledge alert: `POST /alerts/{alert_id}/ack`
+  - Resolve alert: `POST /alerts/{alert_id}/resolve`
+- **Network Sync & Satellite Outage Indicator**:
+  - Connection status & queue count: `GET /sync/status`
+  - Offline mode trigger: `POST /demo/network/offline`
+  - Online recovery & sync trigger: `POST /demo/network/online`
+- **Demo Scenario Execution**:
+  - 1-Click scenario start: `POST /demo/scenarios/{station_id}/{scenario_name}/start`
+  - Full 5-Phase SIH demo run: `POST /demo/run/full-sequence/{station_id}`
+
+### Quick Handoff for Person C (Machine Learning Integration)
+- **Anomaly Score Injection**:
+  - Ingest telemetry via `POST /telemetry` or MQTT topic `antarctic/{station_id}/telemetry`.
+  - Include computed `anomaly_score` ($0.0 \le \text{score} \le 1.0$) and `quality` (`GOOD`, `WARNING`, `BAD`, `OFFLINE`).
+- **Backend Autonomous Reactions**:
+  - `quality == "BAD"` $\rightarrow$ Backend auto-creates `HIGH` severity `SENSOR_FAULT` alert containing the ML anomaly score.
+  - `quality == "OFFLINE"` $\rightarrow$ Backend auto-creates `CRITICAL` severity `SENSOR_OFFLINE` alert.
+  - Energy optimization engine automatically responds to degraded telemetry to shed non-vital loads.
+
+
 
 
 
