@@ -72,7 +72,7 @@ const getStatusColor = (status) => {
 // zones: array of zone objects from station.digitalTwin.zones
 // sensor: sensor object from station.sensors
 // ─────────────────────────────────────────────────────────────────────────────
-export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
+export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [], isHeatmap = false }) => {
   const [hovered, setHovered] = useState(false);
   const beaconRef  = useRef();
   const ringRef    = useRef();
@@ -100,6 +100,14 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
   const isElevated = dispY > rawY + 0.3;
   const stemHeight = Math.max(0.01, dispY - rawY - 0.2); // slight gap at sensor end
 
+  const beaconRadius = isSelected
+    ? 0.52
+    : hovered
+    ? 0.45
+    : isHeatmap
+    ? 0.26
+    : 0.38;
+
   return (
     <group position={[dispX, dispY, dispZ]}>
       {/* ─────────────────────────────────────────────────────────────── */}
@@ -109,14 +117,14 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
       {isElevated && (
         <>
           <mesh position={[0, -stemHeight / 2 - 0.2, 0]}>
-            <cylinderGeometry args={[0.04, 0.04, stemHeight, 8]} />
-            <meshBasicMaterial color="#2d333b" />
+            <cylinderGeometry args={[0.035, 0.035, stemHeight, 8]} />
+            <meshBasicMaterial color="#2d333b" transparent opacity={isHeatmap ? 0.55 : 0.9} />
           </mesh>
 
           {/* Surface Mounting Foot Collar */}
           <mesh position={[0, -stemHeight - 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.14, 0.30, 16]} />
-            <meshBasicMaterial color="#383f4a" side={2} />
+            <ringGeometry args={[0.12, 0.26, 16]} />
+            <meshBasicMaterial color="#383f4a" side={2} transparent opacity={isHeatmap ? 0.55 : 0.9} />
           </mesh>
         </>
       )}
@@ -125,14 +133,14 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
       {/* 2. CIRCULAR INSTRUMENTATION STATUS RING                        */}
       {/* ─────────────────────────────────────────────────────────────── */}
       <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.52, 0.68, 28]} />
-        <meshBasicMaterial color={color} side={2} transparent opacity={0.88} />
+        <ringGeometry args={[isHeatmap ? 0.38 : 0.52, isHeatmap ? 0.50 : 0.68, 28]} />
+        <meshBasicMaterial color={color} side={2} transparent opacity={isHeatmap ? 0.65 : 0.88} />
       </mesh>
 
       {/* Outer Selected Ring */}
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.82, 0.98, 32]} />
+          <ringGeometry args={[0.72, 0.88, 32]} />
           <meshBasicMaterial color="#b65a1f" side={2} />
         </mesh>
       )}
@@ -160,13 +168,15 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
           document.body.style.cursor = 'default';
         }}
       >
-        <sphereGeometry args={[isSelected ? 0.55 : hovered ? 0.48 : 0.38, 16, 16]} />
+        <sphereGeometry args={[beaconRadius, 16, 16]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={isSelected ? 0.95 : hovered ? 0.80 : 0.50}
+          emissiveIntensity={isSelected ? 0.95 : hovered ? 0.80 : isHeatmap ? 0.35 : 0.50}
           roughness={0.25}
           metalness={0.3}
+          transparent={isHeatmap && !hovered && !isSelected}
+          opacity={isHeatmap && !hovered && !isSelected ? 0.82 : 1.0}
         />
       </mesh>
 
@@ -175,9 +185,9 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
       {/* ─────────────────────────────────────────────────────────────── */}
       {(hovered || isSelected || isCritical) && (
         <Html
-          position={[0, 0.95, 0]}
+          position={[0, 1.15, 0]}
           center
-          distanceFactor={45}
+          distanceFactor={42}
           zIndexRange={[300, 0]}
         >
           <div
@@ -189,29 +199,46 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
               e.stopPropagation();
             }}
             style={{
-              background: '#ffffff',
+              background: 'rgba(255, 255, 255, 0.98)',
               border: `1.5px solid ${isSelected ? '#b65a1f' : color}`,
-              borderRadius: '3px',
-              padding: isSelected ? '4px 9px' : '3px 8px',
+              borderRadius: '4px',
+              padding: '6px 10px',
               boxShadow: isSelected
-                ? '0 6px 18px rgba(182, 90, 31, 0.35)'
-                : '0 4px 12px rgba(0,0,0,0.18)',
+                ? '0 6px 20px rgba(182, 90, 31, 0.40)'
+                : '0 4px 14px rgba(0, 0, 0, 0.22)',
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '11px',
+              fontSize: '10px',
               whiteSpace: 'nowrap',
               pointerEvents: 'auto',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              lineHeight: 1.25,
-              transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+              gap: '2px',
+              minWidth: '135px',
+              textAlign: 'left',
+              lineHeight: 1.3,
+              transform: isSelected ? 'scale(1.05)' : 'scale(1)',
               transition: 'transform 0.15s ease'
             }}
           >
+            {/* SENSOR NAME */}
             <div
               style={{
-                fontWeight: isSelected ? 800 : 700,
+                fontSize: '9px',
+                fontWeight: 600,
+                color: '#64748b',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '190px'
+              }}
+            >
+              {sensor.name || 'SENSOR'}
+            </div>
+
+            {/* SENSOR ID */}
+            <div
+              style={{
+                fontWeight: 800,
                 color: '#191c20',
                 display: 'flex',
                 alignItems: 'center',
@@ -221,16 +248,47 @@ export const SensorMarker = ({ sensor, isSelected, onSelect, zones = [] }) => {
             >
               <span
                 style={{
-                  width: isSelected ? '7px' : '6px',
-                  height: isSelected ? '7px' : '6px',
+                  width: '6px',
+                  height: '6px',
                   borderRadius: '50%',
-                  background: color
+                  background: color,
+                  flexShrink: 0
                 }}
               />
               <span>{sensor.id}</span>
             </div>
-            <div style={{ fontSize: '10px', color: '#4b525d', fontWeight: 600 }}>
-              {sensor.value} {sensor.unit}
+
+            {/* CURRENT VALUE & UNIT */}
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: '#0f172a',
+                paddingTop: '2px',
+                paddingBottom: '2px'
+              }}
+            >
+              {sensor.value ?? 'N/A'} <span style={{ fontSize: '10px', color: '#64748b' }}>{sensor.unit}</span>
+            </div>
+
+            {/* STATUS & TIMESTAMP */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderTop: '1px solid #e2e8f0',
+                paddingTop: '3px',
+                marginTop: '1px',
+                fontSize: '8.5px'
+              }}
+            >
+              <span style={{ fontWeight: 800, color }}>
+                ● {sensor.status || 'NORMAL'}
+              </span>
+              <span style={{ color: '#94a3b8' }}>
+                {sensor.lastUpdate || 'Just now'}
+              </span>
             </div>
           </div>
         </Html>

@@ -202,9 +202,9 @@ export const StationZone = ({
           >
             <planeGeometry args={[sx * 0.94, sz * 0.94]} />
             <meshBasicMaterial
-              color="#dcd5c9"
+              color={meta?.hex || "#dcd5c9"}
               transparent
-              opacity={0.35}
+              opacity={0.14}
               depthWrite={false}
               side={THREE.DoubleSide}
             />

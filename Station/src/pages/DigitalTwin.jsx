@@ -13,13 +13,14 @@ import { useIncidentGraph } from '../digital-twin/useIncidentGraph';
 import { DemoMode } from '../components/DemoMode';
 import { StationSelector } from '../components/StationSelector';
 import { useStation } from '../context/StationContext';
+import { isSensorMatchingMetric, normalizeSensorValue } from '../digital-twin/SpatialHeatmap';
 
 // Mode definitions
 const MODES = [
   { id: 'NORMAL',  label: 'NORMAL',  desc: 'Full station view — realistic appearance' },
   { id: 'XRAY',    label: 'X-RAY',   desc: 'Transparent shells — internal infrastructure visible' },
   { id: 'SYSTEM',  label: 'SYSTEM',  desc: 'Energy flow relationships and infrastructure dependencies' },
-  { id: 'HEATMAP', label: 'HEATMAP', desc: 'Spatial sensor condition anomaly intensity overlay' },
+  { id: 'HEATMAP', label: 'HEAT MAP', desc: 'Spatial telemetry intensity and sensor distribution field' },
   { id: 'REPLAY',  label: 'REPLAY',  desc: 'Incident playback timeline — backend data required' }
 ];
 
@@ -41,16 +42,45 @@ export const DigitalTwin = () => {
   // ── Derived incident graph (state-based, no fake data) ───────────────────
   const incidentGraph = useIncidentGraph();
 
-  const [twinMode, setTwinMode]                     = useState('NORMAL');
-  const [selectedSensorId, setSelectedSensorId]     = useState(null);
-  const [selectedAsset, setSelectedAsset]           = useState(null);
-  const [showSensors, setShowSensors]               = useState(true);
-  const [showLabels, setShowLabels]                 = useState(true);
-  const [resetTrigger, setResetTrigger]             = useState(0);
-  const [focusZone, setFocusZone]                   = useState(null);
-  const [activeTestNum, setActiveTestNum]           = useState(null);
+  const [twinMode, setTwinMode]                             = useState('NORMAL');
+  const [heatmapMetric, setHeatmapMetric]                   = useState('TEMPERATURE');
+  const [selectedSensorId, setSelectedSensorId]             = useState(null);
+  const [selectedAsset, setSelectedAsset]                   = useState(null);
+  const [showSensors, setShowSensors]                       = useState(true);
+  const [showLabels, setShowLabels]                         = useState(true);
+  const [resetTrigger, setResetTrigger]                     = useState(0);
+  const [focusZone, setFocusZone]                           = useState(null);
+  const [activeTestNum, setActiveTestNum]                   = useState(null);
   const [selectedIncidentNodeId, setSelectedIncidentNodeId] = useState(null);
   const [incidentBannerDismissed, setIncidentBannerDismissed] = useState(false);
+
+  // Dynamic metric options strictly computed from existing station sensors
+  const availableHeatmapMetrics = React.useMemo(() => {
+    const candidateMetrics = [
+      { id: 'TEMPERATURE', label: 'TEMPERATURE' },
+      { id: 'WIND',        label: 'WIND' },
+      { id: 'POWER',       label: 'POWER' },
+      { id: 'STRUCTURAL',  label: 'STRUCTURAL' },
+      { id: 'FUEL',        label: 'FUEL' },
+      { id: 'ALL',         label: 'ALL METRICS' }
+    ];
+    return candidateMetrics.filter(m => {
+      if (m.id === 'ALL') return sensors.length > 0;
+      return sensors.some(s => isSensorMatchingMetric(s, m.id));
+    });
+  }, [sensors]);
+
+  // Keep heatmapMetric valid when station changes
+  useEffect(() => {
+    if (availableHeatmapMetrics.length > 0 && !availableHeatmapMetrics.some(m => m.id === heatmapMetric)) {
+      setHeatmapMetric(availableHeatmapMetrics[0].id);
+    }
+  }, [availableHeatmapMetrics, heatmapMetric]);
+
+  // Check if current metric has valid active telemetry
+  const hasTelemetryForMetric = React.useMemo(() => {
+    return sensors.some(s => isSensorMatchingMetric(s, heatmapMetric) && normalizeSensorValue(s) !== null);
+  }, [sensors, heatmapMetric]);
 
   // Clear all spatial selection state when station changes
   // (sensor/asset positions are station-specific; stale selection would be meaningless)
@@ -303,32 +333,50 @@ export const DigitalTwin = () => {
         </div>
       </div>
 
-      {/* ── Infrastructure Component Quick Selector Strip ── */}
-      <div className="twin-component-strip" role="toolbar" aria-label="Select Infrastructure Component">
-        <span className="twin-component-label">INFRASTRUCTURE ASSETS:</span>
-        {[
-          { id: 'ENERGY-BATT-01',    type: 'BATTERY',     label: 'BATTERY BANK A',  zone: 'ENERGY', status: 'RUNNING' },
-          { id: 'ENERGY-BATT-02',    type: 'BATTERY',     label: 'BATTERY BANK B',  zone: 'ENERGY', status: 'RUNNING' },
-          { id: 'ENERGY-INV-01',     type: 'INVERTER',    label: 'MICROGRID INV.',  zone: 'ENERGY', status: 'RUNNING' },
-          { id: 'ENERGY-TRANS-01',   type: 'TRANSFORMER', label: 'HV TRANSFORMER',  zone: 'ENERGY', status: 'RUNNING' },
-          { id: 'GENERATOR-GEN-01',  type: 'GENERATOR',   label: 'DIESEL GEN #1',   zone: 'GENERATOR', status: 'RUNNING' },
-          { id: 'GENERATOR-GEN-02',  type: 'GENERATOR',   label: 'DIESEL GEN #2',   zone: 'GENERATOR', status: 'RUNNING' },
-          { id: 'GENERATOR-FUEL-01', type: 'FUEL_TANK',   label: 'DAY TANK',        zone: 'GENERATOR', status: 'RUNNING' },
-          { id: 'MAIN-HVAC-01',      type: 'HVAC',        label: 'HVAC UNIT A',     zone: 'MAIN', status: 'RUNNING' },
-          { id: 'RESEARCH-RES-01',   type: 'RESEARCH',    label: 'MET ARRAY',       zone: 'RESEARCH', status: 'RUNNING' },
-          { id: 'STORAGE-FREEZE-01', type: 'FREEZER',     label: 'CRYO FREEZER',    zone: 'STORAGE', status: 'RUNNING' },
-        ].map(comp => (
-          <button
-            key={comp.id}
-            type="button"
-            className={`twin-comp-chip ${selectedAsset?.id === comp.id ? 'active' : ''}`}
-            onClick={() => handleSelectAsset(comp)}
-          >
-            <span className="twin-comp-dot" />
-            {comp.label}
-          </button>
-        ))}
-      </div>
+      {/* ── Heat Map Metric Selector Strip (Visible in HEATMAP mode) ── */}
+      {twinMode === 'HEATMAP' ? (
+        <div className="twin-component-strip" role="toolbar" aria-label="Select Heat Map Metric">
+          <span className="twin-component-label">HEAT MAP METRIC:</span>
+          {availableHeatmapMetrics.map(metric => (
+            <button
+              key={metric.id}
+              type="button"
+              className={`twin-comp-chip ${heatmapMetric === metric.id ? 'active' : ''}`}
+              onClick={() => setHeatmapMetric(metric.id)}
+            >
+              <span className="twin-comp-dot" />
+              {metric.label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        /* ── Infrastructure Component Quick Selector Strip (Normal / X-Ray / System modes) ── */
+        <div className="twin-component-strip" role="toolbar" aria-label="Select Infrastructure Component">
+          <span className="twin-component-label">INFRASTRUCTURE ASSETS:</span>
+          {[
+            { id: 'ENERGY-BATT-01',    type: 'BATTERY',     label: 'BATTERY BANK A',  zone: 'ENERGY', status: 'RUNNING' },
+            { id: 'ENERGY-BATT-02',    type: 'BATTERY',     label: 'BATTERY BANK B',  zone: 'ENERGY', status: 'RUNNING' },
+            { id: 'ENERGY-INV-01',     type: 'INVERTER',    label: 'MICROGRID INV.',  zone: 'ENERGY', status: 'RUNNING' },
+            { id: 'ENERGY-TRANS-01',   type: 'TRANSFORMER', label: 'HV TRANSFORMER',  zone: 'ENERGY', status: 'RUNNING' },
+            { id: 'GENERATOR-GEN-01',  type: 'GENERATOR',   label: 'DIESEL GEN #1',   zone: 'GENERATOR', status: 'RUNNING' },
+            { id: 'GENERATOR-GEN-02',  type: 'GENERATOR',   label: 'DIESEL GEN #2',   zone: 'GENERATOR', status: 'RUNNING' },
+            { id: 'GENERATOR-FUEL-01', type: 'FUEL_TANK',   label: 'DAY TANK',        zone: 'GENERATOR', status: 'RUNNING' },
+            { id: 'MAIN-HVAC-01',      type: 'HVAC',        label: 'HVAC UNIT A',     zone: 'MAIN', status: 'RUNNING' },
+            { id: 'RESEARCH-RES-01',   type: 'RESEARCH',    label: 'MET ARRAY',       zone: 'RESEARCH', status: 'RUNNING' },
+            { id: 'STORAGE-FREEZE-01', type: 'FREEZER',     label: 'CRYO FREEZER',    zone: 'STORAGE', status: 'RUNNING' },
+          ].map(comp => (
+            <button
+              key={comp.id}
+              type="button"
+              className={`twin-comp-chip ${selectedAsset?.id === comp.id ? 'active' : ''}`}
+              onClick={() => handleSelectAsset(comp)}
+            >
+              <span className="twin-comp-dot" />
+              {comp.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ── Main 3D Viewport Card ── */}
       <section className="twin-viewport-card" aria-label="3D Spatial Model Viewport">
@@ -359,8 +407,38 @@ export const DigitalTwin = () => {
 
           {/* Heatmap inspection badge (HEATMAP mode only) */}
           {twinMode === 'HEATMAP' && (
-            <div className="twin-inspection-chip">
-              INSPECTION MODE — TRANSPARENT ROOF
+            <div className="twin-inspection-chip" style={{ background: 'rgba(43, 92, 143, 0.12)', color: '#2b5c8f', borderColor: 'rgba(43, 92, 143, 0.35)' }}>
+              HEAT MAP MODE — {heatmapMetric} SPATIAL INTENSITY FIELD
+            </div>
+          )}
+
+          {/* Missing Telemetry Overlay Banner */}
+          {twinMode === 'HEATMAP' && !hasTelemetryForMetric && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '46%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(25, 28, 32, 0.94)',
+                color: '#f8f6f0',
+                padding: '14px 26px',
+                borderRadius: '6px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                border: '1px solid rgba(217, 130, 26, 0.45)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                zIndex: 35,
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <span style={{ color: '#d9821a' }}>⚠️</span>
+              NO TELEMETRY AVAILABLE FOR {heatmapMetric}
             </div>
           )}
 
@@ -397,6 +475,7 @@ export const DigitalTwin = () => {
             onSelectAsset={handleSelectAsset}
             selectedAssetId={selectedAsset?.id}
             activeStation={activeStation}
+            heatmapMetric={heatmapMetric}
             incidentGraph={incidentGraph}
             onIncidentNodeClick={handleIncidentNodeClick}
             selectedIncidentNodeId={selectedIncidentNodeId}
@@ -409,6 +488,7 @@ export const DigitalTwin = () => {
               isHeatmapActive={twinMode === 'HEATMAP'}
               isSystemActive={twinMode === 'SYSTEM'}
               telemetry={telemetry}
+              heatmapMetric={heatmapMetric}
             />
           )}
 

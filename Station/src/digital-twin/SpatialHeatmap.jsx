@@ -1,251 +1,212 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
 /**
- * High-resolution soft radial gradient texture with natural falloff.
- * Pure white with alpha attenuation; tinted dynamically via meshBasicMaterial.color
- * to enable zero-overhead 300-800ms smooth color & opacity interpolation.
+ * SpatialHeatmap — Continuous Scientific Telemetry Intensity Field
+ *
+ * Implements a physically continuous, smoothly interpolated heat field
+ * driven directly by actual sensor telemetry, respecting physical 3D coordinates,
+ * configured min/max thresholds, and domain-specific metric filters.
+ *
+ * Color Scale (Restrained Scientific Scale):
+ *   0.00 - 0.33: Cool / muted blue (rgb: 43, 92, 143)
+ *   0.33 - 0.66: Cyan / neutral transition (rgb: 56, 142, 142)
+ *   0.66 - 0.85: Warm amber (rgb: 217, 130, 26)
+ *   0.85 - 1.00: Restrained deep red (rgb: 200, 42, 42)
  */
-let cachedTexture = null;
-const getRadialGradientTexture = () => {
-  if (cachedTexture) return cachedTexture;
 
-  const size = 256;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  const cx = size / 2;
-
-  const grad = ctx.createRadialGradient(cx, cx, 0, cx, cx, cx * 0.95);
-  grad.addColorStop(0.00, 'rgba(255, 255, 255, 1.00)');
-  grad.addColorStop(0.20, 'rgba(255, 255, 255, 0.82)');
-  grad.addColorStop(0.48, 'rgba(255, 255, 255, 0.42)');
-  grad.addColorStop(0.74, 'rgba(255, 255, 255, 0.14)');
-  grad.addColorStop(0.92, 'rgba(255, 255, 255, 0.02)');
-  grad.addColorStop(1.00, 'rgba(255, 255, 255, 0.00)');
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-
-  cachedTexture = new THREE.CanvasTexture(canvas);
-  cachedTexture.generateMipmaps = true;
-  return cachedTexture;
-};
-
-// Restrained POLARIS color palette (NO neon, NO sci-fi glow)
-const COLOR_CRITICAL = new THREE.Color('#c82a2a'); // Restrained red
-const COLOR_WARNING  = new THREE.Color('#d9821a'); // Warm amber
-const COLOR_NORMAL   = new THREE.Color('#3f6e4a'); // Subtle sage
-const COLOR_NEUTRAL  = new THREE.Color('#727b87'); // Neutral gray
-const COLOR_SELECTED = new THREE.Color('#b65a1f'); // Selected highlight amber
-
-/**
- * Computes visual heatmap parameters according to the specification:
- * Telemetry -> Anomaly Score -> Anomaly Status -> Severity -> Opacity + Radius
- */
-export const computeHeatmapParams = (sensor, isSelected = false, overlapAttenuation = 1.0) => {
-  const rawStatus = (sensor.status || '').toUpperCase();
-  const anomalyScore = typeof sensor.anomaly_score === 'number'
-    ? sensor.anomaly_score
-    : typeof sensor.anomalyScore === 'number'
-      ? sensor.anomalyScore
-      : null;
-
-  // OFFLINE or UNKNOWN: no alarm heatmap
-  if (rawStatus === 'OFFLINE' || rawStatus === 'UNKNOWN') {
-    return {
-      targetColor: COLOR_NEUTRAL,
-      targetOpacity: 0.0,
-      targetRadius: 1.0,
-      hasAlarm: false,
-      isCritical: false,
-      isWarning: false
-    };
-  }
-
-  let color = COLOR_NORMAL;
-  let baseOpacity = 0.06;
-  let baseRadius = 2.5;
-  let hasAlarm = false;
-  let isCritical = false;
-  let isWarning = false;
-
-  if (anomalyScore !== null) {
-    // Anomaly score driving intensity and radius
-    if (anomalyScore >= 0.75 || rawStatus === 'CRITICAL') {
-      color = COLOR_CRITICAL;
-      isCritical = true;
-      hasAlarm = true;
-      // 0.75 -> 0.42, 1.00 -> 0.58
-      const t = Math.min(1, Math.max(0, (anomalyScore - 0.75) / 0.25));
-      baseOpacity = 0.42 + t * 0.16;
-      baseRadius = 7.5 + t * 2.0;
-    } else if (anomalyScore >= 0.35 || rawStatus === 'WARNING') {
-      color = COLOR_WARNING;
-      isWarning = true;
-      hasAlarm = true;
-      // 0.35 -> 0.22, 0.75 -> 0.34
-      const t = Math.min(1, Math.max(0, (anomalyScore - 0.35) / 0.40));
-      baseOpacity = 0.22 + t * 0.12;
-      baseRadius = 4.5 + t * 1.8;
-    } else if (anomalyScore >= 0.10) {
-      color = COLOR_NORMAL;
-      baseOpacity = 0.06 + anomalyScore * 0.05;
-      baseRadius = 2.4 + anomalyScore * 1.5;
-    } else {
-      color = COLOR_NORMAL;
-      baseOpacity = 0.05;
-      baseRadius = 2.0;
-    }
+// Restrained color ramp interpolation
+export const getScientificColorRGB = (t) => {
+  t = Math.max(0, Math.min(1, t));
+  if (t < 0.33) {
+    const f = t / 0.33;
+    const r = Math.round(43 + (56 - 43) * f);
+    const g = Math.round(92 + (142 - 92) * f);
+    const b = Math.round(143 + (142 - 143) * f);
+    return [r, g, b];
+  } else if (t < 0.66) {
+    const f = (t - 0.33) / 0.33;
+    const r = Math.round(56 + (217 - 56) * f);
+    const g = Math.round(142 + (130 - 142) * f);
+    const b = Math.round(142 + (26 - 142) * f);
+    return [r, g, b];
   } else {
-    // Data Fallback (Section 16): Use sensor status when anomaly_score is unavailable
-    switch (rawStatus) {
-      case 'CRITICAL':
-        color = COLOR_CRITICAL;
-        baseOpacity = 0.52;
-        baseRadius = 8.0;
-        hasAlarm = true;
-        isCritical = true;
-        break;
-      case 'WARNING':
-        color = COLOR_WARNING;
-        baseOpacity = 0.28;
-        baseRadius = 5.2;
-        hasAlarm = true;
-        isWarning = true;
-        break;
-      case 'NORMAL':
-        color = COLOR_NORMAL;
-        baseOpacity = 0.06;
-        baseRadius = 2.5;
-        break;
-      default:
-        color = COLOR_NEUTRAL;
-        baseOpacity = 0.0;
-        baseRadius = 1.0;
-        break;
-    }
+    const f = (t - 0.66) / 0.34;
+    const r = Math.round(217 + (200 - 217) * f);
+    const g = Math.round(130 + (42 - 130) * f);
+    const b = Math.round(26 + (42 - 26) * f);
+    return [r, g, b];
   }
-
-  // Intelligent multi-sensor zone overlap attenuation (Section 7)
-  baseOpacity *= overlapAttenuation;
-
-  // Selected sensor: intensify contribution (Section 10)
-  if (isSelected) {
-    baseOpacity = Math.min(0.85, baseOpacity * 1.30 + 0.12);
-    baseRadius *= 1.15;
-  }
-
-  return {
-    targetColor: color,
-    targetOpacity: baseOpacity,
-    targetRadius: baseRadius,
-    hasAlarm,
-    isCritical,
-    isWarning
-  };
 };
 
 /**
- * SensorHotspot: Renders individual localized condition pool with smooth Three.js transitions (300-800ms)
+ * Normalizes sensor value strictly using configured minValue / maxValue
  */
-const SensorHotspot = ({
-  sensor,
-  zone,
-  isSelected = false,
-  overlapAttenuation = 1.0,
-  texture
-}) => {
-  const meshRef = useRef();
-  const matRef = useRef();
-  const ringRef = useRef();
-  const ringMatRef = useRef();
+export const normalizeSensorValue = (sensor) => {
+  if (!sensor) return null;
+  const status = (sensor.status || '').toUpperCase();
+  if (status === 'OFFLINE' || status === 'UNKNOWN') return null;
 
-  // Animated state refs for smooth Three.js interpolation
-  const currentOpacity = useRef(0.0);
-  const currentRadius = useRef(2.5);
-  const currentColor = useRef(new THREE.Color('#3f6e4a'));
-  const currentRingOpacity = useRef(0.0);
+  const rawVal = sensor.value ?? sensor.current_value;
+  if (rawVal === null || rawVal === undefined || rawVal === '') return null;
+  const val = Number(rawVal);
+  if (isNaN(val)) return null;
 
-  const rawX = sensor.x ?? 0;
-  const rawZ = sensor.z ?? 0;
+  const min = sensor.minimum_value ?? sensor.minValue;
+  const max = sensor.maximum_value ?? sensor.maxValue;
 
-  // Floor elevation: slightly above interior floor slab or ground
-  const floorY = zone ? zone.position[1] + 0.18 : 0.12;
+  if (typeof min === 'number' && typeof max === 'number' && max > min) {
+    const clamped = Math.max(min, Math.min(max, val));
+    let norm = (clamped - min) / (max - min);
 
-  const {
-    targetColor,
-    targetOpacity,
-    targetRadius,
-    hasAlarm
-  } = useMemo(
-    () => computeHeatmapParams(sensor, isSelected, overlapAttenuation),
-    [sensor, isSelected, overlapAttenuation]
-  );
-
-  useFrame((_, delta) => {
-    // 300–800ms smooth interpolation factor (approx 500ms exponential ease-out)
-    const factor = Math.min(1.0, Math.max(0.01, delta * 5.5));
-
-    currentOpacity.current += (targetOpacity - currentOpacity.current) * factor;
-    currentRadius.current += (targetRadius - currentRadius.current) * factor;
-    currentColor.current.lerp(targetColor, factor);
-
-    if (matRef.current) {
-      matRef.current.opacity = currentOpacity.current;
-      matRef.current.color.copy(currentColor.current);
+    // Reflect severe operational alert condition if flagged
+    if (status === 'CRITICAL') {
+      norm = Math.max(norm, 0.88);
+    } else if (status === 'WARNING') {
+      norm = Math.max(norm, 0.60);
     }
+    return norm;
+  }
 
-    if (meshRef.current) {
-      const r = Math.max(0.01, currentRadius.current);
-      meshRef.current.scale.set(r, r, 1);
-      meshRef.current.visible = currentOpacity.current > 0.005;
-    }
+  // Fallback if min/max not present: check anomaly score
+  const anomaly = sensor.anomaly_score ?? sensor.anomalyScore;
+  if (typeof anomaly === 'number' && !isNaN(anomaly)) {
+    return Math.max(0, Math.min(1, anomaly));
+  }
 
-    if (ringMatRef.current && ringRef.current) {
-      const targetRingOpacity = isSelected ? 0.85 : hasAlarm ? 0.38 : 0.0;
-      currentRingOpacity.current += (targetRingOpacity - currentRingOpacity.current) * factor;
-      ringMatRef.current.opacity = currentRingOpacity.current;
-      ringRef.current.visible = currentRingOpacity.current > 0.01;
-      ringMatRef.current.color.copy(isSelected ? COLOR_SELECTED : currentColor.current);
+  if (status === 'CRITICAL') return 0.95;
+  if (status === 'WARNING') return 0.65;
+  return 0.25;
+};
+
+/**
+ * Validates whether a sensor matches the selected domain / metric filter
+ */
+export const isSensorMatchingMetric = (sensor, metric) => {
+  if (!metric || metric === 'ALL') return true;
+
+  const domain = (sensor.domain || '').toUpperCase();
+  const type = (sensor.type || '').toUpperCase();
+  const name = (sensor.name || '').toUpperCase();
+  const unit = (sensor.unit || '').toUpperCase();
+
+  switch (metric) {
+    case 'TEMPERATURE':
+      return (
+        type === 'TEMPERATURE' ||
+        unit.includes('°C') ||
+        unit.includes('K') ||
+        name.includes('TEMP') ||
+        name.includes('RTD') ||
+        name.includes('THERM')
+      );
+    case 'WIND':
+      return (
+        type === 'WIND_SPEED' ||
+        type === 'WIND' ||
+        unit.includes('KM/H') ||
+        unit.includes('M/S') ||
+        name.includes('ANEMOMETER') ||
+        name.includes('WIND')
+      );
+    case 'POWER':
+      return (
+        domain === 'ENERGY' ||
+        type === 'POWER' ||
+        type === 'IRRADIANCE' ||
+        type === 'VOLTAGE' ||
+        type === 'CURRENT' ||
+        type === 'VIBRATION' ||
+        unit.includes('KW') ||
+        unit.includes('W/M²') ||
+        unit.includes('V') ||
+        unit.includes('A') ||
+        name.includes('GENERATOR') ||
+        name.includes('SOLAR') ||
+        name.includes('BATTERY')
+      );
+    case 'STRUCTURAL':
+      return (
+        domain === 'STRUCTURE' ||
+        type === 'STRAIN' ||
+        type === 'DISPLACEMENT' ||
+        type === 'LOAD' ||
+        type === 'TILT' ||
+        unit.includes('ME') ||
+        unit.includes('MM') ||
+        unit.includes('KN') ||
+        name.includes('STRAIN') ||
+        name.includes('DISPLACEMENT') ||
+        name.includes('STILT')
+      );
+    case 'FUEL':
+      return (
+        domain === 'LOGISTICS' ||
+        type === 'LEVEL' ||
+        type === 'FLOW' ||
+        name.includes('FUEL') ||
+        name.includes('TANK') ||
+        name.includes('RESERVE') ||
+        unit.includes('L') ||
+        unit.includes('L/MIN')
+      );
+    default:
+      return true;
+  }
+};
+
+// Station world space bounds for complete ground coverage
+const BOUNDS = {
+  minX: -80,
+  maxX: 80,
+  minZ: -80,
+  maxZ: 50,
+  width: 160,
+  depth: 130,
+  centerZ: -15
+};
+
+/**
+ * SensorDatumRing: Renders a clean localized spatial focus ring at the sensor coordinates
+ */
+const SensorDatumRing = ({ sensor, norm, isSelected }) => {
+  const [r, g, b] = getScientificColorRGB(norm);
+  const colorStr = `rgb(${r}, ${g}, ${b})`;
+  const pulseRef = useRef();
+
+  useFrame(({ clock }) => {
+    if (pulseRef.current && (isSelected || norm >= 0.75)) {
+      const s = 1 + Math.sin(clock.getElapsedTime() * 3.5) * 0.15;
+      pulseRef.current.scale.set(s, s, 1);
     }
   });
 
+  const rawX = sensor.location_x ?? sensor.x ?? 0;
+  const rawZ = sensor.location_z ?? sensor.z ?? 0;
+  const rawY = Math.max(sensor.location_y ?? sensor.y ?? 0.2, 0.22);
+
   return (
-    <group position={[rawX, floorY, rawZ]}>
-      {/* 1. Localized spatial radial gradient condition wash on interior floor */}
-      <mesh
-        ref={meshRef}
-        rotation={[-Math.PI / 2, 0, 0]}
-        renderOrder={8}
-        raycast={() => null}
-      >
-        <planeGeometry args={[2, 2]} />
+    <group position={[rawX, rawY, rawZ]}>
+      {/* Base datum anchor circle */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={10}>
+        <ringGeometry args={[0.32, 0.58, 32]} />
         <meshBasicMaterial
-          ref={matRef}
-          map={texture}
+          color={colorStr}
           transparent
-          opacity={0}
+          opacity={0.78}
           depthWrite={false}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* 2. Concentric spatial focus ring around the sensor center */}
-      <mesh
-        ref={ringRef}
-        position={[0, 0.02, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        renderOrder={9}
-        raycast={() => null}
-      >
-        <ringGeometry args={[isSelected ? 0.65 : 0.42, isSelected ? 0.85 : 0.54, 32]} />
+      {/* Outer focus halo ring */}
+      <mesh ref={pulseRef} rotation={[-Math.PI / 2, 0, 0]} renderOrder={11}>
+        <ringGeometry args={[isSelected ? 0.85 : 0.68, isSelected ? 1.15 : 0.86, 32]} />
         <meshBasicMaterial
-          ref={ringMatRef}
+          color={isSelected ? '#b65a1f' : colorStr}
           transparent
-          opacity={0}
+          opacity={isSelected ? 0.90 : 0.40}
           depthWrite={false}
           side={THREE.DoubleSide}
         />
@@ -254,88 +215,170 @@ const SensorHotspot = ({
   );
 };
 
-/**
- * SpatialHeatmap: Main container handling multi-sensor zone aggregation and live updates
- */
-export const SpatialHeatmap = ({ sensors = [], zones = [], selectedSensor = null }) => {
-  const texture = useMemo(() => getRadialGradientTexture(), []);
+export const SpatialHeatmap = ({
+  sensors = [],
+  zones = [],
+  selectedSensor = null,
+  heatmapMetric = 'TEMPERATURE',
+  activeStation = 'MAITRI'
+}) => {
+  const canvasRef = useRef(document.createElement('canvas'));
+  const textureRef = useRef(null);
+  const materialRef = useRef(null);
 
-  // Multi-sensor zone aggregation to avoid ugly overlapping stacked blobs (Section 7)
-  const sensorAttenuations = useMemo(() => {
-    const map = {};
-    const byZone = {};
+  // 1. Filter sensors by the selected metric & exclude offline/null sensors
+  const activeSensors = useMemo(() => {
+    if (!sensors || sensors.length === 0) return [];
 
-    sensors.forEach((s) => {
-      const z = s.zone || 'UNKNOWN';
-      if (!byZone[z]) byZone[z] = [];
-      byZone[z].push(s);
-    });
+    return sensors
+      .filter((s) => isSensorMatchingMetric(s, heatmapMetric))
+      .map((s) => ({
+        sensor: s,
+        norm: normalizeSensorValue(s)
+      }))
+      .filter(({ norm }) => norm !== null);
+  }, [sensors, heatmapMetric]);
 
-    Object.entries(byZone).forEach(([_, zoneSensors]) => {
-      zoneSensors.forEach((s) => {
-        const st = (s.status || '').toUpperCase();
-        const score = typeof s.anomaly_score === 'number' ? s.anomaly_score : (s.anomalyScore || 0);
-        let mySev = 0;
-        if (st === 'CRITICAL' || score >= 0.75) mySev = 3;
-        else if (st === 'WARNING' || score >= 0.35) mySev = 2;
-        else if (st === 'NORMAL') mySev = 1;
+  // 2. Initialize Canvas Texture with linear filtering
+  const texture = useMemo(() => {
+    const canvas = canvasRef.current;
+    canvas.width = 256;
+    canvas.height = 256;
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    textureRef.current = tex;
+    return tex;
+  }, []);
 
-        let closeAlarms = 0;
-        let hasHigherSevNeighbor = false;
+  // 3. Render continuous spatial interpolation field to canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const width = 256;
+    const height = 256;
 
-        zoneSensors.forEach((other) => {
-          if (other.id !== s.id) {
-            const dx = (s.x ?? 0) - (other.x ?? 0);
-            const dz = (s.z ?? 0) - (other.z ?? 0);
-            const dist = Math.sqrt(dx * dx + dz * dz);
-            if (dist < 8.0) {
-              const otherSt = (other.status || '').toUpperCase();
-              const otherScore = typeof other.anomaly_score === 'number' ? other.anomaly_score : (other.anomalyScore || 0);
-              let otherSev = 0;
-              if (otherSt === 'CRITICAL' || otherScore >= 0.75) otherSev = 3;
-              else if (otherSt === 'WARNING' || otherScore >= 0.35) otherSev = 2;
-              else if (otherSt === 'NORMAL') otherSev = 1;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
 
-              if (otherSev >= 2) closeAlarms++;
-              if (otherSev > mySev) hasHigherSevNeighbor = true;
-            }
+    if (activeSensors.length === 0) {
+      ctx.clearRect(0, 0, width, height);
+      if (textureRef.current) textureRef.current.needsUpdate = true;
+      return;
+    }
+
+    const imgData = ctx.createImageData(width, height);
+    const data = imgData.data;
+
+    const sensorData = activeSensors.map(({ sensor, norm }) => ({
+      x: sensor.location_x ?? sensor.x ?? 0,
+      z: sensor.location_z ?? sensor.z ?? 0,
+      v: norm
+    }));
+
+    const sigma = 18.0; // Spatial influence radius
+    const twoSigmaSq = 2 * sigma * sigma;
+    const maxInfluenceDist = 48.0; // Outer limit of field decay
+
+    for (let py = 0; py < height; py++) {
+      // With plane rotated [-PI/2, 0, 0] and flipY=true:
+      // py = 0 -> world minZ; py = height - 1 -> world maxZ
+      const worldZ = BOUNDS.minZ + (py / (height - 1)) * BOUNDS.depth;
+
+      for (let px = 0; px < width; px++) {
+        const worldX = BOUNDS.minX + (px / (width - 1)) * BOUNDS.width;
+
+        let totalWeight = 0;
+        let weightedSum = 0;
+        let minDistSq = Infinity;
+
+        for (let i = 0; i < sensorData.length; i++) {
+          const s = sensorData[i];
+          const dx = worldX - s.x;
+          const dz = worldZ - s.z;
+          const distSq = dx * dx + dz * dz;
+
+          if (distSq < minDistSq) {
+            minDistSq = distSq;
           }
-        });
 
-        if (hasHigherSevNeighbor) {
-          map[s.id] = 0.55; // Secondary sensor dampened in presence of higher severity neighbor
-        } else if (closeAlarms > 0) {
-          map[s.id] = 0.80; // Prevent additive saturation blowout
-        } else {
-          map[s.id] = 1.0;
+          if (distSq < maxInfluenceDist * maxInfluenceDist) {
+            const w = Math.exp(-distSq / twoSigmaSq);
+            totalWeight += w;
+            weightedSum += w * s.v;
+          }
         }
-      });
-    });
 
-    return map;
-  }, [sensors]);
+        const idx = (py * width + px) * 4;
+
+        if (totalWeight > 1e-4) {
+          const t = weightedSum / totalWeight;
+          const [r, g, b] = getScientificColorRGB(t);
+
+          const minDist = Math.sqrt(minDistSq);
+          let alpha = 0.84;
+          if (minDist > 22) {
+            const f = (minDist - 22) / (48 - 22);
+            alpha = Math.max(0, 0.84 * (1 - f * f));
+          }
+
+          data[idx] = r;
+          data[idx + 1] = g;
+          data[idx + 2] = b;
+          data[idx + 3] = Math.round(alpha * 255);
+        } else {
+          data[idx] = 0;
+          data[idx + 1] = 0;
+          data[idx + 2] = 0;
+          data[idx + 3] = 0;
+        }
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+
+    if (textureRef.current) {
+      textureRef.current.needsUpdate = true;
+    }
+  }, [activeSensors]);
+
+  // Elevation: Maitri snow ground is at y = -0.05 (grid y=0.01), Bharati rock is at y = -0.08 (snow patches y=0.02)
+  const planeY = activeStation === 'BHARATI' ? 0.12 : 0.08;
 
   return (
-    <group name="spatial-data-driven-heatmap">
-      {sensors.map((sensor) => {
-        const zone = zones.find((z) => (z.code || z.id) === sensor.zone);
-        const isSelected = Boolean(selectedSensor && selectedSensor.id === sensor.id);
-        const attenuation = sensorAttenuations[sensor.id] ?? 1.0;
+    <group name="spatial-continuous-heatmap">
+      {/* Continuous scientific heat field overlaid on terrain and across facilities */}
+      <mesh
+        position={[0, planeY, BOUNDS.centerZ]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={6}
+        raycast={() => null}
+      >
+        <planeGeometry args={[BOUNDS.width, BOUNDS.depth]} />
+        <meshBasicMaterial
+          ref={materialRef}
+          map={texture}
+          transparent
+          opacity={0.88}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
-        return (
-          <SensorHotspot
-            key={`heat-${sensor.id}`}
-            sensor={sensor}
-            zone={zone}
-            isSelected={isSelected}
-            overlapAttenuation={attenuation}
-            texture={texture}
-          />
-        );
-      })}
+      {/* Discrete sensor measurement datum rings */}
+      {activeSensors.map(({ sensor, norm }) => (
+        <SensorDatumRing
+          key={`ring-${sensor.id}`}
+          sensor={sensor}
+          norm={norm}
+          isSelected={Boolean(selectedSensor && selectedSensor.id === sensor.id)}
+        />
+      ))}
     </group>
   );
 };
 
 export default SpatialHeatmap;
-

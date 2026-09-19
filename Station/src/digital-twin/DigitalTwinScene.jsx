@@ -49,6 +49,7 @@ export const DigitalTwinScene = ({
   onSelectAsset,
   selectedAssetId = null,
   activeStation = 'MAITRI',
+  heatmapMetric = 'TEMPERATURE',
   // Incident visualization
   incidentGraph = null,
   onIncidentNodeClick = null,
@@ -169,6 +170,8 @@ export const DigitalTwinScene = ({
           sensors={sensors}
           zones={zones}
           selectedSensor={selectedSensor}
+          heatmapMetric={heatmapMetric}
+          activeStation={activeStation}
         />
       )}
 
@@ -181,6 +184,7 @@ export const DigitalTwinScene = ({
             zones={zones}
             isSelected={selectedSensor?.id === sensor.id}
             onSelect={onSelectSensor}
+            isHeatmap={twinMode === 'HEATMAP'}
           />
         ))}
 
