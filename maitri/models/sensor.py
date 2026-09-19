@@ -33,6 +33,8 @@ class Sensor(Base):
     minimum_value = Column(Float, nullable=True)
     maximum_value = Column(Float, nullable=True)
     active = Column(Boolean, default=True, nullable=False)
+    asset_id = Column(String, nullable=True)
+    zone = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     station = relationship("Station", back_populates="sensors")

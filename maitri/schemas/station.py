@@ -14,6 +14,8 @@ class SensorBase(BaseModel):
     minimum_value: float | None = None
     maximum_value: float | None = None
     active: bool = True
+    asset_id: str | None = None
+    zone: str | None = None
 
 
 class SensorCreate(SensorBase):

@@ -24,6 +24,15 @@ class Settings(BaseModel):
     mqtt_topic_prefix: str = Field(
         default_factory=lambda: os.getenv("MQTT_TOPIC_PREFIX", "antarctic")
     )
+    ml_api_url: str = Field(
+        default_factory=lambda: os.getenv("ML_API_URL", "")
+    )
+    ml_api_key: str = Field(
+        default_factory=lambda: os.getenv("ML_API_KEY", "")
+    )
+    ml_api_timeout_seconds: float = Field(
+        default_factory=lambda: float(os.getenv("ML_API_TIMEOUT_SECONDS", "2.0"))
+    )
 
 
 settings = Settings()

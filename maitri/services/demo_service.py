@@ -58,6 +58,20 @@ def start_station_scenario(
         "is_active": True,
     }
 
+    try:
+        from maitri.services.event_service import log_event
+        log_event(
+            db=db,
+            station_id_or_code=station.id,
+            event_type="SCENARIO_TRANSITION",
+            description=f"Station scenario transitioned to {sc_name}",
+            severity="HIGH" if sc_name in ("POWER_CRISIS", "STORM") else "INFO",
+            source="SCENARIO_ENGINE",
+            details={"scenario": sc_name, "step": step},
+        )
+    except Exception:
+        pass
+
     # Record and execute audit command
     try:
         cmd = create_command(
@@ -112,6 +126,19 @@ def stop_station_scenario(
         "started_at": None,
         "is_active": False,
     }
+
+    try:
+        from maitri.services.event_service import log_event
+        log_event(
+            db=db,
+            station_id_or_code=station.id,
+            event_type="SCENARIO_TRANSITION",
+            description="Station scenario stopped; returned to normal baseline",
+            severity="INFO",
+            source="SCENARIO_ENGINE",
+        )
+    except Exception:
+        pass
 
     try:
         cmd = create_command(

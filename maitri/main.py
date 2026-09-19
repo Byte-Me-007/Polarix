@@ -9,6 +9,7 @@ from maitri.routers import (
     demo,
     devices,
     health,
+    ml,
     resources,
     sensors,
     stations,
@@ -37,6 +38,7 @@ app.include_router(commands.router)
 app.include_router(sync.router)
 app.include_router(demo.router)
 app.include_router(websocket.router)
+app.include_router(ml.router)
 
 
 

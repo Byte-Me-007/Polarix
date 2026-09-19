@@ -82,6 +82,17 @@ def create_telemetry(db: Session, telemetry_in: TelemetryCreate) -> Telemetry:
     db.commit()
     db.refresh(telemetry_record)
 
+    from maitri.services.websocket_manager import manager
+    manager.broadcast_telemetry_sync(
+        station_id=station.station_code,
+        sensor_id=sensor.sensor_code,
+        sensor_type=sensor.domain,
+        value=telemetry_record.value,
+        unit=telemetry_record.unit,
+        timestamp=telemetry_record.timestamp.isoformat() if telemetry_record.timestamp else None,
+        quality=telemetry_record.quality,
+    )
+
     # Optional simple alert creation for BAD or OFFLINE telemetry
     if quality == "BAD":
         create_alert(

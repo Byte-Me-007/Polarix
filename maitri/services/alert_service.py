@@ -57,6 +57,19 @@ def create_alert(db: Session, alert_in: AlertCreate) -> Alert:
     db.add(alert)
     db.commit()
     db.refresh(alert)
+
+    # Log operational event
+    from maitri.services.event_service import log_event
+    log_event(
+        db=db,
+        station_id_or_code=station.id,
+        event_type="ALERT_TRIGGERED",
+        description=f"Alert triggered: {alert.title}",
+        severity=alert.severity,
+        source="ALERT_SYSTEM",
+        details={"alert_id": alert.id, "alert_type": alert.alert_type, "sensor_id": alert.sensor_id},
+    )
+
     return alert
 
 
@@ -90,6 +103,18 @@ def acknowledge_alert(db: Session, alert_id: int) -> Alert:
     alert.acknowledged_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(alert)
+
+    from maitri.services.event_service import log_event
+    log_event(
+        db=db,
+        station_id_or_code=alert.station_id,
+        event_type="ALERT_ACKNOWLEDGED",
+        description=f"Alert acknowledged: {alert.title}",
+        severity="INFO",
+        source="ALERT_SYSTEM",
+        details={"alert_id": alert.id},
+    )
+
     return alert
 
 
@@ -102,4 +127,16 @@ def resolve_alert(db: Session, alert_id: int) -> Alert:
     alert.resolved_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(alert)
+
+    from maitri.services.event_service import log_event
+    log_event(
+        db=db,
+        station_id_or_code=alert.station_id,
+        event_type="ALERT_RESOLVED",
+        description=f"Alert resolved: {alert.title}",
+        severity="INFO",
+        source="ALERT_SYSTEM",
+        details={"alert_id": alert.id},
+    )
+
     return alert

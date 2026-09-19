@@ -466,12 +466,31 @@ publish_simulated_telemetry("MTR", scenario="STORM", step=0, broker_host="localh
 
 ## 7. Machine Learning Handoff Guide (For Person C)
 
-### Where to Plug In ML Inference:
-- The backend telemetry pipeline validates and persists data in `maitri/services/telemetry_service.py` via `create_telemetry(db, telemetry_in)`.
-- When Person C's model performs inference on incoming sensor values:
-  1. Pass the computed `anomaly_score` (float $0.0 \le s \le 1.0$) in `TelemetryCreate.anomaly_score`.
-  2. Assign the predicted `quality` tag (`GOOD`, `WARNING`, `BAD`, `OFFLINE`).
-- **Backend Reaction**:
-  - `anomaly_score \ge 0.70` + `BAD` quality $\rightarrow$ Backend automatically generates `HIGH` severity `SENSOR_FAULT` alert with the ML anomaly score embedded.
-  - `OFFLINE` quality $\rightarrow$ Backend generates `CRITICAL` severity `SENSOR_OFFLINE` alert.
-  - Energy optimization service incorporates the ML-evaluated telemetry to trigger fuel conservation or power crisis modes.
+### 7.1. Isolated ML Integration Adapter Slot
+An isolated adapter layer is prepared in `maitri/services/ml_adapter.py`. 
+Person C's ML API is **not connected yet**. When unconfigured or offline, the backend reports:
+```
+ML INTEGRATION: NOT CONNECTED
+```
+and produces **no fake anomaly scores** or placeholder predictions. Existing telemetry, energy optimization, logistics, and scenarios operate continuously without failure.
+
+### 7.2. Configuration (Environment Variables)
+Configure the external ML API without modifying code:
+```env
+ML_API_URL="http://your-ml-service-host:port"
+ML_API_KEY="your-optional-bearer-or-api-key"
+ML_API_TIMEOUT_SECONDS=2.0
+```
+
+### 7.3. Integration Slot Architecture & Endpoints
+- **Status Endpoint**: `GET /ml/status` (reports current adapter connection state).
+- **Contract Specification**: `GET /ml/contract` (shows placeholder request and response contracts).
+- **Inference Test Slot**: `POST /ml/infer` (sends telemetry features to external ML API when connected).
+
+### 7.4. How Person C Connects Their Model
+When Person C provides the real ML service, integration requires only:
+1. Setting `ML_API_URL` (and optional `ML_API_KEY`) in `.env`.
+2. Updating `map_telemetry_to_request()` in `maitri/services/ml_adapter.py` to match Person C's request schema.
+3. Updating `map_response_to_result()` in `maitri/services/ml_adapter.py` to parse Person C's response JSON.
+4. Implementing genuine dispatch inside `dispatch_ml_result()` to trigger alerts or update twin states.
+

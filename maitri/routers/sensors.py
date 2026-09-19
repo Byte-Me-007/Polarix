@@ -38,16 +38,14 @@ async def ingest_sensor_reading(
             detail=str(exc),
         ) from exc
     stored_reading = create_sensor_reading(db, parsed_reading)
-    await manager.broadcast_json(
-        {
-            "type": "sensor_reading",
-            "data": {
-                "device_id": stored_reading.device_id,
-                "metric": stored_reading.metric,
-                "value": stored_reading.value,
-                "unit": stored_reading.unit,
-            },
-        }
+    station_code = "BHR" if "BHR" in stored_reading.device_id.upper() else "MTR"
+    await manager.broadcast_telemetry(
+        station_id=station_code,
+        sensor_id=stored_reading.device_id,
+        sensor_type=stored_reading.metric,
+        value=stored_reading.value,
+        unit=stored_reading.unit,
+        timestamp=stored_reading.timestamp.isoformat() if hasattr(stored_reading, "timestamp") and stored_reading.timestamp else None,
     )
     return stored_reading
 

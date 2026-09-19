@@ -58,6 +58,10 @@ def test_websocket_broadcast_on_ingest(client):
 
         msg = websocket.receive_json()
         assert msg["type"] == "sensor_reading"
+        assert "station_id" in msg
+        assert msg["station_id"] in ("MTR", "BHR")
+        assert msg["sensor_id"] == "ws-device-001"
+        assert msg["value"] == 22.4
         assert msg["data"]["device_id"] == "ws-device-001"
         assert msg["data"]["metric"] == "temperature"
         assert msg["data"]["value"] == 22.4

@@ -59,10 +59,11 @@ def seed_default_stations(db: Session):
                     "location_x": 0.0,
                     "location_y": 0.0,
                     "location_z": 2.5,
-                    "criticality": "HIGH",
-                    "minimum_value": -60.0,
+                    "criticality": "HIGH",                    "minimum_value": -60.0,
                     "maximum_value": 20.0,
                     "active": True,
+                    "asset_id": "MET-MAST-01",
+                    "zone": "EXTERIOR_MET",
                 },
                 {
                     "sensor_code": "MTR-ENV-WND-01",
@@ -76,6 +77,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 75.0,
                     "active": True,
+                    "asset_id": "MET-MAST-01",
+                    "zone": "EXTERIOR_MET",
                 },
                 {
                     "sensor_code": "MTR-STR-VIB-01",
@@ -89,6 +92,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 50.0,
                     "active": True,
+                    "asset_id": "MAIN-MODULE-BLDG",
+                    "zone": "ZONE_CENTRAL",
                 },
                 {
                     "sensor_code": "MTR-ENG-GEN-01",
@@ -102,6 +107,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 250.0,
                     "active": True,
+                    "asset_id": "GENSET-DIESEL-01",
+                    "zone": "ZONE_POWER",
                 },
                 {
                     "sensor_code": "MTR-LOG-FUL-01",
@@ -115,6 +122,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 100.0,
                     "active": True,
+                    "asset_id": "FUEL-FARM-TANK-01",
+                    "zone": "ZONE_LOGISTICS",
                 },
             ],
         },
@@ -138,6 +147,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": -50.0,
                     "maximum_value": 25.0,
                     "active": True,
+                    "asset_id": "MET-MAST-02",
+                    "zone": "EXTERIOR_MET",
                 },
                 {
                     "sensor_code": "BHR-STR-STN-01",
@@ -151,6 +162,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": -2000.0,
                     "maximum_value": 2000.0,
                     "active": True,
+                    "asset_id": "MAIN-STRUCTURE",
+                    "zone": "ZONE_STRUCTURE",
                 },
                 {
                     "sensor_code": "BHR-ENG-SOL-01",
@@ -164,6 +177,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 120.0,
                     "active": True,
+                    "asset_id": "SOLAR-ARRAY-01",
+                    "zone": "ZONE_RENEWABLES",
                 },
                 {
                     "sensor_code": "BHR-LOG-FUL-01",
@@ -177,6 +192,8 @@ def seed_default_stations(db: Session):
                     "minimum_value": 0.0,
                     "maximum_value": 100.0,
                     "active": True,
+                    "asset_id": "FUEL-FARM-TANK-02",
+                    "zone": "ZONE_LOGISTICS",
                 },
             ],
         },
@@ -214,7 +231,22 @@ def seed_default_stations(db: Session):
                     minimum_value=s_data.get("minimum_value"),
                     maximum_value=s_data.get("maximum_value"),
                     active=s_data.get("active", True),
+                    asset_id=s_data.get("asset_id"),
+                    zone=s_data.get("zone"),
                 )
                 db.add(sensor)
+        else:
+            # Backfill asset_id and zone if missing
+            for s_data in st_data["sensors"]:
+                existing_sensor = (
+                    db.query(Sensor)
+                    .filter(Sensor.sensor_code == s_data["sensor_code"])
+                    .first()
+                )
+                if existing_sensor:
+                    if not existing_sensor.asset_id:
+                        existing_sensor.asset_id = s_data.get("asset_id")
+                    if not existing_sensor.zone:
+                        existing_sensor.zone = s_data.get("zone")
 
     db.commit()

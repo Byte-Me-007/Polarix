@@ -4,12 +4,15 @@ from sqlalchemy.orm import Session
 from maitri.database import get_db
 from maitri.schemas.alert import AlertResponse
 from maitri.schemas.energy import EnergyOptimizationResponse
-
+from maitri.schemas.event import EventResponse
+from maitri.schemas.readiness import MissionReadinessResponse
 from maitri.schemas.resource import ResourceForecastResponse, ResourceResponse
 from maitri.schemas.station import SensorResponse, StationResponse
 from maitri.schemas.telemetry import TelemetryResponse
 from maitri.services.alert_service import list_alerts_by_station
 from maitri.services.energy_service import get_station_energy_optimization
+from maitri.services.event_service import list_events_by_station
+from maitri.services.readiness_service import calculate_mission_readiness
 from maitri.services.resource_service import (
     get_station_resources_forecast,
     list_resources_by_station,
@@ -148,6 +151,43 @@ def get_station_energy_optimization_route(
         return get_station_energy_optimization(
             db, station_id_or_code=station_id
         )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{station_id}/events",
+    response_model=list[EventResponse],
+)
+def get_station_events_route(
+    station_id: str,
+    limit: int = Query(default=50, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    """Retrieves chronological operational events for the station."""
+    try:
+        return list_events_by_station(db, station_id_or_code=station_id, limit=limit)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{station_id}/mission-readiness",
+    response_model=MissionReadinessResponse,
+)
+def get_station_mission_readiness_route(
+    station_id: str,
+    db: Session = Depends(get_db),
+):
+    """Single source of truth for Station Mission Readiness."""
+    try:
+        return calculate_mission_readiness(db, station_id_or_code=station_id)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

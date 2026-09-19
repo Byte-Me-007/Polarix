@@ -96,6 +96,15 @@ def test_get_sensors_for_maitri(client):
     assert any("MTR-ENV" in c for c in sensor_codes)
     assert any("MTR-ENG" in c for c in sensor_codes)
 
+    # Verify sensor -> asset / zone mapping and 3D coordinates preservation
+    for s in sensors:
+        assert "asset_id" in s and s["asset_id"] is not None
+        assert "zone" in s and s["zone"] is not None
+        assert "location_x" in s
+        assert "location_y" in s
+        assert "location_z" in s
+
+
 
 def test_get_sensors_for_bharati(client):
     response = client.get("/stations/BHR/sensors")

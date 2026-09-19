@@ -3,6 +3,7 @@
 from maitri.models.alert import Alert
 from maitri.models.command import Command
 from maitri.models.device import Device
+from maitri.models.event import Event
 from maitri.models.resource import Resource
 from maitri.models.sensor import Sensor
 from maitri.models.sensor_reading import SensorReading
@@ -18,6 +19,7 @@ __all__ = [
     "Alert",
     "Resource",
     "Command",
+    "Event",
 ]
 
 

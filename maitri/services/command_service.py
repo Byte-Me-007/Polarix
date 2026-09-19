@@ -220,10 +220,26 @@ def execute_command(db: Session, command_id: str | int) -> Command:
             db.refresh(cmd)
             return cmd
 
-    else:
         cmd.status = "FAILED"
         cmd.result_message = f"Unsupported command type: {cmd.command_type}"
         cmd.executed_at = datetime.now(timezone.utc)
         db.commit()
         db.refresh(cmd)
-        return cmd
+
+    # Log command event
+    try:
+        from maitri.services.event_service import log_event
+        if cmd.station_id:
+            log_event(
+                db=db,
+                station_id_or_code=cmd.station_id,
+                event_type="COMMAND_EXECUTED",
+                description=f"Command '{cmd.command_type}': {cmd.status}",
+                severity="INFO" if cmd.status == "EXECUTED" else "LOW",
+                source="COMMAND_SYSTEM",
+                details={"command_id": cmd.command_id, "command_type": cmd.command_type, "status": cmd.status, "message": cmd.result_message},
+            )
+    except Exception:
+        pass
+
+    return cmd
