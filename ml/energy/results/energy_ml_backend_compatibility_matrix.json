@@ -1,0 +1,379 @@
+{
+  "matrix_name": "energy_ml_backend_compatibility_matrix",
+  "version": "1.0.0",
+  "audit_timestamp_utc": "2026-09-19T13:20:00Z",
+  "scope": "Person C (ML Specialist) - Energy ML & Person A Backend Telemetry Compatibility Audit",
+  "canonical_stations": {
+    "person_c_energy_ml": ["MTR", "BRT"],
+    "person_c_sensor_ml": ["MTR", "BRT"],
+    "person_a_backend_known_references": ["MTR", "BRT", "BHR"],
+    "station_id_mismatch_analysis": {
+      "mtr_status": "COMPATIBLE",
+      "mtr_notes": "Both Person C and Person A use 'MTR' for Maitri Station.",
+      "brt_vs_bhr_status": "ATTENTION_REQUIRED_ACTION_FOR_PERSON_A",
+      "brt_vs_bhr_notes": "Person C canonical code for Bharati is 'BRT' across all datasets, models, and contracts. Person A's backend contains legacy/transitional references to 'BHR'. Person A must align backend station identifiers to canonical 'BRT' or establish an explicit gateway ingestion normalization. Person C ML strictly enforces 'BRT' and rejects unrecognized strings without silent aliasing."
+    }
+  },
+  "raw_telemetry_fields": [
+    {
+      "field_name": "timestamp",
+      "backend_canonical_name": "timestamp",
+      "requirement": "REQUIRED",
+      "data_type": "string (ISO-8601 UTC)",
+      "unit": "ISO-8601 string (e.g. 2026-09-18T10:00:00Z)",
+      "timestamp_semantics": "Instantaneous observation timestamp at decision epoch t",
+      "source": "Simulator / Station SCADA telemetry stream",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "Ensure all timestamps are serialized as valid ISO-8601 UTC strings or standard RFC 3339 format.",
+      "notes": "Hourly cadence is expected for multi-horizon forecasting."
+    },
+    {
+      "field_name": "station_id",
+      "backend_canonical_name": "station_id",
+      "requirement": "REQUIRED",
+      "data_type": "string (enum: 'MTR', 'BRT')",
+      "unit": "categorical code",
+      "timestamp_semantics": "Static metadata per station stream",
+      "source": "Station metadata / MQTT topic / REST payload",
+      "can_be_derived": false,
+      "compatibility_status": "ATTENTION_REQUIRED",
+      "required_person_a_action": "Standardize Bharati station code to 'BRT' in telemetry ingestion pipelines. Person C rejects 'BHR' with ValueError to prevent silent model misclassification.",
+      "notes": "MTR = Maitri Station (120 kW rated generator); BRT = Bharati Station (150 kW rated generator)."
+    },
+    {
+      "field_name": "power_demand_kw",
+      "backend_canonical_name": "power_demand_kw",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "kW",
+      "timestamp_semantics": "Instantaneous total station electrical & thermal load at time t",
+      "source": "Station electrical bus telemetry / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide aggregate power demand in kW.",
+      "notes": "Valid range: 0.0 to 300.0 kW. Used directly as core LSTM input and base for rolling mean/slope."
+    },
+    {
+      "field_name": "generator_output_kw",
+      "backend_canonical_name": "generator_output_kw",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "kW",
+      "timestamp_semantics": "Instantaneous active diesel generator electrical output at time t",
+      "source": "Diesel generator telemetry / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide active generator output in kW.",
+      "notes": "Valid range: 0.0 to 300.0 kW. Used for generator utilization and spinning reserve monitoring."
+    },
+    {
+      "field_name": "battery_soc_percent",
+      "backend_canonical_name": "battery_soc_percent",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "%",
+      "timestamp_semantics": "Instantaneous BESS State-of-Charge at time t",
+      "source": "Battery Management System (BMS) telemetry / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide State-of-Charge as percentage [0.0, 100.0].",
+      "notes": "Valid range: 0.0 to 100.0%. Critical for deficit-risk thresholding (SoC < 25%)."
+    },
+    {
+      "field_name": "battery_charge_kw",
+      "backend_canonical_name": "battery_charge_kw",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "kW",
+      "timestamp_semantics": "Instantaneous battery charging power at time t",
+      "source": "BMS / Inverter telemetry",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide charging power in kW (non-negative).",
+      "notes": "Valid range: 0.0 to 100.0 kW. Non-negative. Mutually exclusive with discharge."
+    },
+    {
+      "field_name": "battery_discharge_kw",
+      "backend_canonical_name": "battery_discharge_kw",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "kW",
+      "timestamp_semantics": "Instantaneous battery discharging power at time t",
+      "source": "BMS / Inverter telemetry",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide discharging power in kW (non-negative).",
+      "notes": "Valid range: 0.0 to 100.0 kW. Non-negative. Mutually exclusive with charge."
+    },
+    {
+      "field_name": "fuel_consumption_l",
+      "backend_canonical_name": "fuel_consumption_l",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "L/h",
+      "timestamp_semantics": "Hourly rate of diesel fuel consumption at time t",
+      "source": "Generator fuel flow meter / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide fuel burn rate in Liters/hour.",
+      "notes": "Valid range: 0.0 to 100.0 L/h."
+    },
+    {
+      "field_name": "temperature_c",
+      "backend_canonical_name": "temperature_c",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "°C",
+      "timestamp_semantics": "Ambient outdoor air temperature at time t",
+      "source": "AWS Weather Station / NCPOR archives / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide ambient temperature in degrees Celsius.",
+      "notes": "Valid range: -65.0 to +25.0 °C. Strongly correlated with HVAC heating demand."
+    },
+    {
+      "field_name": "humidity_percent",
+      "backend_canonical_name": "humidity_percent",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "%",
+      "timestamp_semantics": "Ambient relative humidity at time t",
+      "source": "AWS Weather Station / NCPOR archives / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide relative humidity as percentage [0.0, 100.0].",
+      "notes": "Valid range: 0.0 to 100.0%."
+    },
+    {
+      "field_name": "pressure_hpa",
+      "backend_canonical_name": "pressure_hpa",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "hPa",
+      "timestamp_semantics": "Barometric surface air pressure at time t",
+      "source": "AWS Weather Station / NCPOR archives / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide surface atmospheric pressure in hPa.",
+      "notes": "Valid range: 850.0 to 1100.0 hPa."
+    },
+    {
+      "field_name": "wind_speed_mps",
+      "backend_canonical_name": "wind_speed_mps",
+      "requirement": "REQUIRED",
+      "data_type": "float",
+      "unit": "m/s",
+      "timestamp_semantics": "Sustained wind speed at time t",
+      "source": "AWS Anemometer / NCPOR archives / simulator",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "None. Provide wind speed in meters per second.",
+      "notes": "Valid range: 0.0 to 80.0 m/s. Triggers blizzard trace heating load."
+    },
+    {
+      "field_name": "sensor_anomaly_score",
+      "backend_canonical_name": "sensor_anomaly_score",
+      "requirement": "OPTIONAL",
+      "data_type": "float",
+      "unit": "z-score",
+      "timestamp_semantics": "Upstream Sensor ML composite reconstruction error / anomaly score at time t",
+      "source": "Upstream Sensor ML Subsystem (Person C)",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "Pass upstream Sensor ML anomaly score if available; otherwise defaults cleanly to 1.0 (nominal).",
+      "notes": "Defaults to 1.0 if omitted by backend."
+    },
+    {
+      "field_name": "sensor_anomaly_status",
+      "backend_canonical_name": "sensor_anomaly_status",
+      "requirement": "OPTIONAL",
+      "data_type": "string (enum: 'NORMAL', 'ANOMALY', 'MISSING_DATA')",
+      "unit": "categorical status",
+      "timestamp_semantics": "Upstream Sensor ML operational health decision at time t",
+      "source": "Upstream Sensor ML Subsystem (Person C)",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "Pass upstream Sensor ML status string if available; otherwise defaults cleanly to 'NORMAL'.",
+      "notes": "Defaults to 'NORMAL' if omitted. Backend must NOT independently reinterpret anomaly status."
+    },
+    {
+      "field_name": "data_quality",
+      "backend_canonical_name": "data_quality",
+      "requirement": "OPTIONAL",
+      "data_type": "string (enum: 'GOOD', 'MISSING')",
+      "unit": "categorical flag",
+      "timestamp_semantics": "Telemetry acquisition quality flag at time t",
+      "source": "Ingestion Pipeline / Sensor ML",
+      "can_be_derived": false,
+      "compatibility_status": "COMPATIBLE",
+      "required_person_a_action": "Pass 'GOOD' or 'MISSING' if known; otherwise defaults cleanly to 'GOOD'.",
+      "notes": "Defaults to 'GOOD' if omitted."
+    }
+  ],
+  "derived_features_causality_proof": [
+    {
+      "feature_name": "station_is_brt",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "1.0 if station_id == 'BRT' else 0.0",
+      "source_fields": ["station_id"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "sin_hour",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "sin(2 * pi * hour(t) / 24.0)",
+      "source_fields": ["timestamp"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "cos_hour",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "cos(2 * pi * hour(t) / 24.0)",
+      "source_fields": ["timestamp"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "sin_day",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "sin(2 * pi * dayofyear(t) / 365.25)",
+      "source_fields": ["timestamp"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "cos_day",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "cos(2 * pi * dayofyear(t) / 365.25)",
+      "source_fields": ["timestamp"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "generator_utilization",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "clip(generator_output_kw(t) / rated_gen, 0.0, 2.0)",
+      "source_fields": ["generator_output_kw", "station_id"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "demand_to_gen_ratio",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "clip(power_demand_kw(t) / (generator_output_kw(t) + 1e-4), 0.0, 5.0)",
+      "source_fields": ["power_demand_kw", "generator_output_kw"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "battery_net_power",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "battery_charge_kw(t) - battery_discharge_kw(t)",
+      "source_fields": ["battery_charge_kw", "battery_discharge_kw"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "thermal_headroom",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "max(0.0, 18.0 - temperature_c(t))",
+      "source_fields": ["temperature_c"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "sensor_is_anomaly",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "1.0 if sensor_anomaly_status == 'ANOMALY' else 0.0",
+      "source_fields": ["sensor_anomaly_status"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "sensor_is_missing",
+      "subsystems_using": ["EnergyLSTM", "DeficitRisk"],
+      "derivation_formula": "1.0 if sensor_anomaly_status == 'MISSING_DATA' or data_quality == 'MISSING' else 0.0",
+      "source_fields": ["sensor_anomaly_status", "data_quality"],
+      "required_history": "1 record (t)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "recent_demand_mean_6h",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "rolling_mean(power_demand_kw, window=6, min_periods=1) over [t-5, t]",
+      "source_fields": ["power_demand_kw"],
+      "required_history": "Up to 6 records ([t-5, t])",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "recent_demand_slope_3h",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "(power_demand_kw(t) - power_demand_kw(t-3)) / 3.0 (defaults to 0.0 if < 3 records)",
+      "source_fields": ["power_demand_kw"],
+      "required_history": "Up to 4 records (t, t-3)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "recent_soc_mean_6h",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "rolling_mean(battery_soc_percent, window=6, min_periods=1) over [t-5, t]",
+      "source_fields": ["battery_soc_percent"],
+      "required_history": "Up to 6 records ([t-5, t])",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    },
+    {
+      "feature_name": "recent_soc_slope_3h",
+      "subsystems_using": ["DeficitRisk"],
+      "derivation_formula": "(battery_soc_percent(t) - battery_soc_percent(t-3)) / 3.0 (defaults to 0.0 if < 3 records)",
+      "source_fields": ["battery_soc_percent"],
+      "required_history": "Up to 4 records (t, t-3)",
+      "is_causal": true,
+      "person_a_action_required": "None. Derived entirely within ML pipeline."
+    }
+  ],
+  "audit_summary": {
+    "total_raw_telemetry_fields": 15,
+    "required_raw_fields": 12,
+    "optional_raw_fields": 3,
+    "total_derived_features_lstm": 18,
+    "total_derived_features_risk": 26,
+    "causality_violations": 0,
+    "lookahead_leakage_risk": 0,
+    "blocking_issues_count": 1,
+    "blocking_issues": [
+      {
+        "id": "BLK-01",
+        "description": "Station ID mismatch between Person C canonical 'BRT' and Person A references to 'BHR'. Person A must standardize ingestion to 'BRT' before running integrated dispatch."
+      }
+    ],
+    "non_blocking_issues_count": 2,
+    "non_blocking_issues": [
+      {
+        "id": "NONBLK-01",
+        "description": "24-hour historical window buffering required in backend before multi-horizon neural forecasting is active (service raises explicit ValueError if < 24h)."
+      },
+      {
+        "id": "NONBLK-02",
+        "description": "Upstream Sensor ML anomaly features are optional but recommended for microgrid health context."
+      }
+    ],
+    "integration_readiness": "ML_SIDE_CONTRACT_VERIFIED_READY_FOR_BACKEND_ALIGNMENT"
+  }
+}

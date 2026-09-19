@@ -1,0 +1,258 @@
+{
+  "spec_version": "1.0.0",
+  "module": "ml.energy",
+  "project": "Polarix SIH2026 (Problem Statement SIH26060)",
+  "subsystem": "Energy Forecasting & Microgrid Optimization",
+  "author": "Person C — Machine Learning Specialist",
+  "date_created": "2026-09-19",
+  "station_scopes": ["MTR", "BRT"],
+  "station_metadata": {
+    "MTR": {
+      "station_name": "Maitri",
+      "location": "Schirmacher Oasis, Queen Maud Land, East Antarctica",
+      "coordinates": {
+        "latitude": "-70.7667 S",
+        "longitude": "11.7333 E"
+      },
+      "elevation_m": 117,
+      "climate_regime": "Inland Antarctic Oasis (Extreme sub-zero, moderate wind, intense seasonal temperature swings)",
+      "nominal_generation_kw": 120.0,
+      "bess_capacity_kwh": 200.0
+    },
+    "BRT": {
+      "station_name": "Bharati",
+      "location": "Larsemann Hills, Prydz Bay, East Antarctica",
+      "coordinates": {
+        "latitude": "-69.4000 S",
+        "longitude": "76.1833 E"
+      },
+      "elevation_m": 35,
+      "climate_regime": "Coastal Promontory (Moderate sub-zero, extreme katabatic and blizzard wind gusts)",
+      "nominal_generation_kw": 150.0,
+      "bess_capacity_kwh": 300.0
+    }
+  },
+  "public_datasets_investigated": [
+    {
+      "dataset_id": "AADC_ELEC_1993_2016",
+      "title": "Monthly electricity usage at Casey, Davis, Mawson and Macquarie Island, January 1993 - February 2016",
+      "provider": "Australian Antarctic Division (AAD) / Australian Antarctic Data Centre (AADC)",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "access_status": "PUBLIC_AVAILABLE",
+      "temporal_coverage": "1993-01 to 2016-02",
+      "temporal_resolution": "Monthly",
+      "variables_present": ["monthly_electricity_kwh", "station_name", "year_month"],
+      "variables_missing_for_realtime_forecasting": ["sub_hourly_kw_telemetry", "generator_loading", "battery_soc", "fuel_burn_rate"],
+      "usage_role": "Macro_Seasonal_Baseline_Benchmark",
+      "provenance_class": "REAL_PUBLIC_ANTARCTIC_DATA"
+    },
+    {
+      "dataset_id": "NCPOR_NPDC_MET_MAITRI_BHARATI",
+      "title": "Meteorological AWS Observations from Indian Antarctic Stations (Maitri & Bharati)",
+      "provider": "National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences, India",
+      "license": "Government Open Data / NCPOR Data Policy (Scientific Use)",
+      "access_status": "PUBLIC_METADATA_AND_EXPEDITION_ARCHIVES",
+      "temporal_coverage": "Multi-year ISEA Expeditions",
+      "temporal_resolution": "Hourly / 3-Hourly AWS",
+      "variables_present": ["temperature_c", "pressure_hpa", "humidity_percent", "wind_speed_mps", "wind_direction_deg"],
+      "variables_missing_for_realtime_forecasting": ["microgrid_power_demand_kw", "generator_output_kw", "battery_telemetry"],
+      "usage_role": "Empirical_Weather_Distribution_Bounds",
+      "provenance_class": "REAL_PUBLIC_INDIAN_ANTARCTIC_WEATHER_DATA"
+    }
+  ],
+  "provenance_disclaimer": "Operational microgrid telemetry (power demand, generator dispatch, battery SoC, and fuel rate) for Indian Antarctic stations is not published as public open-access real-time data streams. Therefore, Polarix uses physically grounded synthetic operational data (SYNTHETIC_POLARIX_OPERATIONAL_DATA) conditioned on empirical Antarctic environmental bounds. We never misrepresent synthetic energy values as real historical station telemetry.",
+  "canonical_fields": {
+    "timestamp": {
+      "type": "string",
+      "format": "ISO-8601 UTC (YYYY-MM-DDTHH:MM:SSZ)",
+      "unit": "datetime",
+      "provenance": "SYNTHETIC_TIMELINE",
+      "nullable": false,
+      "description": "Synchronized chronological timestamp."
+    },
+    "station_id": {
+      "type": "string",
+      "allowed_values": ["MTR", "BRT"],
+      "unit": "categorical",
+      "provenance": "METADATA",
+      "nullable": false,
+      "description": "Station identifier."
+    },
+    "power_demand_kw": {
+      "type": "float",
+      "unit": "kW",
+      "valid_range": [10.0, 150.0],
+      "provenance": "SYNTHETIC_POLARIX_OPERATIONAL",
+      "nullable": false,
+      "description": "Total real-time station electrical + thermal base load."
+    },
+    "generator_output_kw": {
+      "type": "float",
+      "unit": "kW",
+      "valid_range": [0.0, 160.0],
+      "provenance": "SYNTHETIC_POLARIX_OPERATIONAL",
+      "nullable": false,
+      "description": "Active diesel generator output power."
+    },
+    "energy_consumption_kwh": {
+      "type": "float",
+      "unit": "kWh",
+      "valid_range": [0.0, 200.0],
+      "provenance": "DERIVED_METRIC",
+      "nullable": false,
+      "description": "Integrated energy consumed over interval."
+    },
+    "battery_soc_percent": {
+      "type": "float",
+      "unit": "%",
+      "valid_range": [0.0, 100.0],
+      "provenance": "SYNTHETIC_POLARIX_OPERATIONAL",
+      "nullable": false,
+      "description": "Battery Energy Storage System (BESS) State of Charge."
+    },
+    "battery_charge_kw": {
+      "type": "float",
+      "unit": "kW",
+      "valid_range": [0.0, 50.0],
+      "provenance": "SYNTHETIC_POLARIX_OPERATIONAL",
+      "nullable": false,
+      "description": "Charging power delivered into BESS."
+    },
+    "battery_discharge_kw": {
+      "type": "float",
+      "unit": "kW",
+      "valid_range": [0.0, 50.0],
+      "provenance": "SYNTHETIC_POLARIX_OPERATIONAL",
+      "nullable": false,
+      "description": "Discharge power supplied by BESS to support station bus."
+    },
+    "fuel_consumption_l": {
+      "type": "float",
+      "unit": "L",
+      "valid_range": [0.0, 60.0],
+      "provenance": "DERIVED_METRIC",
+      "nullable": false,
+      "description": "Diesel fuel consumed by active generators."
+    },
+    "temperature_c": {
+      "type": "float",
+      "unit": "°C",
+      "valid_range": [-55.0, 15.0],
+      "provenance": "REAL_PUBLIC_INDIAN_WEATHER_BOUNDED",
+      "nullable": false,
+      "description": "Ambient outdoor air temperature."
+    },
+    "humidity_percent": {
+      "type": "float",
+      "unit": "%",
+      "valid_range": [10.0, 100.0],
+      "provenance": "REAL_PUBLIC_INDIAN_WEATHER_BOUNDED",
+      "nullable": false,
+      "description": "Relative humidity."
+    },
+    "pressure_hpa": {
+      "type": "float",
+      "unit": "hPa",
+      "valid_range": [920.0, 1040.0],
+      "provenance": "REAL_PUBLIC_INDIAN_WEATHER_BOUNDED",
+      "nullable": false,
+      "description": "Barometric pressure."
+    },
+    "wind_speed_mps": {
+      "type": "float",
+      "unit": "m/s",
+      "valid_range": [0.0, 65.0],
+      "provenance": "REAL_PUBLIC_INDIAN_WEATHER_BOUNDED",
+      "nullable": false,
+      "description": "Wind speed."
+    },
+    "sensor_anomaly_score": {
+      "type": "float",
+      "unit": "z_score",
+      "valid_range": [0.0, 500.0],
+      "provenance": "UPSTREAM_SENSOR_ML_FEATURE",
+      "nullable": true,
+      "description": "Composite anomaly score from Sensor ML layer."
+    },
+    "sensor_anomaly_status": {
+      "type": "string",
+      "allowed_values": ["NORMAL", "ANOMALY", "INSUFFICIENT_DATA", "MISSING_DATA"],
+      "unit": "categorical",
+      "provenance": "UPSTREAM_SENSOR_ML_FEATURE",
+      "nullable": false,
+      "description": "Operational anomaly flag from Sensor ML layer."
+    },
+    "sensor_anomaly_type": {
+      "type": "string",
+      "allowed_values": ["NORMAL", "SPIKE", "DRIFT", "STUCK_VALUE", "UNKNOWN", null],
+      "unit": "categorical",
+      "provenance": "UPSTREAM_SENSOR_ML_FEATURE",
+      "nullable": true,
+      "description": "Specific failure mode from Sensor ML layer."
+    },
+    "source": {
+      "type": "string",
+      "unit": "categorical",
+      "provenance": "METADATA",
+      "nullable": false,
+      "description": "Origin of telemetry (SIMULATOR, BENCHMARK_AADC, NCPOR_WEATHER)."
+    },
+    "data_quality": {
+      "type": "string",
+      "allowed_values": ["GOOD", "BAD", "UNCERTAIN", "MISSING"],
+      "unit": "categorical",
+      "provenance": "METADATA",
+      "nullable": false,
+      "description": "Telemetry quality flag."
+    }
+  },
+  "forecasting_targets": {
+    "target_power_demand_1h_kw": {
+      "target_type": "regression",
+      "unit": "kW",
+      "horizon": "1-hour ahead (t -> t+1h)",
+      "primary_use_case": "Short-term spinning reserve & peak load dispatch",
+      "recommended_initial_target": true
+    },
+    "target_battery_soc_1h_percent": {
+      "target_type": "regression",
+      "unit": "%",
+      "horizon": "1-hour ahead (t -> t+1h)",
+      "primary_use_case": "Battery health protection & deep-discharge prevention",
+      "recommended_initial_target": true
+    },
+    "target_energy_demand_6h_kwh": {
+      "target_type": "regression",
+      "unit": "kWh",
+      "horizon": "6-hour ahead (t -> t+6h)",
+      "primary_use_case": "Generator bank switching & intermediate energy staging",
+      "recommended_initial_target": false
+    },
+    "target_energy_demand_24h_kwh": {
+      "target_type": "regression",
+      "unit": "kWh",
+      "horizon": "24-hour ahead (t -> t+24h)",
+      "primary_use_case": "Day-ahead fuel burn optimization & blizzards scheduling",
+      "recommended_initial_target": false
+    },
+    "target_energy_deficit_risk": {
+      "target_type": "classification",
+      "classes": ["NORMAL", "DEFICIT_RISK"],
+      "horizon": "1 to 24-hour lookahead",
+      "primary_use_case": "Early warning alert trigger when demand exceeds available generation + BESS buffer",
+      "recommended_initial_target": false
+    }
+  },
+  "temporal_split_strategy": {
+    "method": "Strict Chronological Partition (No shuffling)",
+    "train_ratio": 0.70,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "leakage_prevention_rules": [
+      "Normalization scalers (MinMaxScaler / StandardScaler) fit strictly on train partition only.",
+      "Lagged rolling features (e.g. 1h/6h rolling mean, EWMA) computed causally using timestamps <= t only.",
+      "Candidate model selection and hyperparameter tuning performed on validation partition only.",
+      "Held-out test partition evaluated once after freezing models and thresholds."
+    ]
+  }
+}

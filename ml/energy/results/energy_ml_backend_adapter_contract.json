@@ -1,0 +1,119 @@
+{
+  "adapter_name": "EnergyMLBackendAdapter",
+  "adapter_version": "1.0.0",
+  "subsystem": "Energy Forecasting & Microgrid Optimization",
+  "target_service": "EnergyMLService",
+  "target_service_contract": "energy-ml-contract-v1",
+  "model_status": "CANDIDATE",
+  "supported_stations": ["MTR", "BRT"],
+  "station_discrepancy_policy": {
+    "BHR": "REJECTED_WITH_ERROR",
+    "policy_description": "Person C ML strictly uses 'MTR' and 'BRT'. Any legacy 'BHR' identifier from Person A backend is rejected with a descriptive ValueError. Person A must normalize 'BHR' -> 'BRT' before passing telemetry to the adapter."
+  },
+  "temporal_requirements": {
+    "required_lookback_hours": 24,
+    "cadence_seconds": 3600,
+    "cadence_tolerance_seconds": 1.0,
+    "continuity_rule": "The 24 records must be strictly contiguous hourly observations without gaps. Any gap > 3600s resets the contiguous lookback window."
+  },
+  "input_specification": {
+    "required_canonical_fields": [
+      "timestamp",
+      "station_id",
+      "power_demand_kw",
+      "generator_output_kw",
+      "battery_soc_percent",
+      "battery_charge_kw",
+      "battery_discharge_kw",
+      "fuel_consumption_l",
+      "temperature_c",
+      "humidity_percent",
+      "pressure_hpa",
+      "wind_speed_mps"
+    ],
+    "optional_sensor_ml_fields": [
+      "sensor_anomaly_score",
+      "sensor_anomaly_status",
+      "sensor_anomaly_type",
+      "data_quality",
+      "source"
+    ]
+  },
+  "adapter_response_schema": {
+    "status": {
+      "type": "string",
+      "allowed_values": ["PREDICTION_AVAILABLE", "INSUFFICIENT_HISTORY"],
+      "description": "Indicates whether 24 contiguous hourly records were available to execute unified prediction"
+    },
+    "station_id": {
+      "type": "string",
+      "allowed_values": ["MTR", "BRT"],
+      "description": "Station identifier"
+    },
+    "latest_timestamp": {
+      "type": "string (ISO-8601 UTC)",
+      "description": "Timestamp of the most recently ingested record"
+    },
+    "available_history": {
+      "type": "integer",
+      "description": "Number of valid contiguous hourly records currently in the sliding buffer"
+    },
+    "required_history": {
+      "type": "integer",
+      "default": 24,
+      "description": "Required lookback window size for multi-horizon neural forecasting"
+    },
+    "prediction": {
+      "type": "object or null",
+      "description": "Nested UnifiedEnergyPrediction dictionary matching energy_ml_inference_contract.json when status is PREDICTION_AVAILABLE; null when INSUFFICIENT_HISTORY"
+    },
+    "message": {
+      "type": "string",
+      "description": "Diagnostic or operational status message"
+    }
+  },
+  "sample_responses": {
+    "insufficient_history": {
+      "status": "INSUFFICIENT_HISTORY",
+      "station_id": "MTR",
+      "latest_timestamp": "2026-09-18T05:00:00Z",
+      "available_history": 6,
+      "required_history": 24,
+      "prediction": null,
+      "message": "Buffering in progress: 6/24 contiguous hourly records."
+    },
+    "prediction_available": {
+      "status": "PREDICTION_AVAILABLE",
+      "station_id": "MTR",
+      "latest_timestamp": "2026-09-18T23:00:00Z",
+      "available_history": 24,
+      "required_history": 24,
+      "prediction": {
+        "station_id": "MTR",
+        "timestamp": "2026-09-18T23:00:00Z",
+        "contract_version": "energy-ml-contract-v1",
+        "model_version": "energy-ml-v1-candidate",
+        "forecast_model_version": "lstm-energy-baseline-v1",
+        "risk_model_version": "energy-deficit-risk-v1",
+        "forecasts": {
+          "power_demand_1h_kw": 48.52,
+          "battery_soc_1h_percent": 82.35,
+          "energy_demand_6h_kwh": 298.10,
+          "energy_demand_24h_kwh": 1210.45
+        },
+        "deficit_risk": {
+          "probability": 0.0084,
+          "decision": false,
+          "threshold": 0.35
+        },
+        "provenance": {
+          "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+          "model_status": "CANDIDATE",
+          "calibration_reference": "Australian Antarctic Data Centre (AADC CC BY 4.0) & NCPOR Meteorological Archives",
+          "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
+        }
+      },
+      "message": "Unified energy prediction successfully generated."
+    }
+  }
+}

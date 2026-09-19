@@ -1,0 +1,209 @@
+{
+  "contract_name": "energy_ml_inference_contract",
+  "contract_version": "energy-ml-contract-v1",
+  "subsystem": "Energy Forecasting & Microgrid Optimization",
+  "unified_model_version": "energy-ml-v1-candidate",
+  "model_status": "CANDIDATE",
+  "component_models": {
+    "forecasting_model": {
+      "model_version": "lstm-energy-baseline-v1",
+      "model_type": "Multi-Task PyTorch EnergyLSTM",
+      "horizons": {
+        "power_demand_1h_kw": "1-Hour Ahead Instantaneous Load (t+1h)",
+        "battery_soc_1h_percent": "1-Hour Ahead Battery State of Charge (t+1h)",
+        "energy_demand_6h_kwh": "6-Hour Integrated Energy Demand (t+1..t+6h)",
+        "energy_demand_24h_kwh": "24-Hour Integrated Energy Demand (t+1..t+24h)"
+      },
+      "weights_artifact": "ml/energy/models/energy_lstm_baseline.pt",
+      "config_artifact": "ml/energy/models/energy_lstm_baseline_config.json",
+      "scaler_artifact": "ml/energy/models/energy_lstm_baseline_scaler.json"
+    },
+    "deficit_risk_model": {
+      "model_version": "energy-deficit-risk-v1",
+      "model_type": "HistGradientBoostingClassifier (Balanced)",
+      "prediction_horizon": "1-Hour Ahead Impending Deficit (t -> t+1h)",
+      "operating_threshold": 0.35,
+      "bundle_artifact": "ml/energy/models/energy_deficit_risk_v1.joblib",
+      "config_artifact": "ml/energy/models/energy_deficit_risk_v1_config.json"
+    }
+  },
+  "temporal_requirements": {
+    "required_lookback_hours": 24,
+    "cadence": "1H (Hourly)",
+    "causality_policy": "Strictly historical observations at or before time t. No future target variables or timestamps > t are allowed."
+  },
+  "data_provenance": {
+    "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+    "calibration_reference": "Australian Antarctic Data Centre (AADC CC BY 4.0 monthly electricity envelopes 1993-2016) & NCPOR Indian Antarctic meteorological archives (Maitri & Bharati)",
+    "disclaimer": "Validated strictly on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA logs."
+  },
+  "input_specification": {
+    "required_telemetry_fields": [
+      {
+        "name": "timestamp",
+        "type": "string (ISO-8601 UTC)",
+        "unit": "datetime",
+        "description": "Hourly timestamp of the record"
+      },
+      {
+        "name": "station_id",
+        "type": "string",
+        "allowed_values": ["MTR", "BRT"],
+        "description": "Antarctic station code (Maitri or Bharati)"
+      },
+      {
+        "name": "power_demand_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 300.0],
+        "description": "Total microgrid electrical and thermal load"
+      },
+      {
+        "name": "generator_output_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 300.0],
+        "description": "Active diesel generator electrical power output"
+      },
+      {
+        "name": "battery_soc_percent",
+        "type": "float",
+        "unit": "%",
+        "valid_range": [0.0, 100.0],
+        "description": "Battery Energy Storage System (BESS) State-of-Charge"
+      },
+      {
+        "name": "battery_charge_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 100.0],
+        "description": "BESS instantaneous charging power"
+      },
+      {
+        "name": "battery_discharge_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 100.0],
+        "description": "BESS instantaneous discharging power"
+      },
+      {
+        "name": "fuel_consumption_l",
+        "type": "float",
+        "unit": "L/h",
+        "valid_range": [0.0, 100.0],
+        "description": "Hourly diesel fuel consumption"
+      },
+      {
+        "name": "temperature_c",
+        "type": "float",
+        "unit": "°C",
+        "valid_range": [-65.0, 25.0],
+        "description": "Ambient outdoor air temperature"
+      },
+      {
+        "name": "humidity_percent",
+        "type": "float",
+        "unit": "%",
+        "valid_range": [0.0, 100.0],
+        "description": "Ambient relative humidity"
+      },
+      {
+        "name": "pressure_hpa",
+        "type": "float",
+        "unit": "hPa",
+        "valid_range": [850.0, 1100.0],
+        "description": "Barometric surface air pressure"
+      },
+      {
+        "name": "wind_speed_mps",
+        "type": "float",
+        "unit": "m/s",
+        "valid_range": [0.0, 80.0],
+        "description": "Sustained wind speed"
+      }
+    ],
+    "optional_sensor_ml_fields": [
+      {
+        "name": "sensor_anomaly_score",
+        "type": "float",
+        "default": 1.0,
+        "description": "Upstream Sensor ML composite score"
+      },
+      {
+        "name": "sensor_anomaly_status",
+        "type": "string",
+        "default": "NORMAL",
+        "allowed_values": ["NORMAL", "ANOMALY", "MISSING_DATA"],
+        "description": "Upstream Sensor ML status classification"
+      },
+      {
+        "name": "data_quality",
+        "type": "string",
+        "default": "GOOD",
+        "allowed_values": ["GOOD", "MISSING"],
+        "description": "Telemetry acquisition quality flag"
+      }
+    ]
+  },
+  "output_specification": {
+    "schema": {
+      "station_id": { "type": "string", "description": "Station identifier ('MTR' or 'BRT')" },
+      "timestamp": { "type": "string", "description": "Forecast decision timestamp t" },
+      "contract_version": { "type": "string", "example": "energy-ml-contract-v1" },
+      "model_version": { "type": "string", "example": "energy-ml-v1-candidate" },
+      "forecast_model_version": { "type": "string", "example": "energy_lstm_baseline" },
+      "risk_model_version": { "type": "string", "example": "energy-deficit-risk-v1" },
+      "forecasts": {
+        "type": "object",
+        "properties": {
+          "power_demand_1h_kw": { "type": "float", "unit": "kW", "description": "Predicted power demand at t+1h" },
+          "battery_soc_1h_percent": { "type": "float", "unit": "%", "description": "Predicted battery SoC at t+1h" },
+          "energy_demand_6h_kwh": { "type": "float", "unit": "kWh", "description": "Predicted cumulative 6h energy demand" },
+          "energy_demand_24h_kwh": { "type": "float", "unit": "kWh", "description": "Predicted cumulative 24h energy demand" }
+        }
+      },
+      "deficit_risk": {
+        "type": "object",
+        "properties": {
+          "probability": { "type": "float", "range": [0.0, 1.0], "description": "Calibrated risk probability" },
+          "decision": { "type": "boolean", "description": "Alarm flag (true if probability >= threshold)" },
+          "threshold": { "type": "float", "description": "Operating threshold (0.3500)" }
+        }
+      },
+      "provenance": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string", "example": "SYNTHETIC_POLARIX_OPERATIONAL_DATA" },
+          "model_status": { "type": "string", "example": "CANDIDATE" },
+          "calibration_reference": { "type": "string" },
+          "disclaimer": { "type": "string" }
+        }
+      }
+    },
+    "sample_response": {
+      "station_id": "MTR",
+      "timestamp": "2026-09-18T10:00:00Z",
+      "contract_version": "energy-ml-contract-v1",
+      "model_version": "energy-ml-v1-candidate",
+      "forecast_model_version": "lstm-energy-baseline-v1",
+      "risk_model_version": "energy-deficit-risk-v1",
+      "forecasts": {
+        "power_demand_1h_kw": 48.52,
+        "battery_soc_1h_percent": 82.35,
+        "energy_demand_6h_kwh": 298.10,
+        "energy_demand_24h_kwh": 1210.45
+      },
+      "deficit_risk": {
+        "probability": 0.0084,
+        "decision": false,
+        "threshold": 0.35
+      },
+      "provenance": {
+        "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+        "model_status": "CANDIDATE",
+        "calibration_reference": "Australian Antarctic Data Centre (AADC CC BY 4.0) & NCPOR Meteorological Archives",
+        "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
+      }
+    }
+  }
+}

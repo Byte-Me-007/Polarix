@@ -1,0 +1,76 @@
+{
+  "artifact_name": "energy_ml_backend_e2e_example",
+  "version": "1.0.0",
+  "subsystem": "Energy Forecasting & Microgrid Optimization",
+  "provenance_disclaimer": "SYNTHETIC DEMONSTRATION ONLY. This example illustrates the canonical backend telemetry ingestion flow and unified prediction payload. It does not contain or expose classified real Indian Antarctic station SCADA telemetry.",
+  "workflow_step_1_canonical_telemetry_input": {
+    "description": "Canonical physical telemetry record sent from Person A backend streaming pipeline into EnergyMLBackendAdapter.ingest()",
+    "payload": {
+      "timestamp": "2026-09-18T23:00:00Z",
+      "station_id": "MTR",
+      "power_demand_kw": 48.75,
+      "generator_output_kw": 54.20,
+      "battery_soc_percent": 82.50,
+      "battery_charge_kw": 5.45,
+      "battery_discharge_kw": 0.0,
+      "fuel_consumption_l": 15.12,
+      "temperature_c": -18.35,
+      "humidity_percent": 58.40,
+      "pressure_hpa": 987.60,
+      "wind_speed_mps": 9.20,
+      "sensor_anomaly_score": 0.8521,
+      "sensor_anomaly_status": "NORMAL",
+      "sensor_anomaly_type": "NORMAL",
+      "data_quality": "GOOD",
+      "source": "SIMULATOR"
+    }
+  },
+  "workflow_step_2_insufficient_history_response": {
+    "description": "Adapter response returned when fewer than 24 contiguous hourly records are buffered (e.g. during startup or after a telemetry gap)",
+    "payload": {
+      "status": "INSUFFICIENT_HISTORY",
+      "station_id": "MTR",
+      "latest_timestamp": "2026-09-18T05:00:00Z",
+      "available_history": 6,
+      "required_history": 24,
+      "prediction": null,
+      "message": "Buffering in progress: 6/24 contiguous hourly records."
+    }
+  },
+  "workflow_step_3_prediction_available_response": {
+    "description": "Adapter response returned when exactly 24 contiguous hourly records are buffered, containing the full unified prediction payload",
+    "payload": {
+      "status": "PREDICTION_AVAILABLE",
+      "station_id": "MTR",
+      "latest_timestamp": "2026-09-18T23:00:00Z",
+      "available_history": 24,
+      "required_history": 24,
+      "prediction": {
+        "station_id": "MTR",
+        "timestamp": "2026-09-18T23:00:00Z",
+        "contract_version": "energy-ml-contract-v1",
+        "model_version": "energy-ml-v1-candidate",
+        "forecast_model_version": "lstm-energy-baseline-v1",
+        "risk_model_version": "energy-deficit-risk-v1",
+        "forecasts": {
+          "power_demand_1h_kw": 49.82,
+          "battery_soc_1h_percent": 81.65,
+          "energy_demand_6h_kwh": 302.40,
+          "energy_demand_24h_kwh": 1225.80
+        },
+        "deficit_risk": {
+          "probability": 0.0075,
+          "decision": false,
+          "threshold": 0.35
+        },
+        "provenance": {
+          "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+          "model_status": "CANDIDATE",
+          "calibration_reference": "Australian Antarctic Data Centre (AADC CC BY 4.0) & NCPOR Meteorological Archives",
+          "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
+        }
+      },
+      "message": "Unified energy prediction successfully generated."
+    }
+  }
+}

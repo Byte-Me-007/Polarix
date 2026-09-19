@@ -1,0 +1,404 @@
+{
+  "model_version": "lstm-energy-baseline-v1",
+  "evaluation_partition": "Held-Out Test (Nov 7 - Dec 31, 2026)",
+  "station_metrics": {
+    "MTR": {
+      "neural_lstm": {
+        "target_power_demand_1h_kw": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        }
+      },
+      "persistence": {
+        "target_power_demand_1h_kw": {
+          "mae": 4.951,
+          "rmse": 8.1729,
+          "r2": 0.057,
+          "smape": 7.4827
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.0833,
+          "rmse": 0.4958,
+          "r2": -0.3378,
+          "smape": 0.0867
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 34.2027,
+          "rmse": 47.6682,
+          "r2": -0.7682,
+          "smape": 8.8431
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 149.126,
+          "rmse": 193.1095,
+          "r2": -5.1271,
+          "smape": 9.6422
+        }
+      },
+      "seasonal_24h_lag": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.2761,
+          "rmse": 8.2366,
+          "r2": 0.0422,
+          "smape": 7.9452
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1152,
+          "rmse": 0.6117,
+          "r2": -1.0361,
+          "smape": 0.1195
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 19.8514,
+          "rmse": 25.2333,
+          "r2": 0.5045,
+          "smape": 5.1114
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 49.8613,
+          "rmse": 62.1862,
+          "r2": 0.3646,
+          "smape": 3.1958
+        }
+      },
+      "moving_average": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.6848,
+          "rmse": 7.944,
+          "r2": 0.1091,
+          "smape": 8.8246
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1021,
+          "rmse": 0.4634,
+          "r2": -0.1683,
+          "smape": 0.1054
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 36.6722,
+          "rmse": 44.7154,
+          "r2": -0.5559,
+          "smape": 9.5859
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 48.669,
+          "rmse": 60.4,
+          "r2": 0.4006,
+          "smape": 3.1232
+        }
+      }
+    },
+    "BRT": {
+      "neural_lstm": {
+        "target_power_demand_1h_kw": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 0.0,
+          "rmse": 0.0,
+          "r2": 0.0,
+          "smape": 0.0
+        }
+      },
+      "persistence": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.3802,
+          "rmse": 8.9509,
+          "r2": -0.0796,
+          "smape": 6.9921
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1054,
+          "rmse": 0.4967,
+          "r2": -0.1918,
+          "smape": 0.1093
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 35.8214,
+          "rmse": 50.1136,
+          "r2": -1.003,
+          "smape": 7.9527
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 154.147,
+          "rmse": 203.2336,
+          "r2": -8.3052,
+          "smape": 8.5654
+        }
+      },
+      "seasonal_24h_lag": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.8426,
+          "rmse": 8.9066,
+          "r2": -0.069,
+          "smape": 7.6094
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1612,
+          "rmse": 0.6465,
+          "r2": -1.0191,
+          "smape": 0.1668
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 22.2326,
+          "rmse": 27.5398,
+          "r2": 0.3951,
+          "smape": 4.9345
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 53.6541,
+          "rmse": 72.1054,
+          "r2": -0.1713,
+          "smape": 2.9692
+        }
+      },
+      "moving_average": {
+        "target_power_demand_1h_kw": {
+          "mae": 6.0228,
+          "rmse": 8.3501,
+          "r2": 0.0604,
+          "smape": 8.0287
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1288,
+          "rmse": 0.4711,
+          "r2": -0.0718,
+          "smape": 0.1328
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 38.2558,
+          "rmse": 46.378,
+          "r2": -0.7155,
+          "smape": 8.5796
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 51.7916,
+          "rmse": 67.6736,
+          "r2": -0.0318,
+          "smape": 2.8662
+        }
+      }
+    },
+    "COMBINED": {
+      "neural_lstm": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.0525,
+          "rmse": 7.5694,
+          "r2": 0.4245,
+          "smape": 7.1912
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1035,
+          "rmse": 0.4753,
+          "r2": -0.1359,
+          "smape": 0.1068
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 21.2681,
+          "rmse": 27.2969,
+          "r2": 0.6651,
+          "smape": 5.083
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 44.438,
+          "rmse": 57.0364,
+          "r2": 0.8414,
+          "smape": 2.6155
+        }
+      },
+      "persistence": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.1656,
+          "rmse": 8.5707,
+          "r2": 0.2559,
+          "smape": 7.2374
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.0943,
+          "rmse": 0.4963,
+          "r2": -0.2595,
+          "smape": 0.098
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 35.012,
+          "rmse": 48.9062,
+          "r2": -0.0824,
+          "smape": 8.3979
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 151.6365,
+          "rmse": 198.2362,
+          "r2": -0.931,
+          "smape": 9.1038
+        }
+      },
+      "seasonal_24h_lag": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.5594,
+          "rmse": 8.5782,
+          "r2": 0.2546,
+          "smape": 7.7773
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1382,
+          "rmse": 0.6294,
+          "r2": -1.0256,
+          "smape": 0.1431
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 21.042,
+          "rmse": 26.4117,
+          "r2": 0.6843,
+          "smape": 5.0229
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 51.7577,
+          "rmse": 67.3287,
+          "r2": 0.7773,
+          "smape": 3.0825
+        }
+      },
+      "moving_average": {
+        "target_power_demand_1h_kw": {
+          "mae": 5.8538,
+          "rmse": 8.1496,
+          "r2": 0.3272,
+          "smape": 8.4267
+        },
+        "target_battery_soc_1h_percent": {
+          "mae": 0.1155,
+          "rmse": 0.4672,
+          "r2": -0.1164,
+          "smape": 0.1191
+        },
+        "target_energy_demand_6h_kwh": {
+          "mae": 37.464,
+          "rmse": 45.5543,
+          "r2": 0.0609,
+          "smape": 9.0828
+        },
+        "target_energy_demand_24h_kwh": {
+          "mae": 50.2303,
+          "rmse": 64.14,
+          "r2": 0.7979,
+          "smape": 2.9947
+        }
+      }
+    }
+  },
+  "event_regime_metrics": {
+    "NORMAL": {
+      "target_power_demand_1h_kw": {
+        "mae": 5.056,
+        "rmse": 7.5504,
+        "r2": 0.4237,
+        "smape": 7.2019
+      },
+      "target_battery_soc_1h_percent": {
+        "mae": 0.0831,
+        "rmse": 0.4425,
+        "r2": -0.1427,
+        "smape": 0.0859
+      },
+      "target_energy_demand_6h_kwh": {
+        "mae": 21.2669,
+        "rmse": 27.2738,
+        "r2": 0.6662,
+        "smape": 5.0836
+      },
+      "target_energy_demand_24h_kwh": {
+        "mae": 44.3773,
+        "rmse": 56.9276,
+        "r2": 0.8416,
+        "smape": 2.6125
+      }
+    },
+    "HIGH_LOAD": {
+      "target_power_demand_1h_kw": {
+        "mae": 5.0186,
+        "rmse": 7.7014,
+        "r2": 0.3914,
+        "smape": 7.2051
+      },
+      "target_battery_soc_1h_percent": {
+        "mae": 0.0949,
+        "rmse": 0.3872,
+        "r2": -0.693,
+        "smape": 0.0976
+      },
+      "target_energy_demand_6h_kwh": {
+        "mae": 20.5917,
+        "rmse": 27.2658,
+        "r2": 0.6368,
+        "smape": 4.9336
+      },
+      "target_energy_demand_24h_kwh": {
+        "mae": 44.2136,
+        "rmse": 58.2617,
+        "r2": 0.8314,
+        "smape": 2.5998
+      }
+    },
+    "POWER_CONSTRAINT": {
+      "target_power_demand_1h_kw": {
+        "mae": 4.9184,
+        "rmse": 8.3794,
+        "r2": 0.4843,
+        "smape": 6.4662
+      },
+      "target_battery_soc_1h_percent": {
+        "mae": 1.4361,
+        "rmse": 1.5388,
+        "r2": -6.5771,
+        "smape": 1.4782
+      },
+      "target_energy_demand_6h_kwh": {
+        "mae": 23.1945,
+        "rmse": 28.8139,
+        "r2": 0.6306,
+        "smape": 5.452
+      },
+      "target_energy_demand_24h_kwh": {
+        "mae": 48.9084,
+        "rmse": 60.4916,
+        "r2": 0.8507,
+        "smape": 2.845
+      }
+    }
+  }
+}

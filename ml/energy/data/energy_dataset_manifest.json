@@ -1,0 +1,156 @@
+{
+  "dataset_version": "1.0.0",
+  "module": "ml.energy.data",
+  "generation_timestamp_utc": "2026-09-19T11:30:00Z",
+  "random_seed": 42,
+  "station_ids": [
+    "MTR",
+    "BRT"
+  ],
+  "temporal_coverage": {
+    "start": "2026-01-01T00:00:00Z",
+    "end": "2026-12-31T23:00:00Z",
+    "duration_days": 365,
+    "frequency": "1H (Hourly)"
+  },
+  "feature_list": [
+    "timestamp",
+    "station_id",
+    "power_demand_kw",
+    "generator_output_kw",
+    "energy_consumption_kwh",
+    "battery_soc_percent",
+    "battery_charge_kw",
+    "battery_discharge_kw",
+    "fuel_consumption_l",
+    "temperature_c",
+    "humidity_percent",
+    "pressure_hpa",
+    "wind_speed_mps",
+    "sensor_anomaly_score",
+    "sensor_anomaly_status",
+    "sensor_anomaly_type",
+    "event_type",
+    "source",
+    "data_quality"
+  ],
+  "target_list": [
+    "target_power_demand_1h_kw",
+    "target_battery_soc_1h_percent",
+    "target_energy_demand_6h_kwh",
+    "target_energy_demand_24h_kwh",
+    "target_energy_deficit_risk"
+  ],
+  "provenance_classifications": {
+    "microgrid_telemetry": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+    "meteorological_telemetry": "REAL_PUBLIC_INDIAN_WEATHER_BOUNDED",
+    "upstream_sensor_ml": "UPSTREAM_SENSOR_ML_FEATURE",
+    "derived_energy_metrics": "DERIVED_METRIC"
+  },
+  "total_records": 17520,
+  "station_records": {
+    "MTR": 8760,
+    "BRT": 8760
+  },
+  "chronological_splits": {
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "per_station_split_counts": {
+      "train": 6132,
+      "val": 1314,
+      "test": 1314
+    },
+    "split_timestamp_boundaries": {
+      "MTR": {
+        "train": [
+          "2026-01-01T00:00:00Z",
+          "2026-09-13T11:00:00Z"
+        ],
+        "val": [
+          "2026-09-13T12:00:00Z",
+          "2026-11-07T05:00:00Z"
+        ],
+        "test": [
+          "2026-11-07T06:00:00Z",
+          "2026-12-31T23:00:00Z"
+        ]
+      },
+      "BRT": {
+        "train": [
+          "2026-01-01T00:00:00Z",
+          "2026-09-13T11:00:00Z"
+        ],
+        "val": [
+          "2026-09-13T12:00:00Z",
+          "2026-11-07T05:00:00Z"
+        ],
+        "test": [
+          "2026-11-07T06:00:00Z",
+          "2026-12-31T23:00:00Z"
+        ]
+      }
+    }
+  },
+  "event_distributions": {
+    "MTR": {
+      "NORMAL": 7931,
+      "EXTREME_COLD": 553,
+      "HIGH_LOAD": 156,
+      "POWER_CONSTRAINT": 120
+    },
+    "BRT": {
+      "NORMAL": 8480,
+      "HIGH_LOAD": 156,
+      "POWER_CONSTRAINT": 120,
+      "EXTREME_COLD": 4
+    }
+  },
+  "data_quality_distributions": {
+    "MTR": {
+      "GOOD": 8690,
+      "MISSING": 70
+    },
+    "BRT": {
+      "GOOD": 8690,
+      "MISSING": 70
+    }
+  },
+  "sensor_ml_status_distributions": {
+    "MTR": {
+      "NORMAL": 8389,
+      "ANOMALY": 301,
+      "MISSING_DATA": 70
+    },
+    "BRT": {
+      "NORMAL": 8389,
+      "ANOMALY": 301,
+      "MISSING_DATA": 70
+    }
+  },
+  "physical_invariants_verified": {
+    "power_demand_within_bounds": true,
+    "battery_soc_within_bounds": true,
+    "no_simultaneous_charge_discharge": true,
+    "fuel_consumption_positive": true,
+    "generator_output_non_negative": true,
+    "chronological_ordering_preserved": true
+  },
+  "dataset_files": {
+    "maitri_energy_telemetry.csv": {
+      "rows": 8760,
+      "sha256": "9a40b28e11f004f0ce3b4ffa97f90aef3fa8a754cb32d56739918ae7b86ecb0e",
+      "size_bytes": 1629943
+    },
+    "bharati_energy_telemetry.csv": {
+      "rows": 8760,
+      "sha256": "e2a9d4d3bcfe5400621cfcb3222a64e0e58ae9e7daacc6a6a2fdd159a362c8b5",
+      "size_bytes": 1624618
+    },
+    "polarix_energy_telemetry.csv": {
+      "rows": 17520,
+      "sha256": "5e5e0c754d8a6280af30cfe67394ab89fc1390fac703b7fe61d85b576019d003",
+      "size_bytes": 3254104
+    }
+  }
+}

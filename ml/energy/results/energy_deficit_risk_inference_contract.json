@@ -1,0 +1,186 @@
+{
+  "contract_name": "energy_deficit_risk_inference_contract",
+  "version": "1.0.0",
+  "subsystem": "Energy Forecasting & Microgrid Optimization",
+  "model_version": "energy-deficit-risk-v1",
+  "model_family": "HistGradientBoostingClassifier",
+  "prediction_horizon": "1-Hour Ahead (t -> t+1h)",
+  "operating_threshold": 0.35,
+  "threshold_source": "ml/energy/models/energy_deficit_risk_v1_config.json",
+  "positive_class_semantics": {
+    "target_name": "target_energy_deficit_risk",
+    "target_definition": "battery_soc(t+1) < 25.0% OR power_demand(t+1) > 0.95 * station_rated_power",
+    "station_rated_power_kw": {
+      "MTR": 120.0,
+      "BRT": 150.0
+    },
+    "interpretation": "Binary early-warning indicating severe microgrid reserve shortfall or impending deep battery discharge within the next hour."
+  },
+  "data_provenance": {
+    "classification": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+    "calibration_sources": [
+      "Australian Antarctic Data Centre (AADC CC BY 4.0 monthly electrical load envelopes 1993-2016)",
+      "National Centre for Polar and Ocean Research (NCPOR / NPDC Maitri & Bharati meteorological archives)"
+    ],
+    "disclaimer": "Trained and evaluated strictly on synthetic Polarix operational microgrid telemetry. No classified Indian Antarctic SCADA logs are used or exposed."
+  },
+  "input_specification": {
+    "required_telemetry_fields": [
+      {
+        "name": "timestamp",
+        "type": "string (ISO-8601 UTC)",
+        "unit": "datetime",
+        "description": "Observation timestamp (e.g. 2026-09-18T10:00:00Z)"
+      },
+      {
+        "name": "station_id",
+        "type": "string (categorical)",
+        "unit": "enum",
+        "allowed_values": ["MTR", "BRT"],
+        "description": "Station identifier: MTR (Maitri) or BRT (Bharati)"
+      },
+      {
+        "name": "power_demand_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 300.0],
+        "description": "Instantaneous aggregate station electrical and thermal power demand"
+      },
+      {
+        "name": "generator_output_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 300.0],
+        "description": "Active diesel generator electrical power output"
+      },
+      {
+        "name": "battery_soc_percent",
+        "type": "float",
+        "unit": "%",
+        "valid_range": [0.0, 100.0],
+        "description": "Battery Energy Storage System (BESS) State-of-Charge"
+      },
+      {
+        "name": "battery_charge_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 100.0],
+        "description": "BESS instantaneous charging power"
+      },
+      {
+        "name": "battery_discharge_kw",
+        "type": "float",
+        "unit": "kW",
+        "valid_range": [0.0, 100.0],
+        "description": "BESS instantaneous discharging power"
+      },
+      {
+        "name": "fuel_consumption_l",
+        "type": "float",
+        "unit": "L/h",
+        "valid_range": [0.0, 100.0],
+        "description": "Hourly diesel generator fuel consumption"
+      },
+      {
+        "name": "temperature_c",
+        "type": "float",
+        "unit": "°C",
+        "valid_range": [-65.0, 25.0],
+        "description": "Ambient outdoor air temperature"
+      },
+      {
+        "name": "humidity_percent",
+        "type": "float",
+        "unit": "%",
+        "valid_range": [0.0, 100.0],
+        "description": "Ambient relative humidity"
+      },
+      {
+        "name": "pressure_hpa",
+        "type": "float",
+        "unit": "hPa",
+        "valid_range": [850.0, 1100.0],
+        "description": "Barometric surface air pressure"
+      },
+      {
+        "name": "wind_speed_mps",
+        "type": "float",
+        "unit": "m/s",
+        "valid_range": [0.0, 80.0],
+        "description": "Sustained wind speed"
+      }
+    ],
+    "optional_sensor_ml_fields": [
+      {
+        "name": "sensor_anomaly_score",
+        "type": "float",
+        "default": 1.0,
+        "description": "Upstream Sensor ML composite anomaly score"
+      },
+      {
+        "name": "sensor_anomaly_status",
+        "type": "string (categorical)",
+        "default": "NORMAL",
+        "allowed_values": ["NORMAL", "ANOMALY", "MISSING_DATA"],
+        "description": "Upstream Sensor ML classification state"
+      },
+      {
+        "name": "data_quality",
+        "type": "string (categorical)",
+        "default": "GOOD",
+        "allowed_values": ["GOOD", "MISSING"],
+        "description": "Telemetry acquisition quality flag"
+      }
+    ],
+    "excluded_forbidden_fields": [
+      "target_power_demand_1h_kw",
+      "target_battery_soc_1h_percent",
+      "target_energy_demand_6h_kwh",
+      "target_energy_demand_24h_kwh",
+      "target_energy_deficit_risk"
+    ]
+  },
+  "output_specification": {
+    "fields": [
+      {
+        "name": "station_id",
+        "type": "string",
+        "description": "Station identifier ('MTR' or 'BRT')"
+      },
+      {
+        "name": "timestamp",
+        "type": "string (ISO-8601 UTC)",
+        "description": "Timestamp of the forecast decision point"
+      },
+      {
+        "name": "deficit_risk_probability",
+        "type": "float",
+        "range": [0.0, 1.0],
+        "description": "Calibrated model probability of an impending deficit risk at t+1h"
+      },
+      {
+        "name": "deficit_risk",
+        "type": "boolean",
+        "description": "Binary alarm flag (true if deficit_risk_probability >= threshold)"
+      },
+      {
+        "name": "threshold",
+        "type": "float",
+        "description": "Operating decision threshold loaded from configuration (0.3500)"
+      },
+      {
+        "name": "model_version",
+        "type": "string",
+        "description": "Model identifier version string (e.g. 'energy-deficit-risk-v1')"
+      }
+    ],
+    "sample_response": {
+      "station_id": "MTR",
+      "timestamp": "2026-09-18T10:00:00Z",
+      "deficit_risk_probability": 0.8521,
+      "deficit_risk": true,
+      "threshold": 0.35,
+      "model_version": "energy-deficit-risk-v1"
+    }
+  }
+}
