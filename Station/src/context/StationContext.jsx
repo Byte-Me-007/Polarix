@@ -165,6 +165,15 @@ export const StationProvider = ({ children }) => {
           updated.anomalyScore = 0.02;
           updated.anomaly_status = 'NORMAL';
           updated.anomalyStatus = 'NORMAL';
+          if (updated.type === 'VIBRATION') {
+            updated.value = 1.8;
+          }
+          if (updated.type === 'HUMIDITY' && updated.value === 0.0) {
+            updated.value = 58.0;
+          }
+          if (updated.type === 'FLOW' && updated.value === 0.0) {
+            updated.value = 18.5;
+          }
           if (updated.quality === 'FAIL' || updated.quality === 'OFFLINE' || updated.quality === 'LOST') {
             updated.quality = 'GOOD';
           }

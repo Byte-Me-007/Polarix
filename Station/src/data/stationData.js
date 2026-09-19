@@ -725,8 +725,13 @@ export const DEMO_SCENARIOS = {
   RECOVERY: {
     label: "RECOVERY",
     badge: "RESTORING NOMINAL",
-    description: "System recovery routines executed. Subsystems re-engaging to nominal baseline.",
-    patch: {},
+    patch: {
+      fuel: {
+        remainingDays: 28.5,
+        currentLevel: 75,
+        reserveStatus: "SECURE"
+      }
+    },
     sensorOverrides: {
       ALL_NORMAL: true
     },

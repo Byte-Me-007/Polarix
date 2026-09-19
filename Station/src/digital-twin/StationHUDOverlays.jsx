@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useMissionReadiness } from '../hooks/useMissionReadiness';
 
 /**
  * StationHUDOverlays — Mission-Control Heads-Up Display overlays for the 3D Digital Twin.
@@ -9,21 +10,33 @@ import React, { useMemo } from 'react';
  *   4. Bottom-Left:  CAMERA CONTROLS HINT (L-Click rotate, R-Click pan, Scroll zoom)
  */
 
-export const StationStatusHUD = ({ telemetry, sensors = [], config }) => {
-  // Derive overall station health score
+export const StationStatusHUD = ({ telemetry, sensors = [], config, readiness: propReadiness }) => {
+  const hookReadiness = useMissionReadiness();
+  const readiness = propReadiness || hookReadiness;
+
+  const overallReadiness = readiness?.overallReadiness || 'READY';
+  const overallSummary = readiness?.overallSummary || '';
+
+  // Authoritative system health score derived from the shared readiness evaluation (Power, Comms, Infra, Supplies, Alerts)
   const healthScore = useMemo(() => {
-    if (telemetry?.stationHealth?.overallScore) {
-      return telemetry.stationHealth.overallScore;
+    if (typeof readiness?.overallScore === 'number') {
+      return readiness.overallScore;
     }
-    // Calculate from sensor statuses if not explicit
-    if (!sensors || sensors.length === 0) return 96.4;
-    const total = sensors.length;
-    const crit = sensors.filter(s => (s.status || '').toUpperCase() === 'CRITICAL').length;
-    const warn = sensors.filter(s => (s.status || '').toUpperCase() === 'WARNING').length;
-    const off  = sensors.filter(s => (s.status || '').toUpperCase() === 'OFFLINE').length;
-    const score = Math.max(0, Math.min(100, 100 - (crit * 15 + warn * 5 + off * 2)));
-    return Number(score.toFixed(1));
-  }, [telemetry, sensors]);
+    if (readiness?.systems && readiness.systems.length > 0) {
+      const avg = readiness.systems.reduce((sum, s) => sum + (typeof s.rating === 'number' ? s.rating : 90), 0) / readiness.systems.length;
+      return Math.round(avg);
+    }
+    if (typeof telemetry?.healthScore === 'number') {
+      return telemetry.healthScore;
+    }
+    return 94;
+  }, [readiness?.overallScore, readiness?.systems, telemetry?.healthScore]);
+
+  // Operational status styling aligned with POLARIS readiness design tokens
+  const isAtRisk = overallReadiness === 'AT RISK';
+  const isDegraded = overallReadiness === 'DEGRADED';
+  const readinessColor = isAtRisk ? '#e53e3e' : isDegraded ? '#d97706' : '#38a169';
+  const readinessClass = isAtRisk ? 'critical' : isDegraded ? 'warning' : 'normal';
 
   // SVG Gauge calculations
   const radius = 22;
@@ -34,13 +47,18 @@ export const StationStatusHUD = ({ telemetry, sensors = [], config }) => {
   return (
     <div className="station-hud-card hud-top-left" aria-label="Station Status HUD">
       <div className="hud-card-header">
-        <span className="hud-pulse-dot" style={{ background: healthColor }} />
+        <span className="hud-pulse-dot" style={{ background: readinessColor }} />
         <span className="hud-header-title">STATION STATUS HUD</span>
       </div>
 
       <div className="hud-status-body">
         <div className="hud-health-metric">
-          <span className="hud-metric-label">SYSTEM HEALTH</span>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="hud-metric-label">SYSTEM HEALTH</span>
+            <span style={{ fontSize: '0.48rem', color: '#94a3b8', letterSpacing: '0.04em' }}>
+              SUBSYSTEM CONDITION
+            </span>
+          </div>
           <span className="hud-metric-value" style={{ color: healthColor }}>
             {healthScore}%
           </span>
@@ -84,9 +102,16 @@ export const StationStatusHUD = ({ telemetry, sensors = [], config }) => {
         <span className="hud-footer-tag">
           {config?.zones?.length || 6} MODULES ACTIVE
         </span>
-        <span className="hud-footer-tag normal">
-          OPERATIONAL
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '0.50rem', color: '#94a3b8', letterSpacing: '0.04em' }}>READINESS:</span>
+          <span
+            className={`hud-footer-tag ${readinessClass}`}
+            style={{ color: readinessColor, fontWeight: 700 }}
+            title={overallSummary || `Operational Status: ${overallReadiness}`}
+          >
+            {overallReadiness}
+          </span>
+        </div>
       </div>
     </div>
   );

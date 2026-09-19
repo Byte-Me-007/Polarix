@@ -61,7 +61,7 @@ export const useMissionReadiness = () => {
     // Check if generator vibration sensor is critical or exceeds threshold
     const genVibCritThreshold = thresholds?.generatorVibrationCrit ?? 4.8;
     const genVibrationSensor = sensors.find(s => s.id === 'ENG-MTR-002' || (s.type === 'VIBRATION' && s.zone === 'GENERATOR'));
-    const isGenVibrating = genVibrationSensor && (
+    const isGenVibrating = genVibrationSensor && genVibrationSensor.status !== 'NORMAL' && (
       genVibrationSensor.status === 'CRITICAL' ||
       (typeof genVibrationSensor.value === 'number' && genVibrationSensor.value >= genVibCritThreshold) ||
       (genVibrationSensor.anomalyScore || 0) > 0.85
@@ -483,8 +483,21 @@ export const useMissionReadiness = () => {
       action: s.targetRoute
     }));
 
+    // Composite technical subsystem health score (0-100%)
+    // Synthesizes all 5 operational subsystem ratings (Power, Comms, Infra, Supplies, Alerts)
+    const systemRatingsAverage = Math.round(
+      systems.reduce((sum, s) => sum + (typeof s.rating === 'number' ? s.rating : 90), 0) / (systems.length || 1)
+    );
+
+    // If scenario specifies a health score patch (e.g. POWER_CRISIS=48, STORM=74), align with it;
+    // otherwise derive directly from the dynamic subsystem ratings
+    const overallScore = (activeScenario && activeScenario !== 'NORMAL' && activeScenario !== 'RECOVERY' && typeof telemetry.healthScore === 'number')
+      ? telemetry.healthScore
+      : systemRatingsAverage;
+
     return {
       overallReadiness,
+      overallScore,
       overallSummary,
       overallTheme,
       systems,

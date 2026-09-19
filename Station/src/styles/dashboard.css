@@ -7134,6 +7134,16 @@ body {
   font-weight: 700;
 }
 
+.hud-footer-tag.warning {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.hud-footer-tag.critical {
+  color: #e53e3e;
+  font-weight: 700;
+}
+
 /* Environmental Grid */
 .hud-env-grid {
   display: grid;

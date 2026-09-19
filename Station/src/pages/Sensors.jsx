@@ -421,7 +421,15 @@ export const Sensors = () => {
               <button
                 type="button"
                 className="digital-twin-action-btn"
-                onClick={() => navigate('/digital-twin')}
+                onClick={() =>
+                  navigate('/digital-twin', {
+                    state: {
+                      locateSensorId: activeSensor.id,
+                      focusZone: activeSensor.zone || null,
+                      twinMode: 'XRAY'
+                    }
+                  })
+                }
                 style={{ cursor: 'pointer', opacity: 1, color: '#ffffff', background: 'var(--polaris-copper)', borderColor: 'var(--polaris-copper)' }}
                 title="Navigate to 3D Digital Twin Viewport"
               >
