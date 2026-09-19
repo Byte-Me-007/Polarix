@@ -1,30 +1,30 @@
-# Polarix ML Inference Microservice
+# Polarix ML Inference Microservice — Integration Guide & API Contract
 
 **Subsystem:** Autonomous Sensor Anomaly Detection & Microgrid Energy Forecasting
 **Author:** Person C (Machine Learning Specialist)
-**Branch:** `Rex` (**Source of Truth for all ML Models & Services**)
+**Branch:** `Rex` (**Authoritative Source of Truth for all ML Models & Services**)
 **Service Version:** `1.0.0`
-**FastAPI Service Location:** `ml/service/`
+**API Version:** `v1`
+**Contract Version:** `ml-service-contract-v1`
+**Machine-Readable Contract:** `ml/service/results/ml_service_api_contract.json`
 
 ---
 
-## 1. Service Purpose & Architectural Role
+## 1. Architecture & Authority Declaration
 
-The Polarix ML service is an independent, production-oriented FastAPI microservice exposing HTTP/JSON boundaries for:
-1. **Sensor ML Anomaly Detection:** Real-time multivariate LSTM-Autoencoder anomaly scoring and classification (`SPIKE`, `DRIFT`, `STUCK_VALUE`, `STEP_CHANGE`, etc.) for Maitri (`MTR`) and Bharati (`BRT`).
-2. **Energy ML Forecasting & Deficit Risk:** Real-time multi-horizon load forecasting (1h, 6h, 24h), battery state-of-charge trajectory planning (1h), and binary energy deficit risk classification ($\tau = 0.35$).
+The Polarix ML Service is an independent, production-oriented FastAPI service exposing HTTP/JSON endpoints for Sensor ML anomaly classification and Energy ML load/deficit-risk forecasting.
 
 ```text
-Simulator / Physical Telemetry Stream
+Physical SCADA / Telemetry Stream
                  ↓
       Person A Backend (Parthi)
-                 ↓  HTTP/JSON
+                 ↓  HTTP / JSON
       Person C ML Service (Rex)
                  ├── GET  /api/v1/ml/health
                  ├── GET  /api/v1/ml/version
                  ├── POST /api/v1/ml/sensor/analyze
                  └── POST /api/v1/ml/energy/predict
-                 ↓  Unified ML Response
+                 ↓  Authoritative ML Responses
       Person A Backend Operational Rules Engine
                  ↓
 Alerts / Commands / Resource Scheduling / WebSockets
@@ -33,94 +33,42 @@ Alerts / Commands / Resource Scheduling / WebSockets
 ```
 
 > [!IMPORTANT]
-> **SOURCE OF TRUTH DECLARATION:**
-> Branch `Rex` is the authoritative source of truth for all ML implementations, trained model weights, feature scalers, decision thresholds, and inference contracts. Person A's backend consumes this HTTP service interface and must not reproduce or rewrite ML logic.
+> **AUTHORITY & BOUNDARY INVARIANTS:**
+> 1. **Person C ML Service is the sole authority for ML inference.** It encapsulates feature engineering, scalers, PyTorch/Scikit-learn models, reconstruction thresholds, and deficit-risk decision logic ($\tau = 0.35$).
+> 2. **Person A's backend consumes the service contract.** The backend is responsible for network transport, persistence, operational dispatch, and frontend delivery. The backend must NOT duplicate ML algorithms or threshold anomaly scores independently.
+> 3. **Person B's frontend renders the Digital Twin and displays ML predictions.**
 
 ---
 
 ## 2. Local Execution
 
-Run the ML service locally using Uvicorn:
+Run the ML service locally from the repository root:
 
 ```bash
-# From repository root
+# Start ML microservice on port 8000
 .venv/bin/uvicorn ml.service.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Interactive OpenAPI documentation is automatically served at:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+Interactive documentation:
+- **Swagger UI:** `http://localhost:8000/docs`
+- **ReDoc:** `http://localhost:8000/redoc`
 
 ---
 
-## 3. API Endpoints
+## 3. Endpoints Overview
 
-### A. `GET /api/v1/ml/health`
-Determines service liveness and operational readiness.
-
-**Response (200 OK):**
-```json
-{
-  "status": "ok",
-  "service": "polarix-ml"
-}
-```
+| Method | Path | Purpose | Stateful | Success Code |
+|:---|:---|:---|:---:|:---:|
+| `GET` | `/api/v1/ml/health` | Process liveness check | No | `200 OK` |
+| `GET` | `/api/v1/ml/version` | Active model versions, thresholds, and metadata | No | `200 OK` |
+| `POST` | `/api/v1/ml/sensor/analyze` | Single-point multivariate LSTM anomaly detection | Yes (30-step buffer/sensor) | `200 OK` |
+| `POST` | `/api/v1/ml/energy/predict` | Hourly microgrid forecasting & deficit risk | Yes (24-hour buffer/station) | `200 OK` |
 
 ---
 
-### B. `GET /api/v1/ml/version`
-Exposes release metadata, component model versions, frozen thresholds, and provenance context.
+## 4. Sensor ML API Contract (`POST /api/v1/ml/sensor/analyze`)
 
-**Response (200 OK):**
-```json
-{
-  "service_name": "polarix-ml-service",
-  "service_version": "1.0.0",
-  "contract_version": "energy-ml-contract-v1",
-  "sensor_models": {
-    "maitri": {
-      "model_version": "lstm-ae-v1",
-      "station_id": "MTR",
-      "model_type": "LSTM Autoencoder",
-      "frozen_threshold": 0.017674,
-      "sequence_length": 30,
-      "status": "PRODUCTION"
-    },
-    "bharati": {
-      "model_version": "lstm-ae-bharati-v1",
-      "station_id": "BRT",
-      "model_type": "LSTM Autoencoder",
-      "frozen_threshold": 0.013215307652775843,
-      "sequence_length": 30,
-      "status": "PRODUCTION"
-    }
-  },
-  "energy_models": {
-    "unified_model_version": "energy-ml-v1-candidate",
-    "model_status": "CANDIDATE",
-    "forecast_model_version": "lstm-energy-baseline-v1",
-    "risk_model_version": "energy-deficit-risk-v1",
-    "deficit_risk_threshold": 0.35,
-    "required_history_hours": 24,
-    "supported_stations": ["MTR", "BRT"]
-  },
-  "provenance": {
-    "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
-    "calibration_references": [
-      "National Centre for Polar and Ocean Research (NCPOR) Meteorological Archives",
-      "Australian Antarctic Data Centre (AADC CC BY 4.0) Electrical Load Archives"
-    ],
-    "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
-  }
-}
-```
-
----
-
-### C. `POST /api/v1/ml/sensor/analyze`
-Executes LSTM-Autoencoder sensor anomaly detection for a single incoming observation.
-
-**Request Payload:**
+### Request Specification:
 ```json
 {
   "timestamp": "2026-09-18T12:00:00Z",
@@ -133,7 +81,10 @@ Executes LSTM-Autoencoder sensor anomaly detection for a single incoming observa
 }
 ```
 
-**Response (200 OK):**
+- **Required Fields:** `timestamp`, `station_id` (`"MTR"` or `"BRT"`), `sensor_id`, `value`.
+- **Optional Fields:** `quality` (`"GOOD"`, `"MISSING"`, `"DEGRADED"`), `unit`, `source`.
+
+### Response Specification:
 ```json
 {
   "station_id": "MTR",
@@ -150,16 +101,16 @@ Executes LSTM-Autoencoder sensor anomaly detection for a single incoming observa
 }
 ```
 
-- **Warmup Behavior:** Observations 1 through 29 return `anomaly_status: "INSUFFICIENT_DATA"` with `anomaly_score: null`.
-- **Steady State:** Observation 30+ emits scored reconstruction error and classification (`NORMAL` vs `ANOMALY` / `SPIKE` / `DRIFT` / `STUCK_VALUE`).
-- **Missing Quality:** Packets with `quality: "MISSING"` trigger `anomaly_status: "MISSING_DATA"` and safely flush sensor history to prevent contamination.
+### Sensor ML Semantic Values:
+- **`anomaly_status`:** `NORMAL` | `ANOMALY` | `INSUFFICIENT_DATA` (warmup steps 1..29) | `MISSING_DATA` (non-GOOD quality).
+- **`anomaly_type`:** `NORMAL` | `SPIKE` | `DRIFT` | `STUCK_VALUE` | `STEP_CHANGE` | `UNKNOWN` | `MISSING_DATA`.
+- **Ownership Rule:** Sensor ML models own classification. Backend must NOT re-threshold `anomaly_score`.
 
 ---
 
-### D. `POST /api/v1/ml/energy/predict`
-Ingests a single hourly microgrid telemetry record and generates multi-horizon forecasts and deficit risk alarms.
+## 5. Energy ML API Contract (`POST /api/v1/ml/energy/predict`)
 
-**Request Payload:**
+### Request Specification:
 ```json
 {
   "timestamp": "2026-09-18T23:00:00Z",
@@ -182,7 +133,12 @@ Ingests a single hourly microgrid telemetry record and generates multi-horizon f
 }
 ```
 
-**Response (200 OK — Warmup / Gap: $N < 24$ hours):**
+- **Required Physical Fields (12):** `timestamp`, `station_id`, `power_demand_kw`, `generator_output_kw`, `battery_soc_percent`, `battery_charge_kw`, `battery_discharge_kw`, `fuel_consumption_l`, `temperature_c`, `humidity_percent`, `pressure_hpa`, `wind_speed_mps`.
+- **Optional Context Fields (5):** `sensor_anomaly_score`, `sensor_anomaly_status`, `sensor_anomaly_type`, `data_quality`, `source`.
+
+### Stateful 24-Hour Buffering Responses:
+
+#### A. Warmup / After Timeline Gap ($N < 24$ hours):
 ```json
 {
   "status": "INSUFFICIENT_HISTORY",
@@ -195,7 +151,7 @@ Ingests a single hourly microgrid telemetry record and generates multi-horizon f
 }
 ```
 
-**Response (200 OK — Contiguous $\ge 24$ hours):**
+#### B. Prediction Available ($N \ge 24$ contiguous hours):
 ```json
 {
   "status": "PREDICTION_AVAILABLE",
@@ -234,29 +190,83 @@ Ingests a single hourly microgrid telemetry record and generates multi-horizon f
 
 ---
 
-## 4. Station Identifiers & Gateway Normalization
+## 6. Station Identifiers & Gateway Normalization (`BHR` $\to$ `BRT`)
 
-The ML service strictly accepts only two canonical station codes:
-- `MTR` — Maitri Station
-- `BRT` — Bharati Station
-
-### Legacy Station Code Rejection:
-Any request containing `station_id: "BHR"` is deterministically rejected with **HTTP 400 Bad Request**. Person A's backend gateway must map `"BHR"` to `"BRT"` prior to dispatching HTTP requests to the ML service. Zero silent aliasing is performed.
+- **Canonical Station Codes:** `MTR` (Maitri), `BRT` (Bharati).
+- **`BHR` Rejection:** Any request with `station_id: "BHR"` returns **HTTP 400 Bad Request**.
+- **Normalization Ownership:** Person A's backend gateway must map `"BHR"` to `"BRT"` before sending requests to the ML service.
 
 ---
 
-## 5. Error Semantics
+## 7. Error Semantics Matrix
 
-| HTTP Status | Trigger Condition | Response Structure |
-|:---|:---|:---|
-| **400 Bad Request** | Legacy `station_id: "BHR"`, duplicate timestamp, out-of-order timestamp, unsupported station code, or physical value NaN/Inf. | `{"detail": "<descriptive_error_explanation>"}` |
-| **422 Unprocessable Entity** | Missing required physical schema fields or invalid data types. | FastAPI standard Pydantic validation error array. |
-| **500 Internal Server Error** | Unexpected PyTorch/Scikit-learn compute failure. | `{"detail": "Energy ML inference error: <msg>"}` |
+| HTTP Status | Condition | Example Detail Message | Backend Action |
+|:---|:---|:---|:---|
+| **400 Bad Request** | Legacy `station_id: "BHR"` | `"Invalid station_id 'BHR'. Person C ML contracts enforce 'BRT'..."` | Normalize `"BHR"` to `"BRT"` |
+| **400 Bad Request** | Duplicate timestamp | `"Duplicate timestamp '...' received for sensor..."` | Skip duplicate transmission |
+| **400 Bad Request** | Out-of-order timestamp | `"Out-of-order telemetry timestamp '...'..."` | Discard or queue for historical batch |
+| **400 Bad Request** | NaN or Infinite float | `"Field 'power_demand_kw' contains NaN or infinite value."` | Reject bad telemetry packet |
+| **422 Unprocessable** | Missing required physical field | `[{"loc": ["body", "power_demand_kw"], "msg": "Field required"}]` | Fix payload schema |
+| **500 Server Error** | Unexpected compute exception | `"Energy ML inference error: <msg>"` | Log alert; report issue to Person C |
 
 ---
 
-## 6. Provenance & Synthetic Data Disclaimer
+## 8. Provenance & Synthetic Data Limitation
 
 > [!CAUTION]
-> **DATA PROVENANCE STATEMENT:**
-> Operational microgrid telemetry for Maitri and Bharati stations is classified infrastructure data and is not publicly released. All Energy ML models were trained, evaluated, and hardened on high-fidelity synthetic operational telemetry (`SYNTHETIC_POLARIX_OPERATIONAL_DATA`) conditioned on empirical Antarctic meteorological distributions. Model status remains `CANDIDATE`.
+> **DATA PROVENANCE NOTICE:**
+> Real sub-hourly operational microgrid telemetry for Maitri and Bharati stations is classified infrastructure data and is not publicly distributed. All Energy ML models were trained and validated on high-fidelity synthetic operational telemetry (`SYNTHETIC_POLARIX_OPERATIONAL_DATA`) calibrated against open-access NCPOR weather envelopes and Australian Antarctic Division (AADC CC BY 4.0) historical seasonal load profiles. Model status is `CANDIDATE`.
+
+---
+
+## 9. Example cURL Invocations
+
+### Health Check:
+```bash
+curl -X GET http://localhost:8000/api/v1/ml/health
+```
+
+### Version Metadata:
+```bash
+curl -X GET http://localhost:8000/api/v1/ml/version
+```
+
+### Sensor Analysis:
+```bash
+curl -X POST http://localhost:8000/api/v1/ml/sensor/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timestamp": "2026-09-18T12:00:00Z",
+    "station_id": "MTR",
+    "sensor_id": "TEMP_001",
+    "value": -15.42,
+    "quality": "GOOD",
+    "unit": "C",
+    "source": "SIMULATOR"
+  }'
+```
+
+### Energy Prediction:
+```bash
+curl -X POST http://localhost:8000/api/v1/ml/energy/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timestamp": "2026-09-18T23:00:00Z",
+    "station_id": "MTR",
+    "power_demand_kw": 48.75,
+    "generator_output_kw": 54.20,
+    "battery_soc_percent": 82.50,
+    "battery_charge_kw": 5.45,
+    "battery_discharge_kw": 0.0,
+    "fuel_consumption_l": 15.12,
+    "temperature_c": -18.35,
+    "humidity_percent": 58.40,
+    "pressure_hpa": 987.60,
+    "wind_speed_mps": 9.20,
+    "sensor_anomaly_score": 0.8521,
+    "sensor_anomaly_status": "NORMAL",
+    "sensor_anomaly_type": "NORMAL",
+    "data_quality": "GOOD",
+    "source": "SIMULATOR"
+  }'
+```

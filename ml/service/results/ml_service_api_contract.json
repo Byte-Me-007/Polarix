@@ -1,0 +1,352 @@
+{
+  "service_name": "polarix-ml",
+  "api_version": "v1",
+  "contract_version": "ml-service-contract-v1",
+  "author": "Person C (Machine Learning Specialist)",
+  "date_frozen": "2026-09-19",
+  "status": "FROZEN_API_CONTRACT",
+  "subsystems": [
+    "Sensor ML Anomaly Detection",
+    "Energy Forecasting & Deficit Risk"
+  ],
+  "supported_stations": [
+    "MTR",
+    "BRT"
+  ],
+  "rejected_station_aliases": {
+    "BHR": "Rejected with HTTP 400 Bad Request. Person A backend must normalize 'BHR' to 'BRT' before invoking ML service."
+  },
+  "endpoints": {
+    "health_check": {
+      "method": "GET",
+      "path": "/api/v1/ml/health",
+      "purpose": "Verify ML inference microservice process liveness and operational health.",
+      "stateful": false,
+      "request": {
+        "content_type": null,
+        "parameters": {}
+      },
+      "response": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "schema": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"]
+          },
+          "service": {
+            "type": "string",
+            "enum": ["polarix-ml"]
+          }
+        },
+        "example": {
+          "status": "ok",
+          "service": "polarix-ml"
+        }
+      }
+    },
+    "version_metadata": {
+      "method": "GET",
+      "path": "/api/v1/ml/version",
+      "purpose": "Expose release metadata, active model versions, frozen decision thresholds, and data provenance context.",
+      "stateful": false,
+      "request": {
+        "content_type": null,
+        "parameters": {}
+      },
+      "response": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "schema": {
+          "service_name": { "type": "string" },
+          "service_version": { "type": "string" },
+          "contract_version": { "type": "string" },
+          "sensor_models": { "type": "object" },
+          "energy_models": { "type": "object" },
+          "provenance": { "type": "object" }
+        },
+        "example": {
+          "service_name": "polarix-ml-service",
+          "service_version": "1.0.0",
+          "contract_version": "energy-ml-contract-v1",
+          "sensor_models": {
+            "maitri": {
+              "model_version": "lstm-ae-v1",
+              "station_id": "MTR",
+              "model_type": "LSTM Autoencoder",
+              "frozen_threshold": 0.017674,
+              "sequence_length": 30,
+              "status": "PRODUCTION"
+            },
+            "bharati": {
+              "model_version": "lstm-ae-bharati-v1",
+              "station_id": "BRT",
+              "model_type": "LSTM Autoencoder",
+              "frozen_threshold": 0.013215307652775843,
+              "sequence_length": 30,
+              "status": "PRODUCTION"
+            }
+          },
+          "energy_models": {
+            "unified_model_version": "energy-ml-v1-candidate",
+            "model_status": "CANDIDATE",
+            "forecast_model_version": "lstm-energy-baseline-v1",
+            "risk_model_version": "energy-deficit-risk-v1",
+            "deficit_risk_threshold": 0.35,
+            "required_history_hours": 24,
+            "supported_stations": ["MTR", "BRT"]
+          },
+          "provenance": {
+            "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+            "calibration_references": [
+              "National Centre for Polar and Ocean Research (NCPOR) Meteorological Archives",
+              "Australian Antarctic Data Centre (AADC CC BY 4.0) Electrical Load Archives"
+            ],
+            "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
+          }
+        }
+      }
+    },
+    "sensor_anomaly_analysis": {
+      "method": "POST",
+      "path": "/api/v1/ml/sensor/analyze",
+      "purpose": "Ingest single-point sensor telemetry observation and execute real-time LSTM-Autoencoder anomaly detection.",
+      "stateful": true,
+      "state_description": "Maintains an in-memory 30-observation sliding window per sensor. Steps 1..29 return INSUFFICIENT_DATA. Step 30+ returns scored reconstruction error and anomaly classification.",
+      "request": {
+        "content_type": "application/json",
+        "required_fields": [
+          "timestamp",
+          "station_id",
+          "sensor_id",
+          "value"
+        ],
+        "optional_fields": [
+          "quality",
+          "unit",
+          "source"
+        ],
+        "schema": {
+          "timestamp": { "type": "string", "format": "date-time", "description": "ISO-8601 UTC timestamp" },
+          "station_id": { "type": "string", "enum": ["MTR", "BRT"], "description": "Canonical station identifier" },
+          "sensor_id": { "type": "string", "description": "Supported sensor channel ID" },
+          "value": { "type": "number", "description": "Observed physical sensor measurement" },
+          "quality": { "type": "string", "enum": ["GOOD", "MISSING", "DEGRADED"], "default": "GOOD" },
+          "unit": { "type": "string", "default": "" },
+          "source": { "type": "string", "default": "SIMULATOR" }
+        },
+        "example": {
+          "timestamp": "2026-09-18T12:00:00Z",
+          "station_id": "MTR",
+          "sensor_id": "TEMP_001",
+          "value": -15.42,
+          "quality": "GOOD",
+          "unit": "C",
+          "source": "SIMULATOR"
+        }
+      },
+      "response": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "schema": {
+          "station_id": { "type": "string", "enum": ["MTR", "BRT"] },
+          "sensor_id": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "value": { "type": "number" },
+          "unit": { "type": "string" },
+          "quality": { "type": "string" },
+          "source": { "type": "string" },
+          "anomaly_score": { "type": ["number", "null"], "description": "Normalized reconstruction error MSE (null during warmup/missing)" },
+          "anomaly_status": {
+            "type": "string",
+            "enum": ["NORMAL", "ANOMALY", "INSUFFICIENT_DATA", "MISSING_DATA"]
+          },
+          "anomaly_type": {
+            "type": "string",
+            "enum": ["NORMAL", "SPIKE", "DRIFT", "STUCK_VALUE", "STEP_CHANGE", "UNKNOWN", "MISSING_DATA"]
+          },
+          "model_version": { "type": "string", "enum": ["lstm-ae-v1", "lstm-ae-bharati-v1"] }
+        },
+        "example": {
+          "station_id": "MTR",
+          "sensor_id": "TEMP_001",
+          "timestamp": "2026-09-18T12:00:00Z",
+          "value": -15.42,
+          "unit": "C",
+          "quality": "GOOD",
+          "source": "SIMULATOR",
+          "anomaly_score": 0.00412,
+          "anomaly_status": "NORMAL",
+          "anomaly_type": "NORMAL",
+          "model_version": "lstm-ae-v1"
+        }
+      },
+      "ownership_rule": "Person C Sensor ML models own anomaly scoring, reconstruction thresholding, and anomaly classification. Person A backend must NOT independently threshold anomaly_score or recreate anomaly_status/type."
+    },
+    "energy_forecasting_and_risk": {
+      "method": "POST",
+      "path": "/api/v1/ml/energy/predict",
+      "purpose": "Ingest single-point hourly microgrid telemetry and execute unified multi-horizon load forecasting and deficit risk early-warning.",
+      "stateful": true,
+      "state_description": "Maintains an in-memory 24-hour ring buffer per station. Steps 1..23 return INSUFFICIENT_HISTORY (prediction: null). Step 24+ returns PREDICTION_AVAILABLE with unified forecast and deficit risk payload.",
+      "request": {
+        "content_type": "application/json",
+        "required_fields": [
+          "timestamp",
+          "station_id",
+          "power_demand_kw",
+          "generator_output_kw",
+          "battery_soc_percent",
+          "battery_charge_kw",
+          "battery_discharge_kw",
+          "fuel_consumption_l",
+          "temperature_c",
+          "humidity_percent",
+          "pressure_hpa",
+          "wind_speed_mps"
+        ],
+        "optional_fields": [
+          "sensor_anomaly_score",
+          "sensor_anomaly_status",
+          "sensor_anomaly_type",
+          "data_quality",
+          "source"
+        ],
+        "schema": {
+          "timestamp": { "type": "string", "format": "date-time", "description": "ISO-8601 UTC timestamp" },
+          "station_id": { "type": "string", "enum": ["MTR", "BRT"], "description": "Canonical station identifier" },
+          "power_demand_kw": { "type": "number" },
+          "generator_output_kw": { "type": "number" },
+          "battery_soc_percent": { "type": "number" },
+          "battery_charge_kw": { "type": "number" },
+          "battery_discharge_kw": { "type": "number" },
+          "fuel_consumption_l": { "type": "number" },
+          "temperature_c": { "type": "number" },
+          "humidity_percent": { "type": "number" },
+          "pressure_hpa": { "type": "number" },
+          "wind_speed_mps": { "type": "number" },
+          "sensor_anomaly_score": { "type": ["number", "null"] },
+          "sensor_anomaly_status": { "type": ["string", "null"] },
+          "sensor_anomaly_type": { "type": ["string", "null"] },
+          "data_quality": { "type": ["string", "null"], "default": "GOOD" },
+          "source": { "type": ["string", "null"], "default": "SIMULATOR" }
+        },
+        "example": {
+          "timestamp": "2026-09-18T23:00:00Z",
+          "station_id": "MTR",
+          "power_demand_kw": 48.75,
+          "generator_output_kw": 54.20,
+          "battery_soc_percent": 82.50,
+          "battery_charge_kw": 5.45,
+          "battery_discharge_kw": 0.0,
+          "fuel_consumption_l": 15.12,
+          "temperature_c": -18.35,
+          "humidity_percent": 58.40,
+          "pressure_hpa": 987.60,
+          "wind_speed_mps": 9.20,
+          "sensor_anomaly_score": 0.8521,
+          "sensor_anomaly_status": "NORMAL",
+          "sensor_anomaly_type": "NORMAL",
+          "data_quality": "GOOD",
+          "source": "SIMULATOR"
+        }
+      },
+      "response": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "schema": {
+          "status": {
+            "type": "string",
+            "enum": ["INSUFFICIENT_HISTORY", "PREDICTION_AVAILABLE"]
+          },
+          "station_id": { "type": "string", "enum": ["MTR", "BRT"] },
+          "latest_timestamp": { "type": "string" },
+          "available_history": { "type": "integer" },
+          "required_history": { "type": "integer", "enum": [24] },
+          "prediction": {
+            "type": ["object", "null"],
+            "properties": {
+              "station_id": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "contract_version": { "type": "string", "enum": ["energy-ml-contract-v1"] },
+              "model_version": { "type": "string", "enum": ["energy-ml-v1-candidate"] },
+              "forecast_model_version": { "type": "string", "enum": ["lstm-energy-baseline-v1"] },
+              "risk_model_version": { "type": "string", "enum": ["energy-deficit-risk-v1"] },
+              "forecasts": {
+                "type": "object",
+                "properties": {
+                  "power_demand_1h_kw": { "type": "number" },
+                  "battery_soc_1h_percent": { "type": "number" },
+                  "energy_demand_6h_kwh": { "type": "number" },
+                  "energy_demand_24h_kwh": { "type": "number" }
+                }
+              },
+              "deficit_risk": {
+                "type": "object",
+                "properties": {
+                  "probability": { "type": "number" },
+                  "decision": { "type": "boolean" },
+                  "threshold": { "type": "number", "enum": [0.35] }
+                }
+              },
+              "provenance": {
+                "type": "object",
+                "properties": {
+                  "source": { "type": "string" },
+                  "model_status": { "type": "string", "enum": ["CANDIDATE"] },
+                  "calibration_reference": { "type": "string" },
+                  "disclaimer": { "type": "string" }
+                }
+              }
+            }
+          },
+          "message": { "type": "string" }
+        },
+        "example": {
+          "status": "PREDICTION_AVAILABLE",
+          "station_id": "MTR",
+          "latest_timestamp": "2026-09-18T23:00:00Z",
+          "available_history": 24,
+          "required_history": 24,
+          "prediction": {
+            "station_id": "MTR",
+            "timestamp": "2026-09-18T23:00:00Z",
+            "contract_version": "energy-ml-contract-v1",
+            "model_version": "energy-ml-v1-candidate",
+            "forecast_model_version": "lstm-energy-baseline-v1",
+            "risk_model_version": "energy-deficit-risk-v1",
+            "forecasts": {
+              "power_demand_1h_kw": 49.82,
+              "battery_soc_1h_percent": 81.65,
+              "energy_demand_6h_kwh": 302.40,
+              "energy_demand_24h_kwh": 1225.80
+            },
+            "deficit_risk": {
+              "probability": 0.0075,
+              "decision": false,
+              "threshold": 0.35
+            },
+            "provenance": {
+              "source": "SYNTHETIC_POLARIX_OPERATIONAL_DATA",
+              "model_status": "CANDIDATE",
+              "calibration_reference": "Australian Antarctic Data Centre (AADC CC BY 4.0) & NCPOR Meteorological Archives",
+              "disclaimer": "Validated on synthetic Polarix operational microgrid telemetry. Not validated on real classified station SCADA telemetry."
+            }
+          },
+          "message": "Unified energy prediction successfully generated."
+        }
+      },
+      "ownership_rule": "Person C Energy ML models own multi-horizon forecasting, feature extraction, and deficit risk thresholding (tau = 0.35). Person A backend must NOT independently recalculate risk thresholds or rolling demand features."
+    }
+  },
+  "error_contract": {
+    "status_codes": {
+      "400": "Bad Request (e.g. invalid/legacy station_id 'BHR', duplicate timestamp, out-of-order timestamp, physical value NaN/Inf)",
+      "422": "Unprocessable Entity (FastAPI standard validation error for missing required schema fields or type errors)",
+      "500": "Internal Server Error (unexpected model compute failure)"
+    },
+    "structure": {
+      "detail": "Descriptive error message explaining the rejection reason and corrective action."
+    }
+  }
+}
