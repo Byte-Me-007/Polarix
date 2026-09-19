@@ -1,6 +1,7 @@
 """Maitri Models Package."""
 
 from maitri.models.alert import Alert
+from maitri.models.command import Command
 from maitri.models.device import Device
 from maitri.models.resource import Resource
 from maitri.models.sensor import Sensor
@@ -16,6 +17,7 @@ __all__ = [
     "Telemetry",
     "Alert",
     "Resource",
+    "Command",
 ]
 
 

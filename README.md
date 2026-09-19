@@ -276,6 +276,58 @@ Handles network disconnection, local queueing, and backlog synchronization when 
    - Replays and marks all pending records as `synced = True`.
    - Returns count of synchronized records (`synced_now`) and updates `last_sync_timestamp`.
 
+## Command Handling Backend Foundation
+
+A centralized command API designed for frontend control, demo execution, and station-level scenario triggering.
+
+### Supported Command Types
+- `START_SCENARIO`: Initiates simulator scenarios (`NORMAL_DAY`, `STORM`, `POWER_CRISIS`, `SENSOR_FAILURE`, `SATELLITE_OUTAGE`, `RECOVERY`).
+- `STOP_SCENARIO`: Halts active scenario simulation.
+- `SET_NETWORK_OFFLINE`: Switches network state to `OFFLINE` and begins local queueing.
+- `SET_NETWORK_ONLINE` / `REQUEST_SYNC`: Restores network connectivity and reconciles all queued telemetry.
+- `ACKNOWLEDGE_ALERT`: Acknowledges an active station alert.
+- `RESOLVE_ALERT`: Resolves an alert.
+
+### Endpoints
+- **Create Command:**
+  `POST /commands`
+  ```json
+  {
+    "command_type": "START_SCENARIO",
+    "station_code": "MTR",
+    "payload": {
+      "scenario": "STORM"
+    }
+  }
+  ```
+- **List Commands:**
+  `GET /commands` (optional filters: `?station_id=1&status=PENDING&limit=50`)
+- **Get Single Command:**
+  `GET /commands/{command_id}` (e.g. `GET /commands/CMD-A1B2C3D4`)
+- **Execute Command:**
+  `POST /commands/{command_id}/execute`
+  ```json
+  {
+    "id": 1,
+    "command_id": "CMD-A1B2C3D4",
+    "station_id": 1,
+    "command_type": "START_SCENARIO",
+    "status": "EXECUTED",
+    "payload": {
+      "scenario": "STORM"
+    },
+    "result_message": "Scenario 'STORM' started successfully.",
+    "created_at": "2026-09-18T23:30:00Z",
+    "executed_at": "2026-09-18T23:30:01Z"
+  }
+  ```
+
+### Lifecycle States
+- **`PENDING`**: Command created and queued for execution.
+- **`EXECUTED`**: Successfully validated and executed.
+- **`FAILED`**: Validation or runtime error occurred; failure reason preserved in `result_message`.
+
+
 
 
 

@@ -2,6 +2,7 @@
 
 from maitri.routers import (
     alerts,
+    commands,
     devices,
     health,
     resources,
@@ -14,6 +15,7 @@ from maitri.routers import (
 
 __all__ = [
     "alerts",
+    "commands",
     "devices",
     "health",
     "resources",

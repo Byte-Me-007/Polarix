@@ -7,6 +7,12 @@ from maitri.services.alert_service import (
     list_alerts_by_station,
     resolve_alert,
 )
+from maitri.services.command_service import (
+    create_command,
+    execute_command,
+    get_command_by_id_or_code,
+    list_commands,
+)
 from maitri.services.device_service import (
     create_device,
     get_device_by_device_id,
@@ -109,6 +115,10 @@ __all__ = [
     "get_sync_status",
     "set_network_offline",
     "set_network_online_and_sync",
+    "create_command",
+    "get_command_by_id_or_code",
+    "list_commands",
+    "execute_command",
 ]
 
 
