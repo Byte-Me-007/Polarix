@@ -24,15 +24,54 @@
    pytest
    ```
 
-5. **Run the Maitri backend:**
+5. **Optional local environment file:**
+   ```bash
+   cp .env.example .env
+   mkdir -p data
+   ```
+
+6. **Run the Maitri backend:**
    ```bash
    uvicorn maitri.main:app --reload
    ```
 
-6. **Health check URL:**
+7. **Health check URL:**
    ```text
    http://127.0.0.1:8000/health
    ```
+
+8. **Swagger API docs:**
+   ```text
+   http://127.0.0.1:8000/docs
+   ```
+
+### Docker Demo Mode
+
+The backend can run in a container with SQLite persistence and a local MQTT broker:
+
+```bash
+docker compose up --build
+```
+
+Services:
+- **FastAPI backend:** `http://127.0.0.1:8000`
+- **Swagger docs:** `http://127.0.0.1:8000/docs`
+- **MQTT broker:** `localhost:1883`
+- **SQLite database:** persisted in the `polarix-data` Docker volume at `/app/data/maitri.db`
+
+Useful verification calls after startup:
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/stations
+curl -X POST http://127.0.0.1:8000/demo/run/full-sequence/MTR
+```
+
+To stop the demo stack:
+
+```bash
+docker compose down
+```
 
 ## Maitri Smoke Test
 
@@ -386,7 +425,6 @@ For the exhaustive specification with all schemas, models, and payloads, see [do
   - `quality == "BAD"` $\rightarrow$ Backend auto-creates `HIGH` severity `SENSOR_FAULT` alert containing the ML anomaly score.
   - `quality == "OFFLINE"` $\rightarrow$ Backend auto-creates `CRITICAL` severity `SENSOR_OFFLINE` alert.
   - Energy optimization engine automatically responds to degraded telemetry to shed non-vital loads.
-
 
 
 

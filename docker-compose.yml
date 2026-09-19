@@ -1,0 +1,36 @@
+services:
+  maitri-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: polarix-maitri-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Maitri Backend
+      - ENVIRONMENT=production
+      - DATABASE_URL=sqlite:///./data/maitri.db
+      - MQTT_BROKER_HOST=mqtt-broker
+      - MQTT_BROKER_PORT=1883
+      - MQTT_TOPIC_PREFIX=antarctic
+    depends_on:
+      - mqtt-broker
+    volumes:
+      - polarix-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: polarix-mqtt-broker
+    ports:
+      - "1883:1883"
+    command: mosquitto -c /mosquitto-no-auth.conf
+    restart: unless-stopped
+
+volumes:
+  polarix-data:
