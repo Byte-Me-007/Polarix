@@ -327,6 +327,33 @@ A centralized command API designed for frontend control, demo execution, and sta
 - **`EXECUTED`**: Successfully validated and executed.
 - **`FAILED`**: Validation or runtime error occurred; failure reason preserved in `result_message`.
 
+## SIH Demo Orchestration API
+
+Judge-friendly orchestration controller that coordinates full operational scenarios, telemetry batches, alert triggers, sync states, energy optimization, and resource forecasts across Antarctic stations (`MTR`, `BHR`).
+
+### Endpoints
+- **Start Scenario:**
+  `POST /demo/scenarios/{station_id}/{scenario_name}/start`
+  - Validates station and scenario.
+  - Automatically adapts network mode (`SATELLITE_OUTAGE` $\rightarrow$ `OFFLINE`, `RECOVERY` $\rightarrow$ `ONLINE` & sync).
+  - Generates and ingests telemetry batch.
+  - Returns complete station operational dashboard state.
+- **Stop Scenario:**
+  `POST /demo/scenarios/{station_id}/stop`
+  - Halts active scenario simulation.
+- **Get Scenario Status:**
+  `GET /demo/scenarios/{station_id}/status`
+  - Returns current active scenario, start time, sync status, and active alert count.
+- **Run Full 5-Phase Demo Sequence:**
+  `POST /demo/run/full-sequence/{station_id}`
+  - Automatically executes the complete SIH demonstration timeline:
+    1. **`NORMAL_DAY`**: Baseline nominal telemetry.
+    2. **`STORM`**: Blizzard event with high wind gust warnings.
+    3. **`POWER_CRISIS`**: Generator fluctuation and fuel conservation recommendations.
+    4. **`SATELLITE_OUTAGE`**: Uplink severed, offline queueing activated, critical alerts preserved.
+    5. **`RECOVERY`**: Network restored, pending backlog replayed and synchronized.
+
+
 
 
 

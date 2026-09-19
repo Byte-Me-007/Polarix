@@ -13,6 +13,13 @@ from maitri.services.command_service import (
     get_command_by_id_or_code,
     list_commands,
 )
+from maitri.services.demo_service import (
+    get_station_scenario_status,
+    reset_demo_state,
+    run_full_demo_sequence,
+    start_station_scenario,
+    stop_station_scenario,
+)
 from maitri.services.device_service import (
     create_device,
     get_device_by_device_id,
@@ -119,6 +126,11 @@ __all__ = [
     "get_command_by_id_or_code",
     "list_commands",
     "execute_command",
+    "start_station_scenario",
+    "stop_station_scenario",
+    "get_station_scenario_status",
+    "run_full_demo_sequence",
+    "reset_demo_state",
 ]
 
 

@@ -6,6 +6,7 @@ from maitri.init_db import init_db
 from maitri.routers import (
     alerts,
     commands,
+    demo,
     devices,
     health,
     resources,
@@ -34,6 +35,7 @@ app.include_router(alerts.router)
 app.include_router(resources.router)
 app.include_router(commands.router)
 app.include_router(sync.router)
+app.include_router(demo.router)
 app.include_router(websocket.router)
 
 

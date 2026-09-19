@@ -33,6 +33,12 @@ from maitri.schemas.station import (
     StationResponse,
 )
 from maitri.schemas.command import CommandCreate, CommandResponse
+from maitri.schemas.demo import (
+    DemoFullSequenceResponse,
+    DemoPhaseResult,
+    DemoScenarioStartResponse,
+    DemoScenarioStatusResponse,
+)
 from maitri.schemas.sync import NetworkToggleResponse, SyncStatusResponse
 from maitri.schemas.telemetry import TelemetryCreate, TelemetryResponse
 
@@ -69,6 +75,10 @@ __all__ = [
     "NetworkToggleResponse",
     "CommandCreate",
     "CommandResponse",
+    "DemoScenarioStatusResponse",
+    "DemoScenarioStartResponse",
+    "DemoPhaseResult",
+    "DemoFullSequenceResponse",
 ]
 
 
