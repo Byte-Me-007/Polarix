@@ -1,0 +1,767 @@
+{
+  "experiment": "Sensor ML V2 Recovery-Aware Decision Optimization",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "strategies": {
+        "baseline_step52": {
+          "threshold": 4.538535035629731,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.90465836881253,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_a_hysteresis": {
+          "threshold_high": 4.538535035629731,
+          "threshold_low": 2.7231210213778385,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 143,
+            "FP": 36,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7016806722689075,
+            "precision": 0.4,
+            "recall": 0.4067796610169492,
+            "f1": 0.40336134453781514,
+            "fpr": 0.2011173184357542,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 36,
+              "fpr": 0.41379310344827586,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.90465836881253,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 36,
+                "fpr": 0.2011173184357542
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_b_decay": {
+          "threshold": 3.6118382554173856,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 144,
+            "FP": 35,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.4067796610169492,
+            "recall": 0.4067796610169492,
+            "f1": 0.40677966101694923,
+            "fpr": 0.19553072625698323,
+            "auroc": 0.5289271849256698,
+            "auprc": 0.3561634501615074
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.6694792571997626,
+              "median_score": 0.5137296264385905
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 35,
+              "fpr": 0.40229885057471265,
+              "mean_score": 16.600611146978444,
+              "median_score": 2.309404614534546
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.89862827105208,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 35,
+                "fpr": 0.19553072625698323
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_c_multisensor": {
+          "threshold": 4.538535035629731,
+          "single_barrier_multiplier": 1.3,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.90465836881253,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_d_station_modulation": {
+          "threshold": 4.538535035629731,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.5009942240318151,
+            "auprc": 0.35142846522202653
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.7462910052998113,
+              "median_score": 0.5979645849017703
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.556033090784393,
+              "median_score": 1.8935923761485673
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.90191845525757,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_e_persistence_k2": {
+          "threshold": 4.538535035629731,
+          "k": 2,
+          "test_metrics": {
+            "TP": 24,
+            "TN": 148,
+            "FP": 31,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7226890756302521,
+            "precision": 0.43636363636363634,
+            "recall": 0.4067796610169492,
+            "f1": 0.4210526315789474,
+            "fpr": 0.17318435754189945,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 31,
+              "fpr": 0.3563218390804598,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492,
+              "mean_score": 69.90465836881253,
+              "median_score": 1.5093208051191076
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 31,
+                "fpr": 0.17318435754189945
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "strategies": {
+        "baseline_step52": {
+          "threshold": 7.319922961236617,
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_a_hysteresis": {
+          "threshold_high": 7.319922961236617,
+          "threshold_low": 4.391953776741969,
+          "test_metrics": {
+            "TP": 21,
+            "TN": 141,
+            "FP": 38,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.680672268907563,
+            "precision": 0.3559322033898305,
+            "recall": 0.3559322033898305,
+            "f1": 0.3559322033898305,
+            "fpr": 0.2122905027932961,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 38,
+              "fpr": 0.4367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 38,
+                "fpr": 0.2122905027932961
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_b_decay": {
+          "threshold": 3.593276235828495,
+          "test_metrics": {
+            "TP": 26,
+            "TN": 136,
+            "FP": 43,
+            "FN": 33,
+            "total": 238,
+            "accuracy": 0.680672268907563,
+            "precision": 0.37681159420289856,
+            "recall": 0.4406779661016949,
+            "f1": 0.40624999999999994,
+            "fpr": 0.24022346368715083,
+            "auroc": 0.5076223842439163,
+            "auprc": 0.3536384846893343
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.6363160352724233,
+              "median_score": 0.5270699557317258
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 43,
+              "fpr": 0.4942528735632184,
+              "mean_score": 22.685041121237315,
+              "median_score": 3.5856992046986043
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 26,
+              "recall": 0.4406779661016949,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 43,
+                "fpr": 0.24022346368715083
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 21,
+                "recall": 0.7
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_c_multisensor": {
+          "threshold": 7.319922961236617,
+          "single_barrier_multiplier": 1.3,
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_d_station_modulation": {
+          "threshold": 7.319922961236617,
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4919988637439636,
+            "auprc": 0.3491487400255693
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.732261086270877,
+              "median_score": 0.650849668222732
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.780356932229118,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        },
+        "strategy_e_persistence_k2": {
+          "threshold": 7.319922961236617,
+          "k": 2,
+          "test_metrics": {
+            "TP": 21,
+            "TN": 149,
+            "FP": 30,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7142857142857143,
+            "precision": 0.4117647058823529,
+            "recall": 0.3559322033898305,
+            "f1": 0.3818181818181818,
+            "fpr": 0.16759776536312848,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 30,
+              "fpr": 0.3448275862068966,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305,
+              "mean_score": 83.61127723366938,
+              "median_score": 2.8865744344285775
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 30,
+                "fpr": 0.16759776536312848
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

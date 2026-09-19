@@ -1,0 +1,189 @@
+{
+  "analysis_name": "Sensor ML V2 Recovery Error Diagnostics",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "sensor_threshold": 3.6978198667969413,
+      "station_threshold": 4.538535035629731,
+      "temporal_recovery_bins": {
+        "0_to_1_steps": {
+          "step_range": "0-1",
+          "sample_count": 15,
+          "false_positives": 11,
+          "false_positive_rate": 0.7333333333333333,
+          "mean_sensor_score": 204.31586547488044,
+          "median_sensor_score": 135.4267770029,
+          "p95_sensor_score": 687.2542767253852,
+          "mean_norm_dev_z": 0.9343991875648499,
+          "median_norm_dev_z": 0.9858860373497009,
+          "mean_score_slope": 32.365322587996786,
+          "mean_station_score": 194.5196381206214,
+          "mean_elevated_sensors": 3.6666666666666665
+        },
+        "2_to_5_steps": {
+          "step_range": "2-5",
+          "sample_count": 60,
+          "false_positives": 39,
+          "false_positive_rate": 0.65,
+          "mean_sensor_score": 31.277766754350345,
+          "median_sensor_score": 17.14320613834006,
+          "p95_sensor_score": 101.32360138945543,
+          "mean_norm_dev_z": 0.9253523349761963,
+          "median_norm_dev_z": 0.9787222743034363,
+          "mean_score_slope": -43.241129628189775,
+          "mean_station_score": 55.08322520008381,
+          "mean_elevated_sensors": 3.25
+        },
+        "6_to_10_steps": {
+          "step_range": "6-10",
+          "sample_count": 75,
+          "false_positives": 41,
+          "false_positive_rate": 0.5466666666666666,
+          "mean_sensor_score": 22.01742043148671,
+          "median_sensor_score": 8.537722413675116,
+          "p95_sensor_score": 84.76849891788568,
+          "mean_norm_dev_z": 0.8869668841362,
+          "median_norm_dev_z": 0.8680633902549744,
+          "mean_score_slope": -4.254216665930732,
+          "mean_station_score": 34.664587308452965,
+          "mean_elevated_sensors": 2.72
+        },
+        "11_to_20_steps": {
+          "step_range": "11-20",
+          "sample_count": 150,
+          "false_positives": 36,
+          "false_positive_rate": 0.24,
+          "mean_sensor_score": 2.9813310530402912,
+          "median_sensor_score": 1.3792050673846532,
+          "p95_sensor_score": 9.569426945514582,
+          "mean_norm_dev_z": 0.8514693975448608,
+          "median_norm_dev_z": 0.848686695098877,
+          "mean_score_slope": -0.6314198692332473,
+          "mean_station_score": 3.511154577618538,
+          "mean_elevated_sensors": 1.2333333333333334
+        },
+        "21_to_30_steps": {
+          "step_range": "21-30",
+          "sample_count": 150,
+          "false_positives": 38,
+          "false_positive_rate": 0.25333333333333335,
+          "mean_sensor_score": 2.887671603613303,
+          "median_sensor_score": 1.4139882327106494,
+          "p95_sensor_score": 10.588546759698382,
+          "mean_norm_dev_z": 0.7876425385475159,
+          "median_norm_dev_z": 0.8813366889953613,
+          "mean_score_slope": -0.2970260011194017,
+          "mean_station_score": 3.0932102009323597,
+          "mean_elevated_sensors": 1.24
+        },
+        "greater_than_30_steps": {
+          "step_range": ">30",
+          "sample_count": 443,
+          "false_positives": 4,
+          "false_positive_rate": 0.009029345372460496,
+          "mean_sensor_score": 0.802968013725906,
+          "median_sensor_score": 0.5316164695551393,
+          "p95_sensor_score": 2.3653387530454224,
+          "mean_norm_dev_z": 0.9089909791946411,
+          "median_norm_dev_z": 1.1253448724746704,
+          "mean_score_slope": 0.01677915609973194,
+          "mean_station_score": 0.9189078834662636,
+          "mean_elevated_sensors": 0.045146726862302484
+        }
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "sensor_threshold": 3.112947268932288,
+      "station_threshold": 7.319922961236617,
+      "temporal_recovery_bins": {
+        "0_to_1_steps": {
+          "step_range": "0-1",
+          "sample_count": 15,
+          "false_positives": 11,
+          "false_positive_rate": 0.7333333333333333,
+          "mean_sensor_score": 258.4335468524623,
+          "median_sensor_score": 183.15471340151413,
+          "p95_sensor_score": 853.0259054973516,
+          "mean_norm_dev_z": 0.9410831928253174,
+          "median_norm_dev_z": 1.0175548791885376,
+          "mean_score_slope": 106.4005836917881,
+          "mean_station_score": 262.16868555189654,
+          "mean_elevated_sensors": 3.6666666666666665
+        },
+        "2_to_5_steps": {
+          "step_range": "2-5",
+          "sample_count": 60,
+          "false_positives": 41,
+          "false_positive_rate": 0.6833333333333333,
+          "mean_sensor_score": 45.34265408545982,
+          "median_sensor_score": 15.748713395387583,
+          "p95_sensor_score": 137.19029015520806,
+          "mean_norm_dev_z": 0.9235236048698425,
+          "median_norm_dev_z": 0.9711146354675293,
+          "mean_score_slope": -55.84687702526716,
+          "mean_station_score": 86.16056369234204,
+          "mean_elevated_sensors": 3.4166666666666665
+        },
+        "6_to_10_steps": {
+          "step_range": "6-10",
+          "sample_count": 75,
+          "false_positives": 42,
+          "false_positive_rate": 0.56,
+          "mean_sensor_score": 13.914006683515568,
+          "median_sensor_score": 4.004863670540658,
+          "p95_sensor_score": 58.88107626750912,
+          "mean_norm_dev_z": 0.8789454102516174,
+          "median_norm_dev_z": 0.8339881300926208,
+          "mean_score_slope": -6.148151868207959,
+          "mean_station_score": 25.425255482584483,
+          "mean_elevated_sensors": 2.76
+        },
+        "11_to_20_steps": {
+          "step_range": "11-20",
+          "sample_count": 150,
+          "false_positives": 47,
+          "false_positive_rate": 0.31333333333333335,
+          "mean_sensor_score": 3.5656354302851074,
+          "median_sensor_score": 1.7053686243343051,
+          "p95_sensor_score": 14.279788870819207,
+          "mean_norm_dev_z": 0.8456711769104004,
+          "median_norm_dev_z": 0.8464840650558472,
+          "mean_score_slope": 0.15777457112778542,
+          "mean_station_score": 4.070576154292474,
+          "mean_elevated_sensors": 1.5666666666666667
+        },
+        "21_to_30_steps": {
+          "step_range": "21-30",
+          "sample_count": 150,
+          "false_positives": 52,
+          "false_positive_rate": 0.3466666666666667,
+          "mean_sensor_score": 5.3489503946831345,
+          "median_sensor_score": 1.784202940271915,
+          "p95_sensor_score": 23.76968512858025,
+          "mean_norm_dev_z": 0.7775802612304688,
+          "median_norm_dev_z": 0.8617876172065735,
+          "mean_score_slope": -0.5104650836942021,
+          "mean_station_score": 7.036983501140084,
+          "mean_elevated_sensors": 1.7533333333333334
+        },
+        "greater_than_30_steps": {
+          "step_range": ">30",
+          "sample_count": 443,
+          "false_positives": 13,
+          "false_positive_rate": 0.029345372460496615,
+          "mean_sensor_score": 0.8347807438610424,
+          "median_sensor_score": 0.5572286106972092,
+          "p95_sensor_score": 2.2588274460794118,
+          "mean_norm_dev_z": 0.9039540886878967,
+          "median_norm_dev_z": 1.1635105609893799,
+          "mean_score_slope": 0.01036433699070192,
+          "mean_station_score": 0.8994593875685286,
+          "mean_elevated_sensors": 0.14672686230248308
+        }
+      }
+    }
+  }
+}

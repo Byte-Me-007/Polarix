@@ -1,0 +1,115 @@
+{
+  "audit_name": "Sensor ML V2 Timestamp Alignment & Population Audit",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "total_per_channel_records": 1182,
+      "per_sensor_record_counts": {
+        "HUM_001": 236,
+        "POWER_001": 237,
+        "PRESS_001": 234,
+        "TEMP_001": 237,
+        "VIB_001": 238
+      },
+      "per_sensor_chronological_checks": {
+        "HUM_001": {
+          "record_count": 236,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "POWER_001": {
+          "record_count": 237,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "PRESS_001": {
+          "record_count": 234,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "TEMP_001": {
+          "record_count": 237,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "VIB_001": {
+          "record_count": 238,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        }
+      },
+      "station_aligned_total_timestamps": 238,
+      "is_aligned_chronological": true,
+      "is_aligned_unique_timestamps": true,
+      "station_population_breakdown": {
+        "total_N": 238,
+        "normal_N": 179,
+        "anomaly_N": 59,
+        "clean_normal_N": 92,
+        "contaminated_normal_N": 87,
+        "active_anomaly_N": 59
+      },
+      "sample_count_reconciliation": {
+        "station_level_eval_population": 238,
+        "per_channel_concatenated_eval_population": 1182,
+        "explanation": "Station-level multivariate evaluation operates on synchronized timestamps (N=238), where each timestamp integrates all 5 co-located telemetry sensors simultaneously. The unaligned per-channel concatenated sequence length is N=1182 (sum of 5 sensor channels across the test partition)."
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "total_per_channel_records": 1182,
+      "per_sensor_record_counts": {
+        "BRT_HUM_001": 236,
+        "BRT_POWER_001": 237,
+        "BRT_PRESS_001": 234,
+        "BRT_TEMP_001": 237,
+        "BRT_VIB_001": 238
+      },
+      "per_sensor_chronological_checks": {
+        "BRT_HUM_001": {
+          "record_count": 236,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "BRT_POWER_001": {
+          "record_count": 237,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "BRT_PRESS_001": {
+          "record_count": 234,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "BRT_TEMP_001": {
+          "record_count": 237,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        },
+        "BRT_VIB_001": {
+          "record_count": 238,
+          "is_strictly_chronological": true,
+          "has_duplicate_timestamps": false
+        }
+      },
+      "station_aligned_total_timestamps": 238,
+      "is_aligned_chronological": true,
+      "is_aligned_unique_timestamps": true,
+      "station_population_breakdown": {
+        "total_N": 238,
+        "normal_N": 179,
+        "anomaly_N": 59,
+        "clean_normal_N": 92,
+        "contaminated_normal_N": 87,
+        "active_anomaly_N": 59
+      },
+      "sample_count_reconciliation": {
+        "station_level_eval_population": 238,
+        "per_channel_concatenated_eval_population": 1182,
+        "explanation": "Station-level multivariate evaluation operates on synchronized timestamps (N=238), where each timestamp integrates all 5 co-located telemetry sensors simultaneously. The unaligned per-channel concatenated sequence length is N=1182 (sum of 5 sensor channels across the test partition)."
+      }
+    }
+  }
+}

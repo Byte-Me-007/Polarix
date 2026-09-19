@@ -226,7 +226,7 @@ def test_9_no_test_leakage(tmp_path: Path):
         {
             "station_id": ["BRT"] * 100,
             "sensor_id": ["BRT_TEMP_001"] * 100,
-            "timestamp": [f"2026-03-01T{i:03d}" for i in range(100)],
+            "timestamp": [f"2026-03-01T{i // 60:02d}:{i % 60:02d}:00Z" for i in range(100)],
             "value": all_vals,
             "is_anomaly": [0] * 100,
             "anomaly_type": ["NORMAL"] * 100,
@@ -248,7 +248,7 @@ def test_10_deterministic_preprocessing(tmp_path: Path):
         {
             "station_id": ["BRT"] * 100,
             "sensor_id": ["BRT_TEMP_001"] * 100,
-            "timestamp": [f"2026-03-01T{i:03d}" for i in range(100)],
+            "timestamp": [f"2026-03-01T{i // 60:02d}:{i % 60:02d}:00Z" for i in range(100)],
             "value": np.linspace(10, 20, 100),
             "is_anomaly": [0] * 100,
             "anomaly_type": ["NORMAL"] * 100,
@@ -383,3 +383,29 @@ def test_16_training_artifact_existence():
     assert "BRT_HUM_001" in scalers_data
     assert "BRT_VIB_001" in scalers_data
     assert "BRT_POWER_001" in scalers_data
+
+
+def test_17_datetime_parsing_no_warnings(tmp_path: Path):
+    """17. Datetime parsing in prepare_bharati_datasets handles mixed/ISO formats with zero UserWarnings."""
+    import warnings
+    df = pd.DataFrame(
+        {
+            "station_id": ["BRT"] * 100,
+            "sensor_id": ["BRT_TEMP_001"] * 100,
+            "timestamp": [f"2026-03-01T{i // 60:02d}:{i % 60:02d}:00Z" for i in range(100)],
+            "value": np.linspace(10, 20, 100),
+            "is_anomaly": [0] * 100,
+            "anomaly_type": ["NORMAL"] * 100,
+            "unit": ["°C"] * 100,
+        }
+    )
+    csv_file = tmp_path / "warn_test.csv"
+    df.to_csv(csv_file, index=False)
+
+    with warnings.catch_warnings(record=True) as recorded_warnings:
+        warnings.simplefilter("always")
+        data = prepare_bharati_datasets(str(csv_file), seq_len=10)
+        assert len(data["train_sequences"]) > 0
+        # Check no UserWarnings were raised regarding timestamp parsing
+        user_warnings = [w for w in recorded_warnings if issubclass(w.category, UserWarning)]
+        assert len(user_warnings) == 0, f"Expected 0 UserWarnings, got: {user_warnings}"

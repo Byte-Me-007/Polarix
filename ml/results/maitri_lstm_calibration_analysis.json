@@ -1,7 +1,7 @@
 {
   "model_version": "lstm-ae-v1",
   "current_threshold": 0.017674,
-  "analysis_timestamp": "2026-09-17T19:55:08.985114+00:00",
+  "analysis_timestamp": "2026-09-19T05:09:34.354496+00:00",
   "station_id": "MTR",
   "validation_sample_count": 1181,
   "test_sample_count": 1182,

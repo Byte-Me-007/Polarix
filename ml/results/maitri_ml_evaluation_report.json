@@ -4,7 +4,7 @@
     "station_id": "MTR",
     "model_version": "lstm-ae-v1",
     "threshold": 0.017674,
-    "evaluation_timestamp": "2026-09-17T20:21:38.299301+00:00",
+    "evaluation_timestamp": "2026-09-19T05:09:34.985271+00:00",
     "overall_scenario_status": "PASSED"
   },
   "scenarios": [
@@ -23,7 +23,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 30,
       "diagnostic_status": "SUCCESS",
-      "processing_time_ms": 0.9599,
+      "processing_time_ms": 0.7085,
       "passed": true
     },
     {
@@ -41,7 +41,7 @@
       "buffer_length_before": 30,
       "buffer_length_after": 30,
       "diagnostic_status": "SUCCESS",
-      "processing_time_ms": 0.5598,
+      "processing_time_ms": 0.4947,
       "passed": true
     },
     {
@@ -59,7 +59,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 30,
       "diagnostic_status": "SUCCESS",
-      "processing_time_ms": 0.6181,
+      "processing_time_ms": 0.5657,
       "passed": true
     },
     {
@@ -77,7 +77,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 30,
       "diagnostic_status": "SUCCESS",
-      "processing_time_ms": 0.5431,
+      "processing_time_ms": 0.5026,
       "passed": true
     },
     {
@@ -95,7 +95,7 @@
       "buffer_length_before": 30,
       "buffer_length_after": 0,
       "diagnostic_status": "MISSING_DATA",
-      "processing_time_ms": 0.0069,
+      "processing_time_ms": 0.0053,
       "passed": true
     },
     {
@@ -113,7 +113,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 1,
       "diagnostic_status": "INSUFFICIENT_DATA",
-      "processing_time_ms": 0.0052,
+      "processing_time_ms": 0.0048,
       "passed": true
     },
     {
@@ -131,7 +131,7 @@
       "buffer_length_before": 1,
       "buffer_length_after": 0,
       "diagnostic_status": "MISSING_DATA",
-      "processing_time_ms": 0.0045,
+      "processing_time_ms": 0.0046,
       "passed": true
     },
     {
@@ -149,7 +149,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 0,
       "diagnostic_status": "MISSING_DATA",
-      "processing_time_ms": 0.0058,
+      "processing_time_ms": 0.007,
       "passed": true
     },
     {
@@ -167,7 +167,7 @@
       "buffer_length_before": 1,
       "buffer_length_after": 1,
       "diagnostic_status": "REJECTED_DUPLICATE",
-      "processing_time_ms": 0.0063,
+      "processing_time_ms": 0.0054,
       "passed": true
     },
     {
@@ -185,7 +185,7 @@
       "buffer_length_before": 1,
       "buffer_length_after": 1,
       "diagnostic_status": "REJECTED_STALE",
-      "processing_time_ms": 0.0052,
+      "processing_time_ms": 0.005,
       "passed": true
     },
     {
@@ -203,7 +203,7 @@
       "buffer_length_before": 0,
       "buffer_length_after": 30,
       "diagnostic_status": "SUCCESS",
-      "processing_time_ms": 1.6115,
+      "processing_time_ms": 1.5381,
       "passed": true
     }
   ],

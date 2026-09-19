@@ -1,0 +1,37 @@
+{
+  "HUM_001": {
+    "sensor_id": "HUM_001",
+    "station_id": "MTR",
+    "mean": 54.98849628661478,
+    "std": 5.8544292208395055,
+    "unit": "%"
+  },
+  "POWER_001": {
+    "sensor_id": "POWER_001",
+    "station_id": "MTR",
+    "mean": 35.07523464495391,
+    "std": 4.444064934189248,
+    "unit": "kW"
+  },
+  "PRESS_001": {
+    "sensor_id": "PRESS_001",
+    "station_id": "MTR",
+    "mean": 989.9986060692646,
+    "std": 1.4118426247680214,
+    "unit": "hPa"
+  },
+  "TEMP_001": {
+    "sensor_id": "TEMP_001",
+    "station_id": "MTR",
+    "mean": -15.005476979405001,
+    "std": 3.1667142707058886,
+    "unit": "\u00b0C"
+  },
+  "VIB_001": {
+    "sensor_id": "VIB_001",
+    "station_id": "MTR",
+    "mean": 0.8572392103795352,
+    "std": 0.12178042805702097,
+    "unit": "mm/s"
+  }
+}

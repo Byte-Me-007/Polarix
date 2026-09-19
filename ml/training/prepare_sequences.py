@@ -253,7 +253,13 @@ def prepare_maitri_datasets(
     try:
         df["_parsed_ts"] = pd.to_datetime(df["timestamp"], format="ISO8601", utc=True)
     except Exception:
-        df["_parsed_ts"] = pd.to_datetime(df["timestamp"], utc=True)
+        try:
+            df["_parsed_ts"] = pd.to_datetime(df["timestamp"], format="mixed", utc=True)
+        except Exception:
+            try:
+                df["_parsed_ts"] = pd.to_datetime(df["timestamp"], utc=True)
+            except Exception:
+                df["_parsed_ts"] = np.arange(len(df))
     df.sort_values(by=["sensor_id", "_parsed_ts"], inplace=True)
     df.drop(columns=["_parsed_ts"], inplace=True)
 

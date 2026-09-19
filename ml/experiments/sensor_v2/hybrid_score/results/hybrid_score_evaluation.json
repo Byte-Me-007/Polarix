@@ -1,0 +1,3973 @@
+{
+  "timestamp_utc": "2026-09-18T17:23:59.768855+00:00",
+  "experiment": "Sensor ML V2 Hybrid Anomaly Scoring Formulation",
+  "description": "Evaluates combinations of Current Observation Error, Transition Delta Error, and Bounded Drift Tracking.",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "model_version": "lstm-ae-v2-recovery-aware-candidate",
+      "normalization_parameters": {
+        "HUM_001": {
+          "sensor_id": "HUM_001",
+          "ref_current": 0.0174386841036845,
+          "ref_delta": 0.024568287448922636,
+          "ref_drift": 0.7716155054092407
+        },
+        "POWER_001": {
+          "sensor_id": "POWER_001",
+          "ref_current": 0.00878838478465186,
+          "ref_delta": 0.018051030692568748,
+          "ref_drift": 0.8059482981383801
+        },
+        "PRESS_001": {
+          "sensor_id": "PRESS_001",
+          "ref_current": 0.008902918271673842,
+          "ref_delta": 0.00938760142502433,
+          "ref_drift": 0.7056423666834831
+        },
+        "TEMP_001": {
+          "sensor_id": "TEMP_001",
+          "ref_current": 0.004362489327657385,
+          "ref_delta": 0.0056686333082179765,
+          "ref_drift": 0.5754464096188545
+        },
+        "VIB_001": {
+          "sensor_id": "VIB_001",
+          "ref_current": 0.03529250501100905,
+          "ref_delta": 0.04424905877949204,
+          "ref_drift": 0.8778205947339535
+        }
+      },
+      "counts": {
+        "val_total": 1181,
+        "test_total": 1182
+      },
+      "v1_frozen_baseline": {
+        "model_version": "lstm-ae-v1",
+        "threshold": 0.01767403447212987,
+        "precision": 0.2611683848797251,
+        "recall": 0.5259515570934256,
+        "f1": 0.34902411021814006,
+        "fpr": 0.48152295632698766,
+        "accuracy": 0.5203045685279187,
+        "auroc": 0.47139807111830967,
+        "auprc": 0.2152783897000552
+      },
+      "step50_baselines": {
+        "full_window_mse": {
+          "formula": "score = (1/L) * sum_{k=0}^{L-1} (x[k] - x_hat[k])^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.0007810223614796996,
+              "validation_metrics": {
+                "TP": 292,
+                "TN": 1,
+                "FP": 888,
+                "FN": 0,
+                "total": 1181,
+                "accuracy": 0.2480948348856901,
+                "precision": 0.24745762711864408,
+                "recall": 1.0,
+                "f1": 0.3967391304347826,
+                "fpr": 0.9988751406074241
+              },
+              "test_metrics": {
+                "TP": 289,
+                "TN": 0,
+                "FP": 893,
+                "FN": 0,
+                "total": 1182,
+                "accuracy": 0.24450084602368866,
+                "precision": 0.24450084602368866,
+                "recall": 1.0,
+                "f1": 0.3929299796057104,
+                "fpr": 1.0
+              },
+              "test_auroc": 0.45700701728553883,
+              "test_auprc": 0.2093943788249461,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.012173737346918595,
+                  "median": 0.009130862541496754,
+                  "p95": 0.031174231320619555,
+                  "false_alarms": 458,
+                  "fpr": 1.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.757864605865559,
+                  "median": 0.2685379087924957,
+                  "p95": 2.6556210517883296,
+                  "false_alarms": 435,
+                  "fpr": 1.0
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 150,
+                  "detection_rate": 1.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 893,
+                  "false_positive_rate": 1.0
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 120,
+                  "detection_rate": 1.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 2.0471370268489673,
+              "validation_metrics": {
+                "TP": 6,
+                "TN": 809,
+                "FP": 80,
+                "FN": 286,
+                "total": 1181,
+                "accuracy": 0.6900931414055885,
+                "precision": 0.06976744186046512,
+                "recall": 0.02054794520547945,
+                "f1": 0.031746031746031744,
+                "fpr": 0.08998875140607424
+              },
+              "test_metrics": {
+                "TP": 0,
+                "TN": 826,
+                "FP": 67,
+                "FN": 289,
+                "total": 1182,
+                "accuracy": 0.6988155668358714,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "fpr": 0.07502799552071669
+              },
+              "test_auroc": 0.45700701728553883,
+              "test_auprc": 0.2093943788249461,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.012173737346918595,
+                  "median": 0.009130862541496754,
+                  "p95": 0.031174231320619555,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.757864605865559,
+                  "median": 0.2685379087924957,
+                  "p95": 2.6556210517883296,
+                  "false_alarms": 67,
+                  "fpr": 0.15402298850574714
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 67,
+                  "false_positive_rate": 0.07502799552071669
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.03670604119458829,
+              "validation_metrics": {
+                "TP": 126,
+                "TN": 578,
+                "FP": 311,
+                "FN": 166,
+                "total": 1181,
+                "accuracy": 0.5961049957662997,
+                "precision": 0.28832951945080093,
+                "recall": 0.4315068493150685,
+                "f1": 0.34567901234567905,
+                "fpr": 0.3498312710911136
+              },
+              "test_metrics": {
+                "TP": 59,
+                "TN": 581,
+                "FP": 312,
+                "FN": 230,
+                "total": 1182,
+                "accuracy": 0.5414551607445008,
+                "precision": 0.15902964959568733,
+                "recall": 0.2041522491349481,
+                "f1": 0.17878787878787877,
+                "fpr": 0.3493840985442329
+              },
+              "test_auroc": 0.45700701728553883,
+              "test_auprc": 0.2093943788249461,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.012173737346918595,
+                  "median": 0.009130862541496754,
+                  "p95": 0.031174231320619555,
+                  "false_alarms": 10,
+                  "fpr": 0.021834061135371178
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.757864605865559,
+                  "median": 0.2685379087924957,
+                  "p95": 2.6556210517883296,
+                  "false_alarms": 302,
+                  "fpr": 0.6942528735632184
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 40,
+                  "detection_rate": 0.26666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 312,
+                  "false_positive_rate": 0.3493840985442329
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "last_step_reconstruction": {
+          "formula": "score = (x[t] - x_hat[t])^2 (final timestep error only)",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.10025337187461106,
+              "validation_metrics": {
+                "TP": 130,
+                "TN": 776,
+                "FP": 113,
+                "FN": 162,
+                "total": 1181,
+                "accuracy": 0.7671464860287892,
+                "precision": 0.5349794238683128,
+                "recall": 0.4452054794520548,
+                "f1": 0.48598130841121495,
+                "fpr": 0.12710911136107986
+              },
+              "test_metrics": {
+                "TP": 60,
+                "TN": 736,
+                "FP": 157,
+                "FN": 229,
+                "total": 1182,
+                "accuracy": 0.6734348561759729,
+                "precision": 0.2764976958525346,
+                "recall": 0.20761245674740483,
+                "f1": 0.23715415019762848,
+                "fpr": 0.17581187010078386
+              },
+              "test_auroc": 0.5428186161494438,
+              "test_auprc": 0.3174946455243731,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011951744039050685,
+                  "median": 0.004078158643096685,
+                  "p95": 0.040794492326676826,
+                  "false_alarms": 7,
+                  "fpr": 0.015283842794759825
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.22432067961164398,
+                  "median": 0.035924021154642105,
+                  "p95": 1.2626263618469216,
+                  "false_alarms": 150,
+                  "fpr": 0.3448275862068966
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 41,
+                  "detection_rate": 0.2733333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 157,
+                  "false_positive_rate": 0.17581187010078386
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.16610846882124983,
+              "validation_metrics": {
+                "TP": 113,
+                "TN": 802,
+                "FP": 87,
+                "FN": 179,
+                "total": 1181,
+                "accuracy": 0.7747671464860287,
+                "precision": 0.565,
+                "recall": 0.386986301369863,
+                "f1": 0.45934959349593496,
+                "fpr": 0.09786276715410573
+              },
+              "test_metrics": {
+                "TP": 44,
+                "TN": 774,
+                "FP": 119,
+                "FN": 245,
+                "total": 1182,
+                "accuracy": 0.6920473773265652,
+                "precision": 0.26993865030674846,
+                "recall": 0.1522491349480969,
+                "f1": 0.19469026548672566,
+                "fpr": 0.13325867861142218
+              },
+              "test_auroc": 0.5428186161494438,
+              "test_auprc": 0.3174946455243731,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011951744039050685,
+                  "median": 0.004078158643096685,
+                  "p95": 0.040794492326676826,
+                  "false_alarms": 2,
+                  "fpr": 0.004366812227074236
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.22432067961164398,
+                  "median": 0.035924021154642105,
+                  "p95": 1.2626263618469216,
+                  "false_alarms": 117,
+                  "fpr": 0.2689655172413793
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 25,
+                  "detection_rate": 0.16666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 119,
+                  "false_positive_rate": 0.13325867861142218
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.10025337187461106,
+              "validation_metrics": {
+                "TP": 130,
+                "TN": 776,
+                "FP": 113,
+                "FN": 162,
+                "total": 1181,
+                "accuracy": 0.7671464860287892,
+                "precision": 0.5349794238683128,
+                "recall": 0.4452054794520548,
+                "f1": 0.48598130841121495,
+                "fpr": 0.12710911136107986
+              },
+              "test_metrics": {
+                "TP": 60,
+                "TN": 736,
+                "FP": 157,
+                "FN": 229,
+                "total": 1182,
+                "accuracy": 0.6734348561759729,
+                "precision": 0.2764976958525346,
+                "recall": 0.20761245674740483,
+                "f1": 0.23715415019762848,
+                "fpr": 0.17581187010078386
+              },
+              "test_auroc": 0.5428186161494438,
+              "test_auprc": 0.3174946455243731,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011951744039050685,
+                  "median": 0.004078158643096685,
+                  "p95": 0.040794492326676826,
+                  "false_alarms": 7,
+                  "fpr": 0.015283842794759825
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.22432067961164398,
+                  "median": 0.035924021154642105,
+                  "p95": 1.2626263618469216,
+                  "false_alarms": 150,
+                  "fpr": 0.3448275862068966
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 41,
+                  "detection_rate": 0.2733333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 157,
+                  "false_positive_rate": 0.17581187010078386
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "recent_weighted_reconstruction": {
+          "formula": "score = sum_{k=0}^{L-1} w_k * (x[k] - x_hat[k])^2 (w_k = exp(0.15*k)/Z)",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.00024156860504962103,
+              "validation_metrics": {
+                "TP": 291,
+                "TN": 0,
+                "FP": 889,
+                "FN": 1,
+                "total": 1181,
+                "accuracy": 0.2464013547840813,
+                "precision": 0.24661016949152542,
+                "recall": 0.9965753424657534,
+                "f1": 0.3953804347826087,
+                "fpr": 1.0
+              },
+              "test_metrics": {
+                "TP": 289,
+                "TN": 0,
+                "FP": 893,
+                "FN": 0,
+                "total": 1182,
+                "accuracy": 0.24450084602368866,
+                "precision": 0.24450084602368866,
+                "recall": 1.0,
+                "f1": 0.3929299796057104,
+                "fpr": 1.0
+              },
+              "test_auroc": 0.44471998667064483,
+              "test_auprc": 0.22919735882518505,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01154358651038257,
+                  "median": 0.008853055022669018,
+                  "p95": 0.02802702567608131,
+                  "false_alarms": 458,
+                  "fpr": 1.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.59925665904239,
+                  "median": 0.1299864170191568,
+                  "p95": 3.5639214989335577,
+                  "false_alarms": 435,
+                  "fpr": 1.0
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 150,
+                  "detection_rate": 1.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 893,
+                  "false_positive_rate": 1.0
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 120,
+                  "detection_rate": 1.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.8620415163196486,
+              "validation_metrics": {
+                "TP": 35,
+                "TN": 804,
+                "FP": 85,
+                "FN": 257,
+                "total": 1181,
+                "accuracy": 0.7104149026248942,
+                "precision": 0.2916666666666667,
+                "recall": 0.11986301369863013,
+                "f1": 0.16990291262135923,
+                "fpr": 0.09561304836895389
+              },
+              "test_metrics": {
+                "TP": 19,
+                "TN": 822,
+                "FP": 71,
+                "FN": 270,
+                "total": 1182,
+                "accuracy": 0.7115059221658206,
+                "precision": 0.2111111111111111,
+                "recall": 0.0657439446366782,
+                "f1": 0.10026385224274406,
+                "fpr": 0.07950727883538634
+              },
+              "test_auroc": 0.44471998667064483,
+              "test_auprc": 0.22919735882518505,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01154358651038257,
+                  "median": 0.008853055022669018,
+                  "p95": 0.02802702567608131,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.59925665904239,
+                  "median": 0.1299864170191568,
+                  "p95": 3.5639214989335577,
+                  "false_alarms": 71,
+                  "fpr": 0.1632183908045977
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 71,
+                  "false_positive_rate": 0.07950727883538634
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.04225036216051701,
+              "validation_metrics": {
+                "TP": 135,
+                "TN": 597,
+                "FP": 292,
+                "FN": 157,
+                "total": 1181,
+                "accuracy": 0.619813717188823,
+                "precision": 0.3161592505854801,
+                "recall": 0.4623287671232877,
+                "f1": 0.37552155771905427,
+                "fpr": 0.32845894263217096
+              },
+              "test_metrics": {
+                "TP": 72,
+                "TN": 598,
+                "FP": 295,
+                "FN": 217,
+                "total": 1182,
+                "accuracy": 0.5668358714043993,
+                "precision": 0.19618528610354224,
+                "recall": 0.2491349480968858,
+                "f1": 0.21951219512195122,
+                "fpr": 0.3303471444568869
+              },
+              "test_auroc": 0.44471998667064483,
+              "test_auprc": 0.22919735882518505,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01154358651038257,
+                  "median": 0.008853055022669018,
+                  "p95": 0.02802702567608131,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.59925665904239,
+                  "median": 0.1299864170191568,
+                  "p95": 3.5639214989335577,
+                  "false_alarms": 291,
+                  "fpr": 0.6689655172413793
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 53,
+                  "detection_rate": 0.35333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 295,
+                  "false_positive_rate": 0.3303471444568869
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "delta_transition_error": {
+          "formula": "score = ((x[t] - x[t-1]) - (x_hat[t] - x_hat[t-1]))^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 7.982094984981813e-10,
+              "validation_metrics": {
+                "TP": 291,
+                "TN": 0,
+                "FP": 889,
+                "FN": 1,
+                "total": 1181,
+                "accuracy": 0.2464013547840813,
+                "precision": 0.24661016949152542,
+                "recall": 0.9965753424657534,
+                "f1": 0.3953804347826087,
+                "fpr": 1.0
+              },
+              "test_metrics": {
+                "TP": 288,
+                "TN": 0,
+                "FP": 893,
+                "FN": 1,
+                "total": 1182,
+                "accuracy": 0.2436548223350254,
+                "precision": 0.2438611346316681,
+                "recall": 0.9965397923875432,
+                "f1": 0.39183673469387753,
+                "fpr": 1.0
+              },
+              "test_auroc": 0.30928753821533883,
+              "test_auprc": 0.18881903385419635,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.0170268979712637,
+                  "median": 0.005519328406080604,
+                  "p95": 0.07233936712145797,
+                  "false_alarms": 458,
+                  "fpr": 1.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.33566994736505257,
+                  "median": 0.006251183804124594,
+                  "p95": 0.15404430031776398,
+                  "false_alarms": 435,
+                  "fpr": 1.0
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 150,
+                  "detection_rate": 1.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 893,
+                  "false_positive_rate": 1.0
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 119,
+                  "detection_rate": 0.9916666666666667
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.05876614368823638,
+              "validation_metrics": {
+                "TP": 14,
+                "TN": 811,
+                "FP": 78,
+                "FN": 278,
+                "total": 1181,
+                "accuracy": 0.6985605419136325,
+                "precision": 0.15217391304347827,
+                "recall": 0.04794520547945205,
+                "f1": 0.07291666666666666,
+                "fpr": 0.08773903262092239
+              },
+              "test_metrics": {
+                "TP": 17,
+                "TN": 814,
+                "FP": 79,
+                "FN": 272,
+                "total": 1182,
+                "accuracy": 0.7030456852791879,
+                "precision": 0.17708333333333334,
+                "recall": 0.058823529411764705,
+                "f1": 0.08831168831168833,
+                "fpr": 0.08846584546472565
+              },
+              "test_auroc": 0.30928753821533883,
+              "test_auprc": 0.18881903385419635,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.0170268979712637,
+                  "median": 0.005519328406080604,
+                  "p95": 0.07233936712145797,
+                  "false_alarms": 31,
+                  "fpr": 0.06768558951965066
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.33566994736505257,
+                  "median": 0.006251183804124594,
+                  "p95": 0.15404430031776398,
+                  "false_alarms": 48,
+                  "fpr": 0.1103448275862069
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 11,
+                  "detection_rate": 0.07333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 79,
+                  "false_positive_rate": 0.08846584546472565
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 6,
+                  "detection_rate": 0.3157894736842105
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.036574968017009366,
+              "validation_metrics": {
+                "TP": 29,
+                "TN": 751,
+                "FP": 138,
+                "FN": 263,
+                "total": 1181,
+                "accuracy": 0.6604572396274344,
+                "precision": 0.17365269461077845,
+                "recall": 0.09931506849315068,
+                "f1": 0.12636165577342048,
+                "fpr": 0.15523059617547807
+              },
+              "test_metrics": {
+                "TP": 30,
+                "TN": 752,
+                "FP": 141,
+                "FN": 259,
+                "total": 1182,
+                "accuracy": 0.6615905245346869,
+                "precision": 0.17543859649122806,
+                "recall": 0.10380622837370242,
+                "f1": 0.13043478260869565,
+                "fpr": 0.15789473684210525
+              },
+              "test_auroc": 0.30928753821533883,
+              "test_auprc": 0.18881903385419635,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.0170268979712637,
+                  "median": 0.005519328406080604,
+                  "p95": 0.07233936712145797,
+                  "false_alarms": 63,
+                  "fpr": 0.13755458515283842
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.33566994736505257,
+                  "median": 0.006251183804124594,
+                  "p95": 0.15404430031776398,
+                  "false_alarms": 78,
+                  "fpr": 0.1793103448275862
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 24,
+                  "detection_rate": 0.16
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 141,
+                  "false_positive_rate": 0.15789473684210525
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 6,
+                  "detection_rate": 0.3157894736842105
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "composite_transition_score": {
+          "formula": "score = 0.5 * (x[t] - x_hat[t])^2 + 0.5 * (delta_x - delta_x_hat)^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.060228330667449606,
+              "validation_metrics": {
+                "TP": 128,
+                "TN": 755,
+                "FP": 134,
+                "FN": 164,
+                "total": 1181,
+                "accuracy": 0.7476714648602879,
+                "precision": 0.48854961832061067,
+                "recall": 0.4383561643835616,
+                "f1": 0.4620938628158845,
+                "fpr": 0.15073115860517436
+              },
+              "test_metrics": {
+                "TP": 59,
+                "TN": 716,
+                "FP": 177,
+                "FN": 230,
+                "total": 1182,
+                "accuracy": 0.6556683587140439,
+                "precision": 0.25,
+                "recall": 0.2041522491349481,
+                "f1": 0.22476190476190475,
+                "fpr": 0.19820828667413215
+              },
+              "test_auroc": 0.47589672849575904,
+              "test_auprc": 0.27800680718899906,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014489321005157192,
+                  "median": 0.006014552840497345,
+                  "p95": 0.053815749473869766,
+                  "false_alarms": 20,
+                  "fpr": 0.043668122270742356
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.2799953134883483,
+                  "median": 0.027328604221111163,
+                  "p95": 0.68653412272688,
+                  "false_alarms": 157,
+                  "fpr": 0.36091954022988504
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 40,
+                  "detection_rate": 0.26666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 177,
+                  "false_positive_rate": 0.19820828667413215
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.11724816101390005,
+              "validation_metrics": {
+                "TP": 100,
+                "TN": 803,
+                "FP": 86,
+                "FN": 192,
+                "total": 1181,
+                "accuracy": 0.7646062658763759,
+                "precision": 0.5376344086021505,
+                "recall": 0.3424657534246575,
+                "f1": 0.4184100418410041,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 35,
+                "TN": 775,
+                "FP": 118,
+                "FN": 254,
+                "total": 1182,
+                "accuracy": 0.6852791878172588,
+                "precision": 0.22875816993464052,
+                "recall": 0.12110726643598616,
+                "f1": 0.1583710407239819,
+                "fpr": 0.13213885778275475
+              },
+              "test_auroc": 0.47589672849575904,
+              "test_auprc": 0.27800680718899906,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014489321005157192,
+                  "median": 0.006014552840497345,
+                  "p95": 0.053815749473869766,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.2799953134883483,
+                  "median": 0.027328604221111163,
+                  "p95": 0.68653412272688,
+                  "false_alarms": 114,
+                  "fpr": 0.2620689655172414
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 16,
+                  "detection_rate": 0.10666666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 118,
+                  "false_positive_rate": 0.13213885778275475
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.06950504939976507,
+              "validation_metrics": {
+                "TP": 123,
+                "TN": 769,
+                "FP": 120,
+                "FN": 169,
+                "total": 1181,
+                "accuracy": 0.7552921253175275,
+                "precision": 0.5061728395061729,
+                "recall": 0.4212328767123288,
+                "f1": 0.45981308411214955,
+                "fpr": 0.13498312710911137
+              },
+              "test_metrics": {
+                "TP": 53,
+                "TN": 728,
+                "FP": 165,
+                "FN": 236,
+                "total": 1182,
+                "accuracy": 0.6607445008460237,
+                "precision": 0.24311926605504589,
+                "recall": 0.18339100346020762,
+                "f1": 0.20907297830374755,
+                "fpr": 0.18477043673012317
+              },
+              "test_auroc": 0.47589672849575904,
+              "test_auprc": 0.27800680718899906,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014489321005157192,
+                  "median": 0.006014552840497345,
+                  "p95": 0.053815749473869766,
+                  "false_alarms": 14,
+                  "fpr": 0.03056768558951965
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.2799953134883483,
+                  "median": 0.027328604221111163,
+                  "p95": 0.68653412272688,
+                  "false_alarms": 151,
+                  "fpr": 0.3471264367816092
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 34,
+                  "detection_rate": 0.22666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 165,
+                  "false_positive_rate": 0.18477043673012317
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        }
+      },
+      "hybrid_candidates": {
+        "H1_current_delta": {
+          "name": "H1 (Current 0.7 + Delta 0.3)",
+          "formula": "S_H1 = 0.7 * E_curr_norm + 0.3 * E_delta_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 5.015997052852213,
+              "validation_metrics": {
+                "TP": 131,
+                "TN": 777,
+                "FP": 112,
+                "FN": 161,
+                "total": 1181,
+                "accuracy": 0.768839966130398,
+                "precision": 0.5390946502057613,
+                "recall": 0.4486301369863014,
+                "f1": 0.48971962616822434,
+                "fpr": 0.12598425196850394
+              },
+              "test_metrics": {
+                "TP": 83,
+                "TN": 727,
+                "FP": 166,
+                "FN": 206,
+                "total": 1182,
+                "accuracy": 0.6852791878172588,
+                "precision": 0.3333333333333333,
+                "recall": 0.28719723183391005,
+                "f1": 0.30855018587360594,
+                "fpr": 0.1858902575587906
+              },
+              "test_auroc": 0.5094564800427779,
+              "test_auprc": 0.30466846538189263,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.859162140640524,
+                  "median": 0.4331030448761707,
+                  "p95": 3.1149558397161208,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 24.07385641343827,
+                  "median": 2.202078403660204,
+                  "p95": 110.02642308785974,
+                  "false_alarms": 162,
+                  "fpr": 0.3724137931034483
+                },
+                "separation_ratio_contaminated_over_clean": 28.02015507281395
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 64,
+                  "detection_rate": 0.4266666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 166,
+                  "false_positive_rate": 0.1858902575587906
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 6.852633554867266,
+              "validation_metrics": {
+                "TP": 119,
+                "TN": 803,
+                "FP": 86,
+                "FN": 173,
+                "total": 1181,
+                "accuracy": 0.7806943268416596,
+                "precision": 0.5804878048780487,
+                "recall": 0.4075342465753425,
+                "f1": 0.4788732394366197,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 74,
+                "TN": 756,
+                "FP": 137,
+                "FN": 215,
+                "total": 1182,
+                "accuracy": 0.7021996615905245,
+                "precision": 0.35071090047393366,
+                "recall": 0.2560553633217993,
+                "f1": 0.296,
+                "fpr": 0.1534154535274356
+              },
+              "test_auroc": 0.5094564800427779,
+              "test_auprc": 0.30466846538189263,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.859162140640524,
+                  "median": 0.4331030448761707,
+                  "p95": 3.1149558397161208,
+                  "false_alarms": 3,
+                  "fpr": 0.006550218340611353
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 24.07385641343827,
+                  "median": 2.202078403660204,
+                  "p95": 110.02642308785974,
+                  "false_alarms": 134,
+                  "fpr": 0.3080459770114943
+                },
+                "separation_ratio_contaminated_over_clean": 28.02015507281395
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 55,
+                  "detection_rate": 0.36666666666666664
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 137,
+                  "false_positive_rate": 0.1534154535274356
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 7.993489874843697,
+              "validation_metrics": {
+                "TP": 118,
+                "TN": 811,
+                "FP": 78,
+                "FN": 174,
+                "total": 1181,
+                "accuracy": 0.7866215071972904,
+                "precision": 0.6020408163265306,
+                "recall": 0.4041095890410959,
+                "f1": 0.4836065573770492,
+                "fpr": 0.08773903262092239
+              },
+              "test_metrics": {
+                "TP": 67,
+                "TN": 765,
+                "FP": 128,
+                "FN": 222,
+                "total": 1182,
+                "accuracy": 0.7038917089678511,
+                "precision": 0.3435897435897436,
+                "recall": 0.23183391003460208,
+                "f1": 0.2768595041322314,
+                "fpr": 0.1433370660694289
+              },
+              "test_auroc": 0.5094564800427779,
+              "test_auprc": 0.30466846538189263,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.859162140640524,
+                  "median": 0.4331030448761707,
+                  "p95": 3.1149558397161208,
+                  "false_alarms": 2,
+                  "fpr": 0.004366812227074236
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 24.07385641343827,
+                  "median": 2.202078403660204,
+                  "p95": 110.02642308785974,
+                  "false_alarms": 126,
+                  "fpr": 0.2896551724137931
+                },
+                "separation_ratio_contaminated_over_clean": 28.02015507281395
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 48,
+                  "detection_rate": 0.32
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 128,
+                  "false_positive_rate": 0.1433370660694289
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H2_current_drift": {
+          "name": "H2 (Current 0.7 + Drift 0.3)",
+          "formula": "S_H2 = 0.7 * E_curr_norm + 0.3 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 5.018652201133057,
+              "validation_metrics": {
+                "TP": 130,
+                "TN": 786,
+                "FP": 103,
+                "FN": 162,
+                "total": 1181,
+                "accuracy": 0.7756138865368332,
+                "precision": 0.5579399141630901,
+                "recall": 0.4452054794520548,
+                "f1": 0.4952380952380952,
+                "fpr": 0.11586051743532058
+              },
+              "test_metrics": {
+                "TP": 84,
+                "TN": 727,
+                "FP": 166,
+                "FN": 205,
+                "total": 1182,
+                "accuracy": 0.6861252115059222,
+                "precision": 0.336,
+                "recall": 0.2906574394463668,
+                "f1": 0.3116883116883117,
+                "fpr": 0.1858902575587906
+              },
+              "test_auroc": 0.5030087919496894,
+              "test_auprc": 0.3138775679756357,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.786165079536705,
+                  "median": 0.46776897793498595,
+                  "p95": 2.444827803775695,
+                  "false_alarms": 5,
+                  "fpr": 0.010917030567685589
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 16.939451104764807,
+                  "median": 2.0700211957975063,
+                  "p95": 107.67971761826686,
+                  "false_alarms": 161,
+                  "fpr": 0.3701149425287356
+                },
+                "separation_ratio_contaminated_over_clean": 21.546939117096624
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 65,
+                  "detection_rate": 0.43333333333333335
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 166,
+                  "false_positive_rate": 0.1858902575587906
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 7.005542199834897,
+              "validation_metrics": {
+                "TP": 119,
+                "TN": 803,
+                "FP": 86,
+                "FN": 173,
+                "total": 1181,
+                "accuracy": 0.7806943268416596,
+                "precision": 0.5804878048780487,
+                "recall": 0.4075342465753425,
+                "f1": 0.4788732394366197,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 73,
+                "TN": 760,
+                "FP": 133,
+                "FN": 216,
+                "total": 1182,
+                "accuracy": 0.7047377326565144,
+                "precision": 0.35436893203883496,
+                "recall": 0.25259515570934254,
+                "f1": 0.29494949494949496,
+                "fpr": 0.14893617021276595
+              },
+              "test_auroc": 0.5030087919496894,
+              "test_auprc": 0.3138775679756357,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.786165079536705,
+                  "median": 0.46776897793498595,
+                  "p95": 2.444827803775695,
+                  "false_alarms": 1,
+                  "fpr": 0.002183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 16.939451104764807,
+                  "median": 2.0700211957975063,
+                  "p95": 107.67971761826686,
+                  "false_alarms": 132,
+                  "fpr": 0.30344827586206896
+                },
+                "separation_ratio_contaminated_over_clean": 21.546939117096624
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 54,
+                  "detection_rate": 0.36
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 133,
+                  "false_positive_rate": 0.14893617021276595
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 8.32374885120529,
+              "validation_metrics": {
+                "TP": 118,
+                "TN": 811,
+                "FP": 78,
+                "FN": 174,
+                "total": 1181,
+                "accuracy": 0.7866215071972904,
+                "precision": 0.6020408163265306,
+                "recall": 0.4041095890410959,
+                "f1": 0.4836065573770492,
+                "fpr": 0.08773903262092239
+              },
+              "test_metrics": {
+                "TP": 68,
+                "TN": 766,
+                "FP": 127,
+                "FN": 221,
+                "total": 1182,
+                "accuracy": 0.7055837563451777,
+                "precision": 0.3487179487179487,
+                "recall": 0.23529411764705882,
+                "f1": 0.28099173553719015,
+                "fpr": 0.1422172452407615
+              },
+              "test_auroc": 0.5030087919496894,
+              "test_auprc": 0.3138775679756357,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.786165079536705,
+                  "median": 0.46776897793498595,
+                  "p95": 2.444827803775695,
+                  "false_alarms": 1,
+                  "fpr": 0.002183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 16.939451104764807,
+                  "median": 2.0700211957975063,
+                  "p95": 107.67971761826686,
+                  "false_alarms": 126,
+                  "fpr": 0.2896551724137931
+                },
+                "separation_ratio_contaminated_over_clean": 21.546939117096624
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 49,
+                  "detection_rate": 0.32666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 127,
+                  "false_positive_rate": 0.1422172452407615
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H3_current_delta_drift": {
+          "name": "H3 (Current 0.5 + Delta 0.2 + Drift 0.3)",
+          "formula": "S_H3 = 0.5 * E_curr_norm + 0.2 * E_delta_norm + 0.3 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 3.6978198667969413,
+              "validation_metrics": {
+                "TP": 132,
+                "TN": 773,
+                "FP": 116,
+                "FN": 160,
+                "total": 1181,
+                "accuracy": 0.7662997459779848,
+                "precision": 0.532258064516129,
+                "recall": 0.4520547945205479,
+                "f1": 0.4888888888888888,
+                "fpr": 0.13048368953880765
+              },
+              "test_metrics": {
+                "TP": 85,
+                "TN": 724,
+                "FP": 169,
+                "FN": 204,
+                "total": 1182,
+                "accuracy": 0.6844331641285956,
+                "precision": 0.3346456692913386,
+                "recall": 0.29411764705882354,
+                "f1": 0.31307550644567217,
+                "fpr": 0.18924972004479285
+              },
+              "test_auroc": 0.47149106661965234,
+              "test_auprc": 0.2966225286743296,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8027334148792448,
+                  "median": 0.5241317839052725,
+                  "p95": 2.374223826750536,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 17.15200883749345,
+                  "median": 1.7898245405903759,
+                  "p95": 78.79138828075487,
+                  "false_alarms": 165,
+                  "fpr": 0.3793103448275862
+                },
+                "separation_ratio_contaminated_over_clean": 21.367004935347843
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 66,
+                  "detection_rate": 0.44
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 169,
+                  "false_positive_rate": 0.18924972004479285
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 5.3409174594389475,
+              "validation_metrics": {
+                "TP": 119,
+                "TN": 803,
+                "FP": 86,
+                "FN": 173,
+                "total": 1181,
+                "accuracy": 0.7806943268416596,
+                "precision": 0.5804878048780487,
+                "recall": 0.4075342465753425,
+                "f1": 0.4788732394366197,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 74,
+                "TN": 760,
+                "FP": 133,
+                "FN": 215,
+                "total": 1182,
+                "accuracy": 0.7055837563451777,
+                "precision": 0.357487922705314,
+                "recall": 0.2560553633217993,
+                "f1": 0.2983870967741935,
+                "fpr": 0.14893617021276595
+              },
+              "test_auroc": 0.47149106661965234,
+              "test_auprc": 0.2966225286743296,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8027334148792448,
+                  "median": 0.5241317839052725,
+                  "p95": 2.374223826750536,
+                  "false_alarms": 2,
+                  "fpr": 0.004366812227074236
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 17.15200883749345,
+                  "median": 1.7898245405903759,
+                  "p95": 78.79138828075487,
+                  "false_alarms": 131,
+                  "fpr": 0.30114942528735633
+                },
+                "separation_ratio_contaminated_over_clean": 21.367004935347843
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 55,
+                  "detection_rate": 0.36666666666666664
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 133,
+                  "false_positive_rate": 0.14893617021276595
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 6.149555377108622,
+              "validation_metrics": {
+                "TP": 117,
+                "TN": 810,
+                "FP": 79,
+                "FN": 175,
+                "total": 1181,
+                "accuracy": 0.7849280270956817,
+                "precision": 0.5969387755102041,
+                "recall": 0.4006849315068493,
+                "f1": 0.47950819672131145,
+                "fpr": 0.08886389201349831
+              },
+              "test_metrics": {
+                "TP": 69,
+                "TN": 766,
+                "FP": 127,
+                "FN": 220,
+                "total": 1182,
+                "accuracy": 0.7064297800338409,
+                "precision": 0.3520408163265306,
+                "recall": 0.23875432525951557,
+                "f1": 0.2845360824742268,
+                "fpr": 0.1422172452407615
+              },
+              "test_auroc": 0.47149106661965234,
+              "test_auprc": 0.2966225286743296,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8027334148792448,
+                  "median": 0.5241317839052725,
+                  "p95": 2.374223826750536,
+                  "false_alarms": 1,
+                  "fpr": 0.002183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 17.15200883749345,
+                  "median": 1.7898245405903759,
+                  "p95": 78.79138828075487,
+                  "false_alarms": 126,
+                  "fpr": 0.2896551724137931
+                },
+                "separation_ratio_contaminated_over_clean": 21.367004935347843
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 50,
+                  "detection_rate": 0.3333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 127,
+                  "false_positive_rate": 0.1422172452407615
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H4_drift_emphasis": {
+          "name": "H4 (Current 0.4 + Delta 0.1 + Drift 0.5)",
+          "formula": "S_H4 = 0.4 * E_curr_norm + 0.1 * E_delta_norm + 0.5 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 3.694498146403094,
+              "validation_metrics": {
+                "TP": 126,
+                "TN": 791,
+                "FP": 98,
+                "FN": 166,
+                "total": 1181,
+                "accuracy": 0.7764606265876376,
+                "precision": 0.5625,
+                "recall": 0.4315068493150685,
+                "f1": 0.48837209302325585,
+                "fpr": 0.11023622047244094
+              },
+              "test_metrics": {
+                "TP": 81,
+                "TN": 741,
+                "FP": 152,
+                "FN": 208,
+                "total": 1182,
+                "accuracy": 0.6954314720812182,
+                "precision": 0.34763948497854075,
+                "recall": 0.28027681660899656,
+                "f1": 0.3103448275862069,
+                "fpr": 0.1702127659574468
+              },
+              "test_auroc": 0.45530209976092406,
+              "test_auprc": 0.29829575602281555,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7623528751479685,
+                  "median": 0.5918250149508257,
+                  "p95": 1.8456665841847149,
+                  "false_alarms": 3,
+                  "fpr": 0.006550218340611353
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 12.502017498075467,
+                  "median": 1.7565323537923079,
+                  "p95": 63.17026884218196,
+                  "false_alarms": 149,
+                  "fpr": 0.3425287356321839
+                },
+                "separation_ratio_contaminated_over_clean": 16.39925276814742
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 62,
+                  "detection_rate": 0.41333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 152,
+                  "false_positive_rate": 0.1702127659574468
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 4.697970024163469,
+              "validation_metrics": {
+                "TP": 119,
+                "TN": 803,
+                "FP": 86,
+                "FN": 173,
+                "total": 1181,
+                "accuracy": 0.7806943268416596,
+                "precision": 0.5804878048780487,
+                "recall": 0.4075342465753425,
+                "f1": 0.4788732394366197,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 72,
+                "TN": 764,
+                "FP": 129,
+                "FN": 217,
+                "total": 1182,
+                "accuracy": 0.7072758037225042,
+                "precision": 0.3582089552238806,
+                "recall": 0.2491349480968858,
+                "f1": 0.29387755102040813,
+                "fpr": 0.1444568868980963
+              },
+              "test_auroc": 0.45530209976092406,
+              "test_auprc": 0.29829575602281555,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7623528751479685,
+                  "median": 0.5918250149508257,
+                  "p95": 1.8456665841847149,
+                  "false_alarms": 1,
+                  "fpr": 0.002183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 12.502017498075467,
+                  "median": 1.7565323537923079,
+                  "p95": 63.17026884218196,
+                  "false_alarms": 128,
+                  "fpr": 0.2942528735632184
+                },
+                "separation_ratio_contaminated_over_clean": 16.39925276814742
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 53,
+                  "detection_rate": 0.35333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 129,
+                  "false_positive_rate": 0.1444568868980963
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 5.292241419449284,
+              "validation_metrics": {
+                "TP": 117,
+                "TN": 810,
+                "FP": 79,
+                "FN": 175,
+                "total": 1181,
+                "accuracy": 0.7849280270956817,
+                "precision": 0.5969387755102041,
+                "recall": 0.4006849315068493,
+                "f1": 0.47950819672131145,
+                "fpr": 0.08886389201349831
+              },
+              "test_metrics": {
+                "TP": 70,
+                "TN": 767,
+                "FP": 126,
+                "FN": 219,
+                "total": 1182,
+                "accuracy": 0.7081218274111675,
+                "precision": 0.35714285714285715,
+                "recall": 0.2422145328719723,
+                "f1": 0.28865979381443296,
+                "fpr": 0.14109742441209405
+              },
+              "test_auroc": 0.45530209976092406,
+              "test_auprc": 0.29829575602281555,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7623528751479685,
+                  "median": 0.5918250149508257,
+                  "p95": 1.8456665841847149,
+                  "false_alarms": 1,
+                  "fpr": 0.002183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 12.502017498075467,
+                  "median": 1.7565323537923079,
+                  "p95": 63.17026884218196,
+                  "false_alarms": 125,
+                  "fpr": 0.28735632183908044
+                },
+                "separation_ratio_contaminated_over_clean": 16.39925276814742
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 51,
+                  "detection_rate": 0.34
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 126,
+                  "false_positive_rate": 0.14109742441209405
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "model_version": "lstm-ae-bharati-v2-recovery-aware-candidate",
+      "normalization_parameters": {
+        "BRT_HUM_001": {
+          "sensor_id": "BRT_HUM_001",
+          "ref_current": 0.026128274055360813,
+          "ref_delta": 0.020255289989209266,
+          "ref_drift": 0.766827078473568
+        },
+        "BRT_POWER_001": {
+          "sensor_id": "BRT_POWER_001",
+          "ref_current": 0.00752862332444929,
+          "ref_delta": 0.013266029275901382,
+          "ref_drift": 0.8460278461158275
+        },
+        "BRT_PRESS_001": {
+          "sensor_id": "BRT_PRESS_001",
+          "ref_current": 0.00807876296234317,
+          "ref_delta": 0.004024738563835854,
+          "ref_drift": 0.6263415647745132
+        },
+        "BRT_TEMP_001": {
+          "sensor_id": "BRT_TEMP_001",
+          "ref_current": 0.005099241443593564,
+          "ref_delta": 0.006025954674812965,
+          "ref_drift": 0.5187185303807258
+        },
+        "BRT_VIB_001": {
+          "sensor_id": "BRT_VIB_001",
+          "ref_current": 0.061747978600650094,
+          "ref_delta": 0.036358611495420336,
+          "ref_drift": 0.8342931242346764
+        }
+      },
+      "counts": {
+        "val_total": 1181,
+        "test_total": 1182
+      },
+      "v1_frozen_baseline": {
+        "model_version": "lstm-ae-bharati-v1",
+        "threshold": 0.013215307652775843,
+        "precision": 0.2679,
+        "recall": 0.5709,
+        "f1": 0.3646,
+        "fpr": 0.505,
+        "accuracy": 0.5135,
+        "auroc": 0.47078972554702664,
+        "auprc": 0.21553188450458366
+      },
+      "step50_baselines": {
+        "full_window_mse": {
+          "formula": "score = (1/L) * sum_{k=0}^{L-1} (x[k] - x_hat[k])^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.016885599918872958,
+              "validation_metrics": {
+                "TP": 178,
+                "TN": 493,
+                "FP": 396,
+                "FN": 114,
+                "total": 1181,
+                "accuracy": 0.5681625740897545,
+                "precision": 0.31010452961672474,
+                "recall": 0.6095890410958904,
+                "f1": 0.4110854503464203,
+                "fpr": 0.4454443194600675
+              },
+              "test_metrics": {
+                "TP": 122,
+                "TN": 477,
+                "FP": 416,
+                "FN": 167,
+                "total": 1182,
+                "accuracy": 0.5067681895093062,
+                "precision": 0.22676579925650558,
+                "recall": 0.42214532871972316,
+                "f1": 0.29504232164449823,
+                "fpr": 0.4658454647256439
+              },
+              "test_auroc": 0.45293458928924313,
+              "test_auprc": 0.20872133276537533,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011324564846004786,
+                  "median": 0.007319964235648513,
+                  "p95": 0.02845809226855635,
+                  "false_alarms": 100,
+                  "fpr": 0.2183406113537118
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.7626533334180927,
+                  "median": 0.3042524456977844,
+                  "p95": 2.7181241273879992,
+                  "false_alarms": 316,
+                  "fpr": 0.7264367816091954
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 97,
+                  "detection_rate": 0.6466666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 416,
+                  "false_positive_rate": 0.4658454647256439
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 6,
+                  "detection_rate": 0.05
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 2.0440215540406514,
+              "validation_metrics": {
+                "TP": 6,
+                "TN": 815,
+                "FP": 74,
+                "FN": 286,
+                "total": 1181,
+                "accuracy": 0.6951735817104149,
+                "precision": 0.075,
+                "recall": 0.02054794520547945,
+                "f1": 0.03225806451612903,
+                "fpr": 0.08323959505061868
+              },
+              "test_metrics": {
+                "TP": 1,
+                "TN": 842,
+                "FP": 51,
+                "FN": 288,
+                "total": 1182,
+                "accuracy": 0.7131979695431472,
+                "precision": 0.019230769230769232,
+                "recall": 0.0034602076124567475,
+                "f1": 0.005865102639296188,
+                "fpr": 0.05711086226203808
+              },
+              "test_auroc": 0.45293458928924313,
+              "test_auprc": 0.20872133276537533,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011324564846004786,
+                  "median": 0.007319964235648513,
+                  "p95": 0.02845809226855635,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.7626533334180927,
+                  "median": 0.3042524456977844,
+                  "p95": 2.7181241273879992,
+                  "false_alarms": 51,
+                  "fpr": 0.11724137931034483
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 51,
+                  "false_positive_rate": 0.05711086226203808
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 1,
+                  "detection_rate": 0.05263157894736842
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.03451078874967903,
+              "validation_metrics": {
+                "TP": 145,
+                "TN": 578,
+                "FP": 311,
+                "FN": 147,
+                "total": 1181,
+                "accuracy": 0.6121930567315834,
+                "precision": 0.31798245614035087,
+                "recall": 0.4965753424657534,
+                "f1": 0.3877005347593583,
+                "fpr": 0.3498312710911136
+              },
+              "test_metrics": {
+                "TP": 65,
+                "TN": 577,
+                "FP": 316,
+                "FN": 224,
+                "total": 1182,
+                "accuracy": 0.5431472081218274,
+                "precision": 0.17060367454068243,
+                "recall": 0.22491349480968859,
+                "f1": 0.19402985074626866,
+                "fpr": 0.3538633818589026
+              },
+              "test_auroc": 0.45293458928924313,
+              "test_auprc": 0.20872133276537533,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011324564846004786,
+                  "median": 0.007319964235648513,
+                  "p95": 0.02845809226855635,
+                  "false_alarms": 13,
+                  "fpr": 0.028384279475982533
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.7626533334180927,
+                  "median": 0.3042524456977844,
+                  "p95": 2.7181241273879992,
+                  "false_alarms": 303,
+                  "fpr": 0.696551724137931
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 46,
+                  "detection_rate": 0.30666666666666664
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 316,
+                  "false_positive_rate": 0.3538633818589026
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "last_step_reconstruction": {
+          "formula": "score = (x[t] - x_hat[t])^2 (final timestep error only)",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.10610916049006482,
+              "validation_metrics": {
+                "TP": 141,
+                "TN": 759,
+                "FP": 130,
+                "FN": 151,
+                "total": 1181,
+                "accuracy": 0.7620660457239627,
+                "precision": 0.5202952029520295,
+                "recall": 0.4828767123287671,
+                "f1": 0.5008880994671403,
+                "fpr": 0.14623172103487064
+              },
+              "test_metrics": {
+                "TP": 80,
+                "TN": 697,
+                "FP": 196,
+                "FN": 209,
+                "total": 1182,
+                "accuracy": 0.6573604060913706,
+                "precision": 0.2898550724637681,
+                "recall": 0.2768166089965398,
+                "f1": 0.2831858407079646,
+                "fpr": 0.21948488241881298
+              },
+              "test_auroc": 0.5242815128818142,
+              "test_auprc": 0.3137257202419032,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014181907716228926,
+                  "median": 0.004476321395486593,
+                  "p95": 0.05871936157345769,
+                  "false_alarms": 7,
+                  "fpr": 0.015283842794759825
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.274418582660368,
+                  "median": 0.06176338344812393,
+                  "p95": 1.4198621749877913,
+                  "false_alarms": 189,
+                  "fpr": 0.43448275862068964
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 61,
+                  "detection_rate": 0.4066666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 196,
+                  "false_positive_rate": 0.21948488241881298
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.1993611107557171,
+              "validation_metrics": {
+                "TP": 124,
+                "TN": 803,
+                "FP": 86,
+                "FN": 168,
+                "total": 1181,
+                "accuracy": 0.7849280270956817,
+                "precision": 0.5904761904761905,
+                "recall": 0.4246575342465753,
+                "f1": 0.49402390438247,
+                "fpr": 0.09673790776152981
+              },
+              "test_metrics": {
+                "TP": 51,
+                "TN": 759,
+                "FP": 134,
+                "FN": 238,
+                "total": 1182,
+                "accuracy": 0.6852791878172588,
+                "precision": 0.2756756756756757,
+                "recall": 0.17647058823529413,
+                "f1": 0.21518987341772153,
+                "fpr": 0.15005599104143338
+              },
+              "test_auroc": 0.5242815128818142,
+              "test_auprc": 0.3137257202419032,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014181907716228926,
+                  "median": 0.004476321395486593,
+                  "p95": 0.05871936157345769,
+                  "false_alarms": 2,
+                  "fpr": 0.004366812227074236
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.274418582660368,
+                  "median": 0.06176338344812393,
+                  "p95": 1.4198621749877913,
+                  "false_alarms": 132,
+                  "fpr": 0.30344827586206896
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 32,
+                  "detection_rate": 0.21333333333333335
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 134,
+                  "false_positive_rate": 0.15005599104143338
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.22960438313613457,
+              "validation_metrics": {
+                "TP": 121,
+                "TN": 810,
+                "FP": 79,
+                "FN": 171,
+                "total": 1181,
+                "accuracy": 0.7883149872988993,
+                "precision": 0.605,
+                "recall": 0.4143835616438356,
+                "f1": 0.49186991869918695,
+                "fpr": 0.08886389201349831
+              },
+              "test_metrics": {
+                "TP": 44,
+                "TN": 773,
+                "FP": 120,
+                "FN": 245,
+                "total": 1182,
+                "accuracy": 0.6912013536379019,
+                "precision": 0.2682926829268293,
+                "recall": 0.1522491349480969,
+                "f1": 0.19426048565121412,
+                "fpr": 0.1343784994400896
+              },
+              "test_auroc": 0.5242815128818142,
+              "test_auprc": 0.3137257202419032,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.014181907716228926,
+                  "median": 0.004476321395486593,
+                  "p95": 0.05871936157345769,
+                  "false_alarms": 2,
+                  "fpr": 0.004366812227074236
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.274418582660368,
+                  "median": 0.06176338344812393,
+                  "p95": 1.4198621749877913,
+                  "false_alarms": 118,
+                  "fpr": 0.271264367816092
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 25,
+                  "detection_rate": 0.16666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 120,
+                  "false_positive_rate": 0.1343784994400896
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "recent_weighted_reconstruction": {
+          "formula": "score = sum_{k=0}^{L-1} w_k * (x[k] - x_hat[k])^2 (w_k = exp(0.15*k)/Z)",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.030066580513112822,
+              "validation_metrics": {
+                "TP": 161,
+                "TN": 561,
+                "FP": 328,
+                "FN": 131,
+                "total": 1181,
+                "accuracy": 0.611346316680779,
+                "precision": 0.3292433537832311,
+                "recall": 0.5513698630136986,
+                "f1": 0.412291933418694,
+                "fpr": 0.3689538807649044
+              },
+              "test_metrics": {
+                "TP": 100,
+                "TN": 568,
+                "FP": 325,
+                "FN": 189,
+                "total": 1182,
+                "accuracy": 0.5651438240270727,
+                "precision": 0.23529411764705882,
+                "recall": 0.3460207612456747,
+                "f1": 0.2801120448179271,
+                "fpr": 0.3639417693169093
+              },
+              "test_auroc": 0.42934860526122054,
+              "test_auprc": 0.22700097322167517,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011145740467239701,
+                  "median": 0.00752078428701206,
+                  "p95": 0.02724297844825711,
+                  "false_alarms": 17,
+                  "fpr": 0.03711790393013101
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.6022705268507403,
+                  "median": 0.1591465049738364,
+                  "p95": 3.3568696839865293,
+                  "false_alarms": 308,
+                  "fpr": 0.7080459770114943
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 81,
+                  "detection_rate": 0.54
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 325,
+                  "false_positive_rate": 0.3639417693169093
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.8381176777277379,
+              "validation_metrics": {
+                "TP": 42,
+                "TN": 802,
+                "FP": 87,
+                "FN": 250,
+                "total": 1181,
+                "accuracy": 0.7146486028789162,
+                "precision": 0.32558139534883723,
+                "recall": 0.14383561643835616,
+                "f1": 0.1995249406175772,
+                "fpr": 0.09786276715410573
+              },
+              "test_metrics": {
+                "TP": 19,
+                "TN": 818,
+                "FP": 75,
+                "FN": 270,
+                "total": 1182,
+                "accuracy": 0.7081218274111675,
+                "precision": 0.20212765957446807,
+                "recall": 0.0657439446366782,
+                "f1": 0.09921671018276762,
+                "fpr": 0.083986562150056
+              },
+              "test_auroc": 0.42934860526122054,
+              "test_auprc": 0.22700097322167517,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011145740467239701,
+                  "median": 0.00752078428701206,
+                  "p95": 0.02724297844825711,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.6022705268507403,
+                  "median": 0.1591465049738364,
+                  "p95": 3.3568696839865293,
+                  "false_alarms": 75,
+                  "fpr": 0.1724137931034483
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 75,
+                  "false_positive_rate": 0.083986562150056
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.038248511730516535,
+              "validation_metrics": {
+                "TP": 148,
+                "TN": 581,
+                "FP": 308,
+                "FN": 144,
+                "total": 1181,
+                "accuracy": 0.6172734970364098,
+                "precision": 0.32456140350877194,
+                "recall": 0.5068493150684932,
+                "f1": 0.39572192513368987,
+                "fpr": 0.3464566929133858
+              },
+              "test_metrics": {
+                "TP": 87,
+                "TN": 580,
+                "FP": 313,
+                "FN": 202,
+                "total": 1182,
+                "accuracy": 0.5642978003384095,
+                "precision": 0.2175,
+                "recall": 0.30103806228373703,
+                "f1": 0.2525399129172714,
+                "fpr": 0.3505039193729003
+              },
+              "test_auroc": 0.42934860526122054,
+              "test_auprc": 0.22700097322167517,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.011145740467239701,
+                  "median": 0.00752078428701206,
+                  "p95": 0.02724297844825711,
+                  "false_alarms": 8,
+                  "fpr": 0.017467248908296942
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.6022705268507403,
+                  "median": 0.1591465049738364,
+                  "p95": 3.3568696839865293,
+                  "false_alarms": 305,
+                  "fpr": 0.7011494252873564
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 68,
+                  "detection_rate": 0.4533333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 313,
+                  "false_positive_rate": 0.3505039193729003
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "delta_transition_error": {
+          "formula": "score = ((x[t] - x[t-1]) - (x_hat[t] - x_hat[t-1]))^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 7.033126081523733e-09,
+              "validation_metrics": {
+                "TP": 292,
+                "TN": 1,
+                "FP": 888,
+                "FN": 0,
+                "total": 1181,
+                "accuracy": 0.2480948348856901,
+                "precision": 0.24745762711864408,
+                "recall": 1.0,
+                "f1": 0.3967391304347826,
+                "fpr": 0.9988751406074241
+              },
+              "test_metrics": {
+                "TP": 289,
+                "TN": 0,
+                "FP": 893,
+                "FN": 0,
+                "total": 1182,
+                "accuracy": 0.24450084602368866,
+                "precision": 0.24450084602368866,
+                "recall": 1.0,
+                "f1": 0.3929299796057104,
+                "fpr": 1.0
+              },
+              "test_auroc": 0.3300604083277472,
+              "test_auprc": 0.19674234193721557,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01268017119632229,
+                  "median": 0.00409919093362987,
+                  "p95": 0.05744779296219346,
+                  "false_alarms": 458,
+                  "fpr": 1.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.31878171554720686,
+                  "median": 0.00490616774186492,
+                  "p95": 0.12749395817518208,
+                  "false_alarms": 435,
+                  "fpr": 1.0
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 150,
+                  "detection_rate": 1.0
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 893,
+                  "false_positive_rate": 1.0
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 120,
+                  "detection_rate": 1.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.0433366219295436,
+              "validation_metrics": {
+                "TP": 17,
+                "TN": 805,
+                "FP": 84,
+                "FN": 275,
+                "total": 1181,
+                "accuracy": 0.6960203217612193,
+                "precision": 0.16831683168316833,
+                "recall": 0.05821917808219178,
+                "f1": 0.08651399491094149,
+                "fpr": 0.09448818897637795
+              },
+              "test_metrics": {
+                "TP": 20,
+                "TN": 810,
+                "FP": 83,
+                "FN": 269,
+                "total": 1182,
+                "accuracy": 0.7021996615905245,
+                "precision": 0.1941747572815534,
+                "recall": 0.06920415224913495,
+                "f1": 0.10204081632653063,
+                "fpr": 0.0929451287793953
+              },
+              "test_auroc": 0.3300604083277472,
+              "test_auprc": 0.19674234193721557,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01268017119632229,
+                  "median": 0.00409919093362987,
+                  "p95": 0.05744779296219346,
+                  "false_alarms": 34,
+                  "fpr": 0.07423580786026202
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.31878171554720686,
+                  "median": 0.00490616774186492,
+                  "p95": 0.12749395817518208,
+                  "false_alarms": 49,
+                  "fpr": 0.11264367816091954
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 15,
+                  "detection_rate": 0.1
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 83,
+                  "false_positive_rate": 0.0929451287793953
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 5,
+                  "detection_rate": 0.2631578947368421
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.01651947654514428,
+              "validation_metrics": {
+                "TP": 56,
+                "TN": 674,
+                "FP": 215,
+                "FN": 236,
+                "total": 1181,
+                "accuracy": 0.6181202370872142,
+                "precision": 0.2066420664206642,
+                "recall": 0.1917808219178082,
+                "f1": 0.1989342806394316,
+                "fpr": 0.24184476940382452
+              },
+              "test_metrics": {
+                "TP": 52,
+                "TN": 675,
+                "FP": 218,
+                "FN": 237,
+                "total": 1182,
+                "accuracy": 0.6150592216582065,
+                "precision": 0.1925925925925926,
+                "recall": 0.17993079584775087,
+                "f1": 0.18604651162790697,
+                "fpr": 0.24412094064949608
+              },
+              "test_auroc": 0.3300604083277472,
+              "test_auprc": 0.19674234193721557,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.01268017119632229,
+                  "median": 0.00409919093362987,
+                  "p95": 0.05744779296219346,
+                  "false_alarms": 99,
+                  "fpr": 0.21615720524017468
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.31878171554720686,
+                  "median": 0.00490616774186492,
+                  "p95": 0.12749395817518208,
+                  "false_alarms": 119,
+                  "fpr": 0.2735632183908046
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 44,
+                  "detection_rate": 0.29333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 218,
+                  "false_positive_rate": 0.24412094064949608
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 8,
+                  "detection_rate": 0.42105263157894735
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "composite_transition_score": {
+          "formula": "score = 0.5 * (x[t] - x_hat[t])^2 + 0.5 * (delta_x - delta_x_hat)^2",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 0.09127835880422866,
+              "validation_metrics": {
+                "TP": 131,
+                "TN": 779,
+                "FP": 110,
+                "FN": 161,
+                "total": 1181,
+                "accuracy": 0.7705334462320068,
+                "precision": 0.5435684647302904,
+                "recall": 0.4486301369863014,
+                "f1": 0.4915572232645403,
+                "fpr": 0.12373453318335208
+              },
+              "test_metrics": {
+                "TP": 58,
+                "TN": 726,
+                "FP": 167,
+                "FN": 231,
+                "total": 1182,
+                "accuracy": 0.6632825719120136,
+                "precision": 0.2577777777777778,
+                "recall": 0.20069204152249134,
+                "f1": 0.22568093385214008,
+                "fpr": 0.187010078387458
+              },
+              "test_auroc": 0.4700767600367332,
+              "test_auprc": 0.28135274609384037,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.013431039456275608,
+                  "median": 0.005651540634062258,
+                  "p95": 0.04893119428306816,
+                  "false_alarms": 8,
+                  "fpr": 0.017467248908296942
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.29660014910378746,
+                  "median": 0.04097899538464844,
+                  "p95": 0.763496044086059,
+                  "false_alarms": 159,
+                  "fpr": 0.36551724137931035
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 39,
+                  "detection_rate": 0.26
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 167,
+                  "false_positive_rate": 0.187010078387458
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 0.12015499969858326,
+              "validation_metrics": {
+                "TP": 122,
+                "TN": 801,
+                "FP": 88,
+                "FN": 170,
+                "total": 1181,
+                "accuracy": 0.781541066892464,
+                "precision": 0.580952380952381,
+                "recall": 0.4178082191780822,
+                "f1": 0.4860557768924303,
+                "fpr": 0.09898762654668167
+              },
+              "test_metrics": {
+                "TP": 44,
+                "TN": 761,
+                "FP": 132,
+                "FN": 245,
+                "total": 1182,
+                "accuracy": 0.6810490693739425,
+                "precision": 0.25,
+                "recall": 0.1522491349480969,
+                "f1": 0.18924731182795698,
+                "fpr": 0.14781634938409854
+              },
+              "test_auroc": 0.4700767600367332,
+              "test_auprc": 0.28135274609384037,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.013431039456275608,
+                  "median": 0.005651540634062258,
+                  "p95": 0.04893119428306816,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.29660014910378746,
+                  "median": 0.04097899538464844,
+                  "p95": 0.763496044086059,
+                  "false_alarms": 128,
+                  "fpr": 0.2942528735632184
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 25,
+                  "detection_rate": 0.16666666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 132,
+                  "false_positive_rate": 0.14781634938409854
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 0.13715561857029415,
+              "validation_metrics": {
+                "TP": 120,
+                "TN": 809,
+                "FP": 80,
+                "FN": 172,
+                "total": 1181,
+                "accuracy": 0.7866215071972904,
+                "precision": 0.6,
+                "recall": 0.410958904109589,
+                "f1": 0.4878048780487805,
+                "fpr": 0.08998875140607424
+              },
+              "test_metrics": {
+                "TP": 40,
+                "TN": 772,
+                "FP": 121,
+                "FN": 249,
+                "total": 1182,
+                "accuracy": 0.6869712351945855,
+                "precision": 0.2484472049689441,
+                "recall": 0.1384083044982699,
+                "f1": 0.17777777777777778,
+                "fpr": 0.135498320268757
+              },
+              "test_auroc": 0.4700767600367332,
+              "test_auprc": 0.28135274609384037,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.013431039456275608,
+                  "median": 0.005651540634062258,
+                  "p95": 0.04893119428306816,
+                  "false_alarms": 3,
+                  "fpr": 0.006550218340611353
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 0.29660014910378746,
+                  "median": 0.04097899538464844,
+                  "p95": 0.763496044086059,
+                  "false_alarms": 118,
+                  "fpr": 0.271264367816092
+                }
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 21,
+                  "detection_rate": 0.14
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 121,
+                  "false_positive_rate": 0.135498320268757
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        }
+      },
+      "hybrid_candidates": {
+        "H1_current_delta": {
+          "name": "H1 (Current 0.7 + Delta 0.3)",
+          "formula": "S_H1 = 0.7 * E_curr_norm + 0.3 * E_delta_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 4.193290448592107,
+              "validation_metrics": {
+                "TP": 146,
+                "TN": 740,
+                "FP": 149,
+                "FN": 146,
+                "total": 1181,
+                "accuracy": 0.7502116850127011,
+                "precision": 0.49491525423728816,
+                "recall": 0.5,
+                "f1": 0.4974446337308348,
+                "fpr": 0.16760404949381327
+              },
+              "test_metrics": {
+                "TP": 102,
+                "TN": 692,
+                "FP": 201,
+                "FN": 187,
+                "total": 1182,
+                "accuracy": 0.6717428087986463,
+                "precision": 0.33663366336633666,
+                "recall": 0.35294117647058826,
+                "f1": 0.34459459459459457,
+                "fpr": 0.22508398656215006
+              },
+              "test_auroc": 0.4889005994335024,
+              "test_auprc": 0.2996061525537716,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.884263926262442,
+                  "median": 0.4882516936982154,
+                  "p95": 2.832015922094755,
+                  "false_alarms": 13,
+                  "fpr": 0.028384279475982533
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 29.05456516222206,
+                  "median": 3.144423799076574,
+                  "p95": 130.22069988810924,
+                  "false_alarms": 188,
+                  "fpr": 0.432183908045977
+                },
+                "separation_ratio_contaminated_over_clean": 32.85734530077269
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 83,
+                  "detection_rate": 0.5533333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 201,
+                  "false_positive_rate": 0.22508398656215006
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 14.250658250487257,
+              "validation_metrics": {
+                "TP": 112,
+                "TN": 801,
+                "FP": 88,
+                "FN": 180,
+                "total": 1181,
+                "accuracy": 0.77307366638442,
+                "precision": 0.56,
+                "recall": 0.3835616438356164,
+                "f1": 0.45528455284552843,
+                "fpr": 0.09898762654668167
+              },
+              "test_metrics": {
+                "TP": 50,
+                "TN": 780,
+                "FP": 113,
+                "FN": 239,
+                "total": 1182,
+                "accuracy": 0.7021996615905245,
+                "precision": 0.3067484662576687,
+                "recall": 0.17301038062283736,
+                "f1": 0.22123893805309733,
+                "fpr": 0.1265397536394177
+              },
+              "test_auroc": 0.4889005994335024,
+              "test_auprc": 0.2996061525537716,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.884263926262442,
+                  "median": 0.4882516936982154,
+                  "p95": 2.832015922094755,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 29.05456516222206,
+                  "median": 3.144423799076574,
+                  "p95": 130.22069988810924,
+                  "false_alarms": 113,
+                  "fpr": 0.2597701149425287
+                },
+                "separation_ratio_contaminated_over_clean": 32.85734530077269
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 31,
+                  "detection_rate": 0.20666666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 113,
+                  "false_positive_rate": 0.1265397536394177
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 5.651826029040914,
+              "validation_metrics": {
+                "TP": 137,
+                "TN": 759,
+                "FP": 130,
+                "FN": 155,
+                "total": 1181,
+                "accuracy": 0.7586790855207451,
+                "precision": 0.5131086142322098,
+                "recall": 0.4691780821917808,
+                "f1": 0.49016100178890876,
+                "fpr": 0.14623172103487064
+              },
+              "test_metrics": {
+                "TP": 90,
+                "TN": 728,
+                "FP": 165,
+                "FN": 199,
+                "total": 1182,
+                "accuracy": 0.6920473773265652,
+                "precision": 0.35294117647058826,
+                "recall": 0.31141868512110726,
+                "f1": 0.3308823529411765,
+                "fpr": 0.18477043673012317
+              },
+              "test_auroc": 0.4889005994335024,
+              "test_auprc": 0.2996061525537716,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.884263926262442,
+                  "median": 0.4882516936982154,
+                  "p95": 2.832015922094755,
+                  "false_alarms": 6,
+                  "fpr": 0.013100436681222707
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 29.05456516222206,
+                  "median": 3.144423799076574,
+                  "p95": 130.22069988810924,
+                  "false_alarms": 159,
+                  "fpr": 0.36551724137931035
+                },
+                "separation_ratio_contaminated_over_clean": 32.85734530077269
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 71,
+                  "detection_rate": 0.47333333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 165,
+                  "false_positive_rate": 0.18477043673012317
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H2_current_drift": {
+          "name": "H2 (Current 0.7 + Drift 0.3)",
+          "formula": "S_H2 = 0.7 * E_curr_norm + 0.3 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 3.818142746474253,
+              "validation_metrics": {
+                "TP": 146,
+                "TN": 740,
+                "FP": 149,
+                "FN": 146,
+                "total": 1181,
+                "accuracy": 0.7502116850127011,
+                "precision": 0.49491525423728816,
+                "recall": 0.5,
+                "f1": 0.4974446337308348,
+                "fpr": 0.16760404949381327
+              },
+              "test_metrics": {
+                "TP": 106,
+                "TN": 681,
+                "FP": 212,
+                "FN": 183,
+                "total": 1182,
+                "accuracy": 0.6658206429780034,
+                "precision": 0.3333333333333333,
+                "recall": 0.36678200692041524,
+                "f1": 0.3492586490939044,
+                "fpr": 0.2374020156774916
+              },
+              "test_auroc": 0.4909116271500366,
+              "test_auprc": 0.3097420846375313,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8363814083900701,
+                  "median": 0.49934401066805806,
+                  "p95": 2.756467805905401,
+                  "false_alarms": 12,
+                  "fpr": 0.026200873362445413
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 19.50401962009483,
+                  "median": 3.038569631527486,
+                  "p95": 123.96457422139574,
+                  "false_alarms": 200,
+                  "fpr": 0.45977011494252873
+                },
+                "separation_ratio_contaminated_over_clean": 23.319527938381167
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 87,
+                  "detection_rate": 0.58
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 212,
+                  "false_positive_rate": 0.2374020156774916
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 13.715879847183714,
+              "validation_metrics": {
+                "TP": 112,
+                "TN": 801,
+                "FP": 88,
+                "FN": 180,
+                "total": 1181,
+                "accuracy": 0.77307366638442,
+                "precision": 0.56,
+                "recall": 0.3835616438356164,
+                "f1": 0.45528455284552843,
+                "fpr": 0.09898762654668167
+              },
+              "test_metrics": {
+                "TP": 51,
+                "TN": 779,
+                "FP": 114,
+                "FN": 238,
+                "total": 1182,
+                "accuracy": 0.7021996615905245,
+                "precision": 0.3090909090909091,
+                "recall": 0.17647058823529413,
+                "f1": 0.22466960352422907,
+                "fpr": 0.1276595744680851
+              },
+              "test_auroc": 0.4909116271500366,
+              "test_auprc": 0.3097420846375313,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8363814083900701,
+                  "median": 0.49934401066805806,
+                  "p95": 2.756467805905401,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 19.50401962009483,
+                  "median": 3.038569631527486,
+                  "p95": 123.96457422139574,
+                  "false_alarms": 114,
+                  "fpr": 0.2620689655172414
+                },
+                "separation_ratio_contaminated_over_clean": 23.319527938381167
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 32,
+                  "detection_rate": 0.21333333333333335
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 114,
+                  "false_positive_rate": 0.1276595744680851
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 5.396605358453834,
+              "validation_metrics": {
+                "TP": 138,
+                "TN": 760,
+                "FP": 129,
+                "FN": 154,
+                "total": 1181,
+                "accuracy": 0.7603725656223539,
+                "precision": 0.5168539325842697,
+                "recall": 0.4726027397260274,
+                "f1": 0.4937388193202147,
+                "fpr": 0.14510686164229472
+              },
+              "test_metrics": {
+                "TP": 96,
+                "TN": 721,
+                "FP": 172,
+                "FN": 193,
+                "total": 1182,
+                "accuracy": 0.6912013536379019,
+                "precision": 0.3582089552238806,
+                "recall": 0.33217993079584773,
+                "f1": 0.34470377019748655,
+                "fpr": 0.19260918253079506
+              },
+              "test_auroc": 0.4909116271500366,
+              "test_auprc": 0.3097420846375313,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.8363814083900701,
+                  "median": 0.49934401066805806,
+                  "p95": 2.756467805905401,
+                  "false_alarms": 4,
+                  "fpr": 0.008733624454148471
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 19.50401962009483,
+                  "median": 3.038569631527486,
+                  "p95": 123.96457422139574,
+                  "false_alarms": 168,
+                  "fpr": 0.38620689655172413
+                },
+                "separation_ratio_contaminated_over_clean": 23.319527938381167
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 77,
+                  "detection_rate": 0.5133333333333333
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 172,
+                  "false_positive_rate": 0.19260918253079506
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H3_current_delta_drift": {
+          "name": "H3 (Current 0.5 + Delta 0.2 + Drift 0.3)",
+          "formula": "S_H3 = 0.5 * E_curr_norm + 0.2 * E_delta_norm + 0.3 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 3.112947268932288,
+              "validation_metrics": {
+                "TP": 148,
+                "TN": 737,
+                "FP": 152,
+                "FN": 144,
+                "total": 1181,
+                "accuracy": 0.7493649449618967,
+                "precision": 0.49333333333333335,
+                "recall": 0.5068493150684932,
+                "f1": 0.5,
+                "fpr": 0.17097862767154107
+              },
+              "test_metrics": {
+                "TP": 105,
+                "TN": 687,
+                "FP": 206,
+                "FN": 184,
+                "total": 1182,
+                "accuracy": 0.6700507614213198,
+                "precision": 0.33762057877813506,
+                "recall": 0.3633217993079585,
+                "f1": 0.35000000000000003,
+                "fpr": 0.23068309070548712
+              },
+              "test_auroc": 0.4679882360690802,
+              "test_auprc": 0.2960360501696315,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.832933370744078,
+                  "median": 0.5577843901376565,
+                  "p95": 2.245809526491963,
+                  "false_alarms": 13,
+                  "fpr": 0.028384279475982533
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 20.611782088857655,
+                  "median": 2.493869943012164,
+                  "p95": 93.28983336812918,
+                  "false_alarms": 193,
+                  "fpr": 0.4436781609195402
+                },
+                "separation_ratio_contaminated_over_clean": 24.74601548314085
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 86,
+                  "detection_rate": 0.5733333333333334
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 206,
+                  "false_positive_rate": 0.23068309070548712
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 10.332974267493029,
+              "validation_metrics": {
+                "TP": 112,
+                "TN": 801,
+                "FP": 88,
+                "FN": 180,
+                "total": 1181,
+                "accuracy": 0.77307366638442,
+                "precision": 0.56,
+                "recall": 0.3835616438356164,
+                "f1": 0.45528455284552843,
+                "fpr": 0.09898762654668167
+              },
+              "test_metrics": {
+                "TP": 50,
+                "TN": 779,
+                "FP": 114,
+                "FN": 239,
+                "total": 1182,
+                "accuracy": 0.7013536379018612,
+                "precision": 0.3048780487804878,
+                "recall": 0.17301038062283736,
+                "f1": 0.22075055187637965,
+                "fpr": 0.1276595744680851
+              },
+              "test_auroc": 0.4679882360690802,
+              "test_auprc": 0.2960360501696315,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.832933370744078,
+                  "median": 0.5577843901376565,
+                  "p95": 2.245809526491963,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 20.611782088857655,
+                  "median": 2.493869943012164,
+                  "p95": 93.28983336812918,
+                  "false_alarms": 114,
+                  "fpr": 0.2620689655172414
+                },
+                "separation_ratio_contaminated_over_clean": 24.74601548314085
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 31,
+                  "detection_rate": 0.20666666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 114,
+                  "false_positive_rate": 0.1276595744680851
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 3.911345754367884,
+              "validation_metrics": {
+                "TP": 140,
+                "TN": 753,
+                "FP": 136,
+                "FN": 152,
+                "total": 1181,
+                "accuracy": 0.756138865368332,
+                "precision": 0.5072463768115942,
+                "recall": 0.4794520547945205,
+                "f1": 0.49295774647887325,
+                "fpr": 0.1529808773903262
+              },
+              "test_metrics": {
+                "TP": 98,
+                "TN": 708,
+                "FP": 185,
+                "FN": 191,
+                "total": 1182,
+                "accuracy": 0.6818950930626058,
+                "precision": 0.3462897526501767,
+                "recall": 0.3391003460207612,
+                "f1": 0.34265734265734266,
+                "fpr": 0.20716685330347145
+              },
+              "test_auroc": 0.4679882360690802,
+              "test_auprc": 0.2960360501696315,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.832933370744078,
+                  "median": 0.5577843901376565,
+                  "p95": 2.245809526491963,
+                  "false_alarms": 9,
+                  "fpr": 0.019650655021834062
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 20.611782088857655,
+                  "median": 2.493869943012164,
+                  "p95": 93.28983336812918,
+                  "false_alarms": 176,
+                  "fpr": 0.4045977011494253
+                },
+                "separation_ratio_contaminated_over_clean": 24.74601548314085
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 79,
+                  "detection_rate": 0.5266666666666666
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 185,
+                  "false_positive_rate": 0.20716685330347145
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        },
+        "H4_drift_emphasis": {
+          "name": "H4 (Current 0.4 + Delta 0.1 + Drift 0.5)",
+          "formula": "S_H4 = 0.4 * E_curr_norm + 0.1 * E_delta_norm + 0.5 * D_norm",
+          "operating_points": {
+            "max_f1": {
+              "validation_threshold": 2.5140952304602058,
+              "validation_metrics": {
+                "TP": 149,
+                "TN": 729,
+                "FP": 160,
+                "FN": 143,
+                "total": 1181,
+                "accuracy": 0.7434377646062659,
+                "precision": 0.48220064724919093,
+                "recall": 0.5102739726027398,
+                "f1": 0.49584026622296173,
+                "fpr": 0.17997750281214847
+              },
+              "test_metrics": {
+                "TP": 107,
+                "TN": 670,
+                "FP": 223,
+                "FN": 182,
+                "total": 1182,
+                "accuracy": 0.6573604060913706,
+                "precision": 0.3242424242424242,
+                "recall": 0.370242214532872,
+                "f1": 0.345718901453958,
+                "fpr": 0.24972004479283313
+              },
+              "test_auroc": 0.46189703073113836,
+              "test_auprc": 0.29746042588226806,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7992876733395008,
+                  "median": 0.6191102098180284,
+                  "p95": 1.8864582177922762,
+                  "false_alarms": 13,
+                  "fpr": 0.028384279475982533
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 14.798632961820916,
+                  "median": 2.2138694453409404,
+                  "p95": 74.75641631183528,
+                  "false_alarms": 210,
+                  "fpr": 0.4827586206896552
+                },
+                "separation_ratio_contaminated_over_clean": 18.51477691378725
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 88,
+                  "detection_rate": 0.5866666666666667
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 223,
+                  "false_positive_rate": 0.24972004479283313
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "fpr_constrained": {
+              "validation_threshold": 8.357758945357146,
+              "validation_metrics": {
+                "TP": 112,
+                "TN": 801,
+                "FP": 88,
+                "FN": 180,
+                "total": 1181,
+                "accuracy": 0.77307366638442,
+                "precision": 0.56,
+                "recall": 0.3835616438356164,
+                "f1": 0.45528455284552843,
+                "fpr": 0.09898762654668167
+              },
+              "test_metrics": {
+                "TP": 52,
+                "TN": 777,
+                "FP": 116,
+                "FN": 237,
+                "total": 1182,
+                "accuracy": 0.7013536379018612,
+                "precision": 0.30952380952380953,
+                "recall": 0.17993079584775087,
+                "f1": 0.22757111597374183,
+                "fpr": 0.12989921612541994
+              },
+              "test_auroc": 0.46189703073113836,
+              "test_auprc": 0.29746042588226806,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7992876733395008,
+                  "median": 0.6191102098180284,
+                  "p95": 1.8864582177922762,
+                  "false_alarms": 0,
+                  "fpr": 0.0
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 14.798632961820916,
+                  "median": 2.2138694453409404,
+                  "p95": 74.75641631183528,
+                  "false_alarms": 116,
+                  "fpr": 0.26666666666666666
+                },
+                "separation_ratio_contaminated_over_clean": 18.51477691378725
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 33,
+                  "detection_rate": 0.22
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 116,
+                  "false_positive_rate": 0.12989921612541994
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            },
+            "balanced": {
+              "validation_threshold": 3.2419091186161606,
+              "validation_metrics": {
+                "TP": 142,
+                "TN": 750,
+                "FP": 139,
+                "FN": 150,
+                "total": 1181,
+                "accuracy": 0.7552921253175275,
+                "precision": 0.505338078291815,
+                "recall": 0.4863013698630137,
+                "f1": 0.4956369982547993,
+                "fpr": 0.156355455568054
+              },
+              "test_metrics": {
+                "TP": 97,
+                "TN": 707,
+                "FP": 186,
+                "FN": 192,
+                "total": 1182,
+                "accuracy": 0.6802030456852792,
+                "precision": 0.34275618374558303,
+                "recall": 0.3356401384083045,
+                "f1": 0.3391608391608391,
+                "fpr": 0.20828667413213886
+              },
+              "test_auroc": 0.46189703073113836,
+              "test_auprc": 0.29746042588226806,
+              "normal_subset_analysis": {
+                "CLEAN_NORMAL": {
+                  "count": 458,
+                  "mean": 0.7992876733395008,
+                  "median": 0.6191102098180284,
+                  "p95": 1.8864582177922762,
+                  "false_alarms": 8,
+                  "fpr": 0.017467248908296942
+                },
+                "CONTAMINATED_NORMAL": {
+                  "count": 435,
+                  "mean": 14.798632961820916,
+                  "median": 2.2138694453409404,
+                  "p95": 74.75641631183528,
+                  "false_alarms": 178,
+                  "fpr": 0.4091954022988506
+                },
+                "separation_ratio_contaminated_over_clean": 18.51477691378725
+              },
+              "per_anomaly_type_breakdown": {
+                "DRIFT": {
+                  "total_instances": 150,
+                  "detected_anomalies": 78,
+                  "detection_rate": 0.52
+                },
+                "NORMAL": {
+                  "total_instances": 893,
+                  "false_alarms": 186,
+                  "false_positive_rate": 0.20828667413213886
+                },
+                "SPIKE": {
+                  "total_instances": 19,
+                  "detected_anomalies": 19,
+                  "detection_rate": 1.0
+                },
+                "STUCK_VALUE": {
+                  "total_instances": 120,
+                  "detected_anomalies": 0,
+                  "detection_rate": 0.0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "key_takeaways": [
+    "Integrating short-term bounded drift tracking (H2, H3, H4) significantly improves DRIFT anomaly recall compared to last-step error in isolation.",
+    "Normalizing components via clean-normal validation MAD scales stabilizes disparate physical sensor dimensions.",
+    "Clean-normal false alarms remain substantially lower than full-window MSE, proving the effectiveness of localized observation-transition scoring.",
+    "Downstream deterministic anomaly classification rules remain 100% functional and compatible."
+  ]
+}

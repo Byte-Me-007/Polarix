@@ -1,0 +1,845 @@
+{
+  "experiment": "Sensor ML V2 Causal Decision Revalidation",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "validation_selected_candidate": "strategy_b_decay",
+      "validation_selection_ranking": [
+        "strategy_b_decay",
+        "baseline_step52",
+        "strategy_c_multisensor",
+        "strategy_d_station_modulation",
+        "strategy_e_causal_persistence_k1",
+        "strategy_a_hysteresis",
+        "strategy_e_causal_persistence_k2",
+        "strategy_e_causal_persistence_k3",
+        "strategy_e_causal_persistence_k4"
+      ],
+      "all_candidates": {
+        "baseline_step52": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 158,
+              "FP": 19,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7932489451476793,
+              "precision": 0.6122448979591837,
+              "recall": 0.5,
+              "f1": 0.5504587155963303,
+              "fpr": 0.10734463276836158
+            },
+            "strategy_type": "baseline",
+            "threshold": 4.538535035629731
+          }
+        },
+        "strategy_a_hysteresis": {
+          "validation_metrics": {
+            "TP": 31,
+            "TN": 154,
+            "FP": 23,
+            "FN": 29,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5740740740740741,
+            "recall": 0.5166666666666667,
+            "f1": 0.543859649122807,
+            "fpr": 0.12994350282485875
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 143,
+            "FP": 36,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7016806722689075,
+            "precision": 0.4,
+            "recall": 0.4067796610169492,
+            "f1": 0.40336134453781514,
+            "fpr": 0.2011173184357542,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 31,
+              "TN": 154,
+              "FP": 23,
+              "FN": 29,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5740740740740741,
+              "recall": 0.5166666666666667,
+              "f1": 0.543859649122807,
+              "fpr": 0.12994350282485875
+            },
+            "strategy_type": "hysteresis",
+            "threshold_high": 4.538535035629731,
+            "threshold_low": 2.7231210213778385
+          }
+        },
+        "strategy_b_decay": {
+          "validation_metrics": {
+            "TP": 31,
+            "TN": 156,
+            "FP": 21,
+            "FN": 29,
+            "total": 237,
+            "accuracy": 0.7890295358649789,
+            "precision": 0.5961538461538461,
+            "recall": 0.5166666666666667,
+            "f1": 0.5535714285714286,
+            "fpr": 0.11864406779661017
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 144,
+            "FP": 35,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.4067796610169492,
+            "recall": 0.4067796610169492,
+            "f1": 0.40677966101694923,
+            "fpr": 0.19553072625698323,
+            "auroc": 0.5289271849256698,
+            "auprc": 0.3561634501615074
+          },
+          "config": {
+            "metrics": {
+              "TP": 31,
+              "TN": 156,
+              "FP": 21,
+              "FN": 29,
+              "total": 237,
+              "accuracy": 0.7890295358649789,
+              "precision": 0.5961538461538461,
+              "recall": 0.5166666666666667,
+              "f1": 0.5535714285714286,
+              "fpr": 0.11864406779661017
+            },
+            "strategy_type": "decay",
+            "threshold": 3.6118382554173856
+          }
+        },
+        "strategy_c_multisensor": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 158,
+              "FP": 19,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7932489451476793,
+              "precision": 0.6122448979591837,
+              "recall": 0.5,
+              "f1": 0.5504587155963303,
+              "fpr": 0.10734463276836158
+            },
+            "strategy_type": "multisensor",
+            "threshold": 4.538535035629731,
+            "single_barrier_multiplier": 1.3
+          }
+        },
+        "strategy_d_station_modulation": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.5009942240318151,
+            "auprc": 0.35142846522202653
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 158,
+              "FP": 19,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7932489451476793,
+              "precision": 0.6122448979591837,
+              "recall": 0.5,
+              "f1": 0.5504587155963303,
+              "fpr": 0.10734463276836158
+            },
+            "strategy_type": "station_modulation",
+            "threshold": 4.538535035629731
+          }
+        },
+        "strategy_e_causal_persistence_k1": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 158,
+              "FP": 19,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7932489451476793,
+              "precision": 0.6122448979591837,
+              "recall": 0.5,
+              "f1": 0.5504587155963303,
+              "fpr": 0.10734463276836158
+            },
+            "strategy_type": "causal_persistence",
+            "k": 1,
+            "threshold": 4.538535035629731
+          }
+        },
+        "strategy_e_causal_persistence_k2": {
+          "validation_metrics": {
+            "TP": 27,
+            "TN": 160,
+            "FP": 17,
+            "FN": 33,
+            "total": 237,
+            "accuracy": 0.7890295358649789,
+            "precision": 0.6136363636363636,
+            "recall": 0.45,
+            "f1": 0.5192307692307692,
+            "fpr": 0.096045197740113
+          },
+          "test_metrics": {
+            "TP": 22,
+            "TN": 149,
+            "FP": 30,
+            "FN": 37,
+            "total": 238,
+            "accuracy": 0.7184873949579832,
+            "precision": 0.4230769230769231,
+            "recall": 0.3728813559322034,
+            "f1": 0.39639639639639646,
+            "fpr": 0.16759776536312848,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 27,
+              "TN": 160,
+              "FP": 17,
+              "FN": 33,
+              "total": 237,
+              "accuracy": 0.7890295358649789,
+              "precision": 0.6136363636363636,
+              "recall": 0.45,
+              "f1": 0.5192307692307692,
+              "fpr": 0.096045197740113
+            },
+            "strategy_type": "causal_persistence",
+            "k": 2,
+            "threshold": 4.538535035629731
+          }
+        },
+        "strategy_e_causal_persistence_k3": {
+          "validation_metrics": {
+            "TP": 25,
+            "TN": 161,
+            "FP": 16,
+            "FN": 35,
+            "total": 237,
+            "accuracy": 0.7848101265822784,
+            "precision": 0.6097560975609756,
+            "recall": 0.4166666666666667,
+            "f1": 0.4950495049504951,
+            "fpr": 0.0903954802259887
+          },
+          "test_metrics": {
+            "TP": 20,
+            "TN": 150,
+            "FP": 29,
+            "FN": 39,
+            "total": 238,
+            "accuracy": 0.7142857142857143,
+            "precision": 0.40816326530612246,
+            "recall": 0.3389830508474576,
+            "f1": 0.37037037037037035,
+            "fpr": 0.16201117318435754,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 25,
+              "TN": 161,
+              "FP": 16,
+              "FN": 35,
+              "total": 237,
+              "accuracy": 0.7848101265822784,
+              "precision": 0.6097560975609756,
+              "recall": 0.4166666666666667,
+              "f1": 0.4950495049504951,
+              "fpr": 0.0903954802259887
+            },
+            "strategy_type": "causal_persistence",
+            "k": 3,
+            "threshold": 4.538535035629731
+          }
+        },
+        "strategy_e_causal_persistence_k4": {
+          "validation_metrics": {
+            "TP": 23,
+            "TN": 162,
+            "FP": 15,
+            "FN": 37,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.6052631578947368,
+            "recall": 0.38333333333333336,
+            "f1": 0.4693877551020408,
+            "fpr": 0.0847457627118644
+          },
+          "test_metrics": {
+            "TP": 18,
+            "TN": 151,
+            "FP": 28,
+            "FN": 41,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.391304347826087,
+            "recall": 0.3050847457627119,
+            "f1": 0.3428571428571429,
+            "fpr": 0.1564245810055866,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "config": {
+            "metrics": {
+              "TP": 23,
+              "TN": 162,
+              "FP": 15,
+              "FN": 37,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.6052631578947368,
+              "recall": 0.38333333333333336,
+              "f1": 0.4693877551020408,
+              "fpr": 0.0847457627118644
+            },
+            "strategy_type": "causal_persistence",
+            "k": 4,
+            "threshold": 4.538535035629731
+          }
+        }
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "validation_selected_candidate": "strategy_b_decay",
+      "validation_selection_ranking": [
+        "strategy_b_decay",
+        "strategy_a_hysteresis",
+        "baseline_step52",
+        "strategy_c_multisensor",
+        "strategy_d_station_modulation",
+        "strategy_e_causal_persistence_k1",
+        "strategy_e_causal_persistence_k2",
+        "strategy_e_causal_persistence_k3",
+        "strategy_e_causal_persistence_k4"
+      ],
+      "all_candidates": {
+        "baseline_step52": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 155,
+              "FP": 22,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5769230769230769,
+              "recall": 0.5,
+              "f1": 0.5357142857142857,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "baseline",
+            "threshold": 7.319922961236617
+          }
+        },
+        "strategy_a_hysteresis": {
+          "validation_metrics": {
+            "TP": 31,
+            "TN": 154,
+            "FP": 23,
+            "FN": 29,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5740740740740741,
+            "recall": 0.5166666666666667,
+            "f1": 0.543859649122807,
+            "fpr": 0.12994350282485875
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 141,
+            "FP": 38,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.680672268907563,
+            "precision": 0.3559322033898305,
+            "recall": 0.3559322033898305,
+            "f1": 0.3559322033898305,
+            "fpr": 0.2122905027932961,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 31,
+              "TN": 154,
+              "FP": 23,
+              "FN": 29,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5740740740740741,
+              "recall": 0.5166666666666667,
+              "f1": 0.543859649122807,
+              "fpr": 0.12994350282485875
+            },
+            "strategy_type": "hysteresis",
+            "threshold_high": 7.319922961236617,
+            "threshold_low": 4.391953776741969
+          }
+        },
+        "strategy_b_decay": {
+          "validation_metrics": {
+            "TP": 33,
+            "TN": 154,
+            "FP": 23,
+            "FN": 27,
+            "total": 237,
+            "accuracy": 0.7890295358649789,
+            "precision": 0.5892857142857143,
+            "recall": 0.55,
+            "f1": 0.5689655172413793,
+            "fpr": 0.12994350282485875
+          },
+          "test_metrics": {
+            "TP": 26,
+            "TN": 136,
+            "FP": 43,
+            "FN": 33,
+            "total": 238,
+            "accuracy": 0.680672268907563,
+            "precision": 0.37681159420289856,
+            "recall": 0.4406779661016949,
+            "f1": 0.40624999999999994,
+            "fpr": 0.24022346368715083,
+            "auroc": 0.5076223842439163,
+            "auprc": 0.3536384846893343
+          },
+          "config": {
+            "metrics": {
+              "TP": 33,
+              "TN": 154,
+              "FP": 23,
+              "FN": 27,
+              "total": 237,
+              "accuracy": 0.7890295358649789,
+              "precision": 0.5892857142857143,
+              "recall": 0.55,
+              "f1": 0.5689655172413793,
+              "fpr": 0.12994350282485875
+            },
+            "strategy_type": "decay",
+            "threshold": 3.593276235828495
+          }
+        },
+        "strategy_c_multisensor": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 155,
+              "FP": 22,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5769230769230769,
+              "recall": 0.5,
+              "f1": 0.5357142857142857,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "multisensor",
+            "threshold": 7.319922961236617,
+            "single_barrier_multiplier": 1.3
+          }
+        },
+        "strategy_d_station_modulation": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4919988637439636,
+            "auprc": 0.3491487400255693
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 155,
+              "FP": 22,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5769230769230769,
+              "recall": 0.5,
+              "f1": 0.5357142857142857,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "station_modulation",
+            "threshold": 7.319922961236617
+          }
+        },
+        "strategy_e_causal_persistence_k1": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 30,
+              "TN": 155,
+              "FP": 22,
+              "FN": 30,
+              "total": 237,
+              "accuracy": 0.7805907172995781,
+              "precision": 0.5769230769230769,
+              "recall": 0.5,
+              "f1": 0.5357142857142857,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "causal_persistence",
+            "k": 1,
+            "threshold": 7.319922961236617
+          }
+        },
+        "strategy_e_causal_persistence_k2": {
+          "validation_metrics": {
+            "TP": 27,
+            "TN": 155,
+            "FP": 22,
+            "FN": 33,
+            "total": 237,
+            "accuracy": 0.7679324894514767,
+            "precision": 0.5510204081632653,
+            "recall": 0.45,
+            "f1": 0.4954128440366973,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 19,
+            "TN": 151,
+            "FP": 28,
+            "FN": 40,
+            "total": 238,
+            "accuracy": 0.7142857142857143,
+            "precision": 0.40425531914893614,
+            "recall": 0.3220338983050847,
+            "f1": 0.3584905660377358,
+            "fpr": 0.1564245810055866,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 27,
+              "TN": 155,
+              "FP": 22,
+              "FN": 33,
+              "total": 237,
+              "accuracy": 0.7679324894514767,
+              "precision": 0.5510204081632653,
+              "recall": 0.45,
+              "f1": 0.4954128440366973,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "causal_persistence",
+            "k": 2,
+            "threshold": 7.319922961236617
+          }
+        },
+        "strategy_e_causal_persistence_k3": {
+          "validation_metrics": {
+            "TP": 25,
+            "TN": 155,
+            "FP": 22,
+            "FN": 35,
+            "total": 237,
+            "accuracy": 0.759493670886076,
+            "precision": 0.5319148936170213,
+            "recall": 0.4166666666666667,
+            "f1": 0.4672897196261682,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 17,
+            "TN": 153,
+            "FP": 26,
+            "FN": 42,
+            "total": 238,
+            "accuracy": 0.7142857142857143,
+            "precision": 0.3953488372093023,
+            "recall": 0.288135593220339,
+            "f1": 0.33333333333333337,
+            "fpr": 0.1452513966480447,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 25,
+              "TN": 155,
+              "FP": 22,
+              "FN": 35,
+              "total": 237,
+              "accuracy": 0.759493670886076,
+              "precision": 0.5319148936170213,
+              "recall": 0.4166666666666667,
+              "f1": 0.4672897196261682,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "causal_persistence",
+            "k": 3,
+            "threshold": 7.319922961236617
+          }
+        },
+        "strategy_e_causal_persistence_k4": {
+          "validation_metrics": {
+            "TP": 23,
+            "TN": 155,
+            "FP": 22,
+            "FN": 37,
+            "total": 237,
+            "accuracy": 0.7510548523206751,
+            "precision": 0.5111111111111111,
+            "recall": 0.38333333333333336,
+            "f1": 0.4380952380952381,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 15,
+            "TN": 155,
+            "FP": 24,
+            "FN": 44,
+            "total": 238,
+            "accuracy": 0.7142857142857143,
+            "precision": 0.38461538461538464,
+            "recall": 0.2542372881355932,
+            "f1": 0.30612244897959184,
+            "fpr": 0.1340782122905028,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "config": {
+            "metrics": {
+              "TP": 23,
+              "TN": 155,
+              "FP": 22,
+              "FN": 37,
+              "total": 237,
+              "accuracy": 0.7510548523206751,
+              "precision": 0.5111111111111111,
+              "recall": 0.38333333333333336,
+              "f1": 0.4380952380952381,
+              "fpr": 0.12429378531073447
+            },
+            "strategy_type": "causal_persistence",
+            "k": 4,
+            "threshold": 7.319922961236617
+          }
+        }
+      }
+    }
+  }
+}

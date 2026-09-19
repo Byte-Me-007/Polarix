@@ -1,0 +1,1123 @@
+{
+  "experiment": "Sensor ML V2 Final Decision State Machine",
+  "stations": {
+    "MTR": {
+      "station_id": "MTR",
+      "station_name": "Maitri",
+      "station_level_eval_population_N": 238,
+      "validation_selected_candidate": "candidate_a_reference",
+      "authoritative_experimental_reference": "Step 52 Robust Multivariate Fusion (Candidate A Reference)",
+      "validation_selection_ranking": [
+        "candidate_a_reference",
+        "candidate_c_suppression_override",
+        "candidate_d_decay_override",
+        "candidate_b_suppression"
+      ],
+      "all_candidates": {
+        "candidate_a_reference": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 103.07051110182682,
+                "median_score": 123.58853207594295,
+                "p95_score": 177.21772914573708
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 44.940991027263074,
+                "median_score": 40.16916511172572,
+                "p95_score": 96.99313176214928
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 10,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 28.651632111558417,
+                "median_score": 27.839761198198417,
+                "p95_score": 79.47434057091509
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 6,
+                "false_positive_rate": 0.2,
+                "mean_score": 2.799558611362223,
+                "median_score": 1.7756365232677722,
+                "p95_score": 8.462513222873625
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 8,
+                "false_positive_rate": 0.26666666666666666,
+                "mean_score": 3.027135149123848,
+                "median_score": 1.7198980109546298,
+                "p95_score": 9.746691503934805
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.9118616791020216,
+                "median_score": 0.7650052584452375,
+                "p95_score": 1.825059083233179
+              }
+            }
+          },
+          "config": {
+            "mode": "ref",
+            "base_threshold": 4.538535035629731,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_b_suppression": {
+          "validation_metrics": {
+            "TP": 29,
+            "TN": 160,
+            "FP": 17,
+            "FN": 31,
+            "total": 237,
+            "accuracy": 0.7974683544303798,
+            "precision": 0.6304347826086957,
+            "recall": 0.48333333333333334,
+            "f1": 0.5471698113207547,
+            "fpr": 0.096045197740113
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 151,
+            "FP": 28,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7226890756302521,
+            "precision": 0.42857142857142855,
+            "recall": 0.3559322033898305,
+            "f1": 0.38888888888888884,
+            "fpr": 0.1564245810055866,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 28,
+              "fpr": 0.3218390804597701,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 28,
+                "fpr": 0.1564245810055866
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 103.07051110182682,
+                "median_score": 123.58853207594295,
+                "p95_score": 177.21772914573708
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 44.940991027263074,
+                "median_score": 40.16916511172572,
+                "p95_score": 96.99313176214928
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 10,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 28.651632111558417,
+                "median_score": 27.839761198198417,
+                "p95_score": 79.47434057091509
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 4,
+                "false_positive_rate": 0.13333333333333333,
+                "mean_score": 2.799558611362223,
+                "median_score": 1.7756365232677722,
+                "p95_score": 8.462513222873625
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 4,
+                "false_positive_rate": 0.13333333333333333,
+                "mean_score": 3.027135149123848,
+                "median_score": 1.7198980109546298,
+                "p95_score": 9.746691503934805
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.9118616791020216,
+                "median_score": 0.7650052584452375,
+                "p95_score": 1.825059083233179
+              }
+            }
+          },
+          "config": {
+            "mode": "suppression",
+            "base_threshold": 4.538535035629731,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_c_suppression_override": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 103.07051110182682,
+                "median_score": 123.58853207594295,
+                "p95_score": 177.21772914573708
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 44.940991027263074,
+                "median_score": 40.16916511172572,
+                "p95_score": 96.99313176214928
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 10,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 28.651632111558417,
+                "median_score": 27.839761198198417,
+                "p95_score": 79.47434057091509
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 6,
+                "false_positive_rate": 0.2,
+                "mean_score": 2.799558611362223,
+                "median_score": 1.7756365232677722,
+                "p95_score": 8.462513222873625
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 8,
+                "false_positive_rate": 0.26666666666666666,
+                "mean_score": 3.027135149123848,
+                "median_score": 1.7198980109546298,
+                "p95_score": 9.746691503934805
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.9118616791020216,
+                "median_score": 0.7650052584452375,
+                "p95_score": 1.825059083233179
+              }
+            }
+          },
+          "config": {
+            "mode": "suppression_override",
+            "base_threshold": 4.538535035629731,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_d_decay_override": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 158,
+            "FP": 19,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7932489451476793,
+            "precision": 0.6122448979591837,
+            "recall": 0.5,
+            "f1": 0.5504587155963303,
+            "fpr": 0.10734463276836158
+          },
+          "test_metrics": {
+            "TP": 24,
+            "TN": 145,
+            "FP": 34,
+            "FN": 35,
+            "total": 238,
+            "accuracy": 0.7100840336134454,
+            "precision": 0.41379310344827586,
+            "recall": 0.4067796610169492,
+            "f1": 0.4102564102564103,
+            "fpr": 0.18994413407821228,
+            "auroc": 0.4669065429410094,
+            "auprc": 0.34300606894532154
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8995212831014072,
+              "median_score": 0.737660529427438
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 34,
+              "fpr": 0.39080459770114945,
+              "mean_score": 16.68366036224536,
+              "median_score": 2.4477365546518444
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 24,
+              "recall": 0.4067796610169492
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 34,
+                "fpr": 0.18994413407821228
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 19,
+                "recall": 0.6333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 103.07051110182682,
+                "median_score": 123.58853207594295,
+                "p95_score": 177.21772914573708
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 44.940991027263074,
+                "median_score": 40.16916511172572,
+                "p95_score": 96.99313176214928
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 10,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 28.651632111558417,
+                "median_score": 27.839761198198417,
+                "p95_score": 79.47434057091509
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 6,
+                "false_positive_rate": 0.2,
+                "mean_score": 2.799558611362223,
+                "median_score": 1.7756365232677722,
+                "p95_score": 8.462513222873625
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 8,
+                "false_positive_rate": 0.26666666666666666,
+                "mean_score": 3.027135149123848,
+                "median_score": 1.7198980109546298,
+                "p95_score": 9.746691503934805
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.9118616791020216,
+                "median_score": 0.7650052584452375,
+                "p95_score": 1.825059083233179
+              }
+            }
+          },
+          "config": {
+            "mode": "decay_override",
+            "base_threshold": 4.538535035629731,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        }
+      }
+    },
+    "BRT": {
+      "station_id": "BRT",
+      "station_name": "Bharati",
+      "station_level_eval_population_N": 238,
+      "validation_selected_candidate": "candidate_a_reference",
+      "authoritative_experimental_reference": "Step 52 Robust Multivariate Fusion (Candidate A Reference)",
+      "validation_selection_ranking": [
+        "candidate_a_reference",
+        "candidate_c_suppression_override",
+        "candidate_d_decay_override",
+        "candidate_b_suppression"
+      ],
+      "all_candidates": {
+        "candidate_a_reference": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 171.01391241007846,
+                "median_score": 146.05094761303053,
+                "p95_score": 343.56203016880676
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 72.46007614669863,
+                "median_score": 86.42541063027566,
+                "p95_score": 137.54738684838017
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 8,
+                "false_positive_rate": 0.5333333333333333,
+                "mean_score": 19.038656258152415,
+                "median_score": 7.6110833528556014,
+                "p95_score": 53.82676890622629
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 4,
+                "false_positive_rate": 0.13333333333333333,
+                "mean_score": 3.878071728333948,
+                "median_score": 3.018034072699821,
+                "p95_score": 11.069510666410986
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 10,
+                "false_positive_rate": 0.3333333333333333,
+                "mean_score": 6.84075512056484,
+                "median_score": 1.8886218570022626,
+                "p95_score": 21.484556005060647
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.8961795532290812,
+                "median_score": 0.8819894695685258,
+                "p95_score": 1.5088811474632509
+              }
+            }
+          },
+          "config": {
+            "mode": "ref",
+            "base_threshold": 7.319922961236617,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_b_suppression": {
+          "validation_metrics": {
+            "TP": 28,
+            "TN": 155,
+            "FP": 22,
+            "FN": 32,
+            "total": 237,
+            "accuracy": 0.7721518987341772,
+            "precision": 0.56,
+            "recall": 0.4666666666666667,
+            "f1": 0.509090909090909,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 18,
+            "TN": 150,
+            "FP": 29,
+            "FN": 41,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.3829787234042553,
+            "recall": 0.3050847457627119,
+            "f1": 0.339622641509434,
+            "fpr": 0.16201117318435754,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 29,
+              "fpr": 0.3333333333333333,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 18,
+              "recall": 0.3050847457627119
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 29,
+                "fpr": 0.16201117318435754
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 13,
+                "recall": 0.43333333333333335
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 171.01391241007846,
+                "median_score": 146.05094761303053,
+                "p95_score": 343.56203016880676
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 72.46007614669863,
+                "median_score": 86.42541063027566,
+                "p95_score": 137.54738684838017
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 7,
+                "false_positive_rate": 0.4666666666666667,
+                "mean_score": 19.038656258152415,
+                "median_score": 7.6110833528556014,
+                "p95_score": 53.82676890622629
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 3,
+                "false_positive_rate": 0.1,
+                "mean_score": 3.878071728333948,
+                "median_score": 3.018034072699821,
+                "p95_score": 11.069510666410986
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 9,
+                "false_positive_rate": 0.3,
+                "mean_score": 6.84075512056484,
+                "median_score": 1.8886218570022626,
+                "p95_score": 21.484556005060647
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.8961795532290812,
+                "median_score": 0.8819894695685258,
+                "p95_score": 1.5088811474632509
+              }
+            }
+          },
+          "config": {
+            "mode": "suppression",
+            "base_threshold": 7.319922961236617,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_c_suppression_override": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 171.01391241007846,
+                "median_score": 146.05094761303053,
+                "p95_score": 343.56203016880676
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 72.46007614669863,
+                "median_score": 86.42541063027566,
+                "p95_score": 137.54738684838017
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 8,
+                "false_positive_rate": 0.5333333333333333,
+                "mean_score": 19.038656258152415,
+                "median_score": 7.6110833528556014,
+                "p95_score": 53.82676890622629
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 4,
+                "false_positive_rate": 0.13333333333333333,
+                "mean_score": 3.878071728333948,
+                "median_score": 3.018034072699821,
+                "p95_score": 11.069510666410986
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 10,
+                "false_positive_rate": 0.3333333333333333,
+                "mean_score": 6.84075512056484,
+                "median_score": 1.8886218570022626,
+                "p95_score": 21.484556005060647
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.8961795532290812,
+                "median_score": 0.8819894695685258,
+                "p95_score": 1.5088811474632509
+              }
+            }
+          },
+          "config": {
+            "mode": "suppression_override",
+            "base_threshold": 7.319922961236617,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        },
+        "candidate_d_decay_override": {
+          "validation_metrics": {
+            "TP": 30,
+            "TN": 155,
+            "FP": 22,
+            "FN": 30,
+            "total": 237,
+            "accuracy": 0.7805907172995781,
+            "precision": 0.5769230769230769,
+            "recall": 0.5,
+            "f1": 0.5357142857142857,
+            "fpr": 0.12429378531073447
+          },
+          "test_metrics": {
+            "TP": 21,
+            "TN": 147,
+            "FP": 32,
+            "FN": 38,
+            "total": 238,
+            "accuracy": 0.7058823529411765,
+            "precision": 0.39622641509433965,
+            "recall": 0.3559322033898305,
+            "f1": 0.375,
+            "fpr": 0.1787709497206704,
+            "auroc": 0.4871697755894328,
+            "auprc": 0.3475183295650359
+          },
+          "breakdown": {
+            "CLEAN_NORMAL": {
+              "sample_count": 92,
+              "false_positives": 0,
+              "fpr": 0.0,
+              "mean_score": 0.8984148346786381,
+              "median_score": 0.8884271450631898
+            },
+            "CONTAMINATED_NORMAL": {
+              "sample_count": 87,
+              "false_positives": 32,
+              "fpr": 0.367816091954023,
+              "mean_score": 22.836932365250835,
+              "median_score": 3.769541934198139
+            },
+            "ACTIVE_ANOMALY": {
+              "sample_count": 59,
+              "true_positives": 21,
+              "recall": 0.3559322033898305
+            },
+            "anomaly_types": {
+              "NORMAL": {
+                "total": 179,
+                "false_alarms": 32,
+                "fpr": 0.1787709497206704
+              },
+              "SPIKE": {
+                "total": 5,
+                "detected": 5,
+                "recall": 1.0
+              },
+              "DRIFT": {
+                "total": 30,
+                "detected": 16,
+                "recall": 0.5333333333333333
+              },
+              "STUCK_VALUE": {
+                "total": 24,
+                "detected": 0,
+                "recall": 0.0
+              }
+            },
+            "temporal_recovery_bins": {
+              "0_to_1_steps": {
+                "step_range": "0-1",
+                "sample_count": 3,
+                "false_positives": 2,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 171.01391241007846,
+                "median_score": 146.05094761303053,
+                "p95_score": 343.56203016880676
+              },
+              "2_to_5_steps": {
+                "step_range": "2-5",
+                "sample_count": 12,
+                "false_positives": 8,
+                "false_positive_rate": 0.6666666666666666,
+                "mean_score": 72.46007614669863,
+                "median_score": 86.42541063027566,
+                "p95_score": 137.54738684838017
+              },
+              "6_to_10_steps": {
+                "step_range": "6-10",
+                "sample_count": 15,
+                "false_positives": 8,
+                "false_positive_rate": 0.5333333333333333,
+                "mean_score": 19.038656258152415,
+                "median_score": 7.6110833528556014,
+                "p95_score": 53.82676890622629
+              },
+              "11_to_20_steps": {
+                "step_range": "11-20",
+                "sample_count": 30,
+                "false_positives": 4,
+                "false_positive_rate": 0.13333333333333333,
+                "mean_score": 3.878071728333948,
+                "median_score": 3.018034072699821,
+                "p95_score": 11.069510666410986
+              },
+              "21_to_30_steps": {
+                "step_range": "21-30",
+                "sample_count": 30,
+                "false_positives": 10,
+                "false_positive_rate": 0.3333333333333333,
+                "mean_score": 6.84075512056484,
+                "median_score": 1.8886218570022626,
+                "p95_score": 21.484556005060647
+              },
+              "greater_than_30_steps": {
+                "step_range": ">30",
+                "sample_count": 89,
+                "false_positives": 0,
+                "false_positive_rate": 0.0,
+                "mean_score": 0.8961795532290812,
+                "median_score": 0.8819894695685258,
+                "p95_score": 1.5088811474632509
+              }
+            }
+          },
+          "config": {
+            "mode": "decay_override",
+            "base_threshold": 7.319922961236617,
+            "recovery_window_steps": 30,
+            "suppression_barrier": 1.35,
+            "strong_isolated_override": 1.5,
+            "z_bound_override": 2.0,
+            "sensor_elev_threshold": 3.0
+          }
+        }
+      }
+    }
+  }
+}
