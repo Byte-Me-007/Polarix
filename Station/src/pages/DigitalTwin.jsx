@@ -52,10 +52,16 @@ export const DigitalTwin = () => {
   const [selectedIncidentNodeId, setSelectedIncidentNodeId] = useState(null);
   const [incidentBannerDismissed, setIncidentBannerDismissed] = useState(false);
 
-  // Clear incident focus & banner state when station changes
+  // Clear all spatial selection state when station changes
+  // (sensor/asset positions are station-specific; stale selection would be meaningless)
   useEffect(() => {
     setSelectedIncidentNodeId(null);
     setIncidentBannerDismissed(false);
+    setSelectedSensorId(null);
+    setSelectedAsset(null);
+    setFocusZone(null);
+    // Trigger camera reset so view jumps to correct station overview
+    setResetTrigger(prev => prev + 1);
   }, [activeStation]);
 
   // Clear incident focus when scenario returns to NORMAL/RECOVERY
@@ -390,6 +396,7 @@ export const DigitalTwin = () => {
             focusZone={focusZone}
             onSelectAsset={handleSelectAsset}
             selectedAssetId={selectedAsset?.id}
+            activeStation={activeStation}
             incidentGraph={incidentGraph}
             onIncidentNodeClick={handleIncidentNodeClick}
             selectedIncidentNodeId={selectedIncidentNodeId}

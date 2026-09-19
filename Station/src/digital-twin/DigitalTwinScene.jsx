@@ -6,11 +6,15 @@ import { SensorMarker, computeDisplayPos } from './SensorMarker';
 import { SpatialHeatmap } from './SpatialHeatmap';
 import { IncidentGraph } from './IncidentGraph';
 
-// Elevated perspective overview — calibrated to match authentic station angle
+// Maitri elevated perspective overview
 const DEFAULT_CAMERA_POS = [18, 65, 75];
 const DEFAULT_TARGET = [3, 8, -16];
 
-// Zone focus positions — calibrated for taller buildings
+// Bharati coastal perspective — shows main building + coastal terrain + fuel area
+const BHARATI_CAMERA_POS = [-5, 55, 68];
+const BHARATI_TARGET = [2, 5, -10];
+
+// Maitri zone focus positions
 const ZONE_FOCUS = {
   MAIN:      { pos: [30,  55, 40],   target: [0,   7.0, 0]   },
   RESEARCH:  { pos: [72,  55, 30],   target: [38,  6.5, 0]   },
@@ -18,6 +22,16 @@ const ZONE_FOCUS = {
   GENERATOR: { pos: [-14, 52, 5],    target: [-30, 5.5, -30] },
   STORAGE:   { pos: [60,  52, 5],    target: [32,  5.5, -30] },
   COMMS:     { pos: [25,  48, -30],  target: [0,   5.0, -54] }
+};
+
+// Bharati zone focus positions — match new coastal zone layout
+const BHARATI_ZONE_FOCUS = {
+  MAIN:      { pos: [20,  48, 30],   target: [0,   6.5,   0]  },
+  RESEARCH:  { pos: [60,  48, 18],   target: [34,  5.5,   6]  },
+  ENERGY:    { pos: [-12, 46,  4],   target: [-26, 5.5, -22]  },
+  GENERATOR: { pos: [-10, 44, -22],  target: [-26, 4.5, -44]  },
+  STORAGE:   { pos: [48,  44, -2],   target: [24,  5.0, -18]  },
+  COMMS:     { pos: [22,  42, -26],  target: [6,   4.5, -46]  }
 };
 
 export const DigitalTwinScene = ({
@@ -34,6 +48,7 @@ export const DigitalTwinScene = ({
   focusZone = null,
   onSelectAsset,
   selectedAssetId = null,
+  activeStation = 'MAITRI',
   // Incident visualization
   incidentGraph = null,
   onIncidentNodeClick = null,
@@ -41,16 +56,22 @@ export const DigitalTwinScene = ({
 }) => {
   const controlsRef = useRef();
   const zones = station?.digitalTwin?.zones || [];
+  const isBharati = activeStation === 'BHARATI';
+
+  // Choose camera defaults per station
+  const camPos    = isBharati ? BHARATI_CAMERA_POS : DEFAULT_CAMERA_POS;
+  const camTarget = isBharati ? BHARATI_TARGET      : DEFAULT_TARGET;
+  const zoneFocusMap = isBharati ? BHARATI_ZONE_FOCUS : ZONE_FOCUS;
 
   // Reset camera view whenever resetTrigger increments
   useEffect(() => {
     if (controlsRef.current && resetTrigger > 0) {
       controlsRef.current.reset();
-      controlsRef.current.object.position.set(...DEFAULT_CAMERA_POS);
-      controlsRef.current.target.set(...DEFAULT_TARGET);
+      controlsRef.current.object.position.set(...camPos);
+      controlsRef.current.target.set(...camTarget);
       controlsRef.current.update();
     }
-  }, [resetTrigger]);
+  }, [resetTrigger, isBharati]);
 
   // Smooth camera target focus when a sensor is selected
   useEffect(() => {
@@ -68,18 +89,18 @@ export const DigitalTwinScene = ({
   // Smooth camera focus when a zone is targeted from cross-module navigation
   useEffect(() => {
     if (!controlsRef.current || !focusZone) return;
-    const focus = ZONE_FOCUS[focusZone] || ZONE_FOCUS.MAIN;
+    const focus = zoneFocusMap[focusZone] || zoneFocusMap.MAIN;
     controlsRef.current.object.position.set(...focus.pos);
     controlsRef.current.target.set(...focus.target);
     controlsRef.current.update();
-  }, [focusZone]);
+  }, [focusZone, isBharati]);
 
   // Camera focus when an incident node is clicked
   useEffect(() => {
     if (!controlsRef.current || !selectedIncidentNodeId || !incidentGraph?.isActive) return;
     const node = incidentGraph.nodes?.find(n => n.id === selectedIncidentNodeId);
     if (!node) return;
-    const focus = ZONE_FOCUS[node.zoneCode];
+    const focus = zoneFocusMap[node.zoneCode];
     if (focus) {
       controlsRef.current.object.position.set(...focus.pos);
       controlsRef.current.target.set(...focus.target);
@@ -92,7 +113,7 @@ export const DigitalTwinScene = ({
 
   return (
     <Canvas
-      camera={{ position: DEFAULT_CAMERA_POS, fov: 50 }}
+      camera={{ position: camPos, fov: 50 }}
       shadows
       style={{ width: '100%', height: '100%', background: '#f8f6f0' }}
     >
@@ -115,7 +136,7 @@ export const DigitalTwinScene = ({
       {/* OrbitControls with smooth damping and reasonable constraints */}
       <OrbitControls
         ref={controlsRef}
-        target={DEFAULT_TARGET}
+        target={camTarget}
         enableDamping
         dampingFactor={0.06}
         minDistance={12}

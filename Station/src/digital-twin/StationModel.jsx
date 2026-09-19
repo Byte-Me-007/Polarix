@@ -5,6 +5,8 @@ import { SystemFlowOverlay } from './SystemFlowOverlay';
 import { computeDisplayPos } from './SensorMarker';
 import { getAssociatedAssetIdForSensor, ZONE_INTERNAL_ASSETS } from './stationAssets';
 import { IndianFlagPole } from './IndianFlagPole';
+import { BharatiStationModel } from './BharatiStationModel';
+import { BharatiSystemFlowOverlay } from './BharatiSystemFlowOverlay';
 
 // New station layout (all zones scaled ~1.75x from original):
 //   MAIN:      pos [0, 3.5, 0],    size [34, 7, 22]   → X: -17..+17   Z: -11..+11
@@ -72,10 +74,16 @@ export const StationModel = ({
 }) => {
   const zones = station?.digitalTwin?.zones || [];
 
+  // Detect active station from zone ids — must be computed BEFORE any hooks
+  // but CANNOT cause an early return (Rules of Hooks).
+  const isBharati = zones.length > 0 && (zones[0].id || '').startsWith('Z-BHR-');
+
+  // --- ALL HOOKS MUST RUN UNCONDITIONALLY (Rules of Hooks) ---
+
   const isXray = twinMode === 'XRAY';
   const isSemiTransparent = showHeatmap || isXray || twinMode === 'SYSTEM';
 
-  // Connecting Corridor Material Styles (Subordinated in X-RAY mode, solid technical in SYSTEM)
+  // Connecting Corridor Material Styles (Maitri only, but computed always)
   const isSystem = twinMode === 'SYSTEM';
   const corridorOpacity     = isXray ? 0.12 : isSystem ? 0.45 : isSemiTransparent ? 0.30 : 1.0;
   const corridorParapetOp   = isXray ? 0.06 : isSystem ? 0.28 : isSemiTransparent ? 0.18 : 1.0;
@@ -147,8 +155,50 @@ export const StationModel = ({
     return map;
   }, [sensors, zones]);
 
+
+
   return (
     <group name="station-model-root">
+
+      {/* ================================================================= */}
+      {/* BHARATI — delegate to dedicated coastal model                      */}
+      {/* ================================================================= */}
+      {isBharati ? (
+        <>
+          <BharatiStationModel
+            station={station}
+            sensors={sensors}
+            showLabels={showLabels}
+            showHeatmap={showHeatmap}
+            selectedZone={selectedZone}
+            selectedSensor={selectedSensor}
+            twinMode={twinMode}
+            focusZone={focusZone}
+            telemetry={telemetry}
+            onSelectAsset={onSelectAsset}
+            selectedAssetId={selectedAssetId}
+            incidentAffectedZones={incidentAffectedZones}
+            incidentPrimaryZones={incidentPrimaryZones}
+            incidentActive={incidentActive}
+            incidentGraph={incidentGraph}
+          />
+          {twinMode === 'SYSTEM' && (
+            <BharatiSystemFlowOverlay
+              telemetry={telemetry}
+              station={station}
+              selectedAssetId={selectedAssetId}
+              selectedSensor={selectedSensor}
+              onSelectAsset={onSelectAsset}
+              incidentGraph={incidentGraph}
+            />
+          )}
+        </>
+      ) : (
+        <>
+      {/* ================================================================= */}
+      {/* MAITRI — original rendering path, completely unchanged             */}
+      {/* ================================================================= */}
+
       {/* ------------------------------------------------------------- */}
       {/* 1. ANTARCTIC PERMAFROST & SNOWFIELD TERRAIN                   */}
       {/* ------------------------------------------------------------- */}
@@ -669,6 +719,8 @@ export const StationModel = ({
         position={[-8.5, 0, 18.0]}
         twinMode={twinMode}
       />
+        </>
+      )}
     </group>
   );
 };
