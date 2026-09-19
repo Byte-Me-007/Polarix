@@ -1,0 +1,37 @@
+{
+  "model_name": "temperature-lstm-v1",
+  "model_type": "TemperatureLSTM",
+  "provenance": "SYNTHETIC_POLARIX_DATA",
+  "random_seed": 42,
+  "input_dim": 9,
+  "feature_cols": [
+    "temperature_c",
+    "humidity_percent",
+    "pressure_hpa",
+    "wind_speed_mps",
+    "sin_hour",
+    "cos_hour",
+    "sin_day",
+    "cos_day",
+    "is_bharati"
+  ],
+  "target_cols": [
+    "target_temperature_1h_c",
+    "target_temperature_6h_c",
+    "target_temperature_24h_c"
+  ],
+  "lookback_hours": 24,
+  "hidden_dim": 64,
+  "num_layers": 2,
+  "dropout": 0.1,
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "best_epoch": 4,
+  "best_val_loss_normalized": 0.05110797378372352,
+  "parameter_counts": {
+    "total_parameters": 54659,
+    "trainable_parameters": 54659
+  },
+  "training_samples": 12218,
+  "validation_samples": 2582
+}

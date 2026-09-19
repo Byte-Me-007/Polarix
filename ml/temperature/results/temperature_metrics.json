@@ -1,0 +1,280 @@
+{
+  "evaluation_version": "1.0.0",
+  "subsystem": "Temperature Forecasting ML Subsystem",
+  "model_version": "temperature-lstm-v1",
+  "data_provenance": "SYNTHETIC_POLARIX_DATA",
+  "evaluation_split": "TEST (2026-11-07T06:00:00Z to 2026-12-31T23:00:00Z)",
+  "stations": {
+    "MTR": {
+      "station": "MTR",
+      "sample_count": 1267,
+      "horizons": {
+        "1h": {
+          "lstm": {
+            "mae_c": 1.4232,
+            "rmse_c": 1.7574,
+            "r2": 0.7359,
+            "smape_pct": 0.5149
+          },
+          "persistence": {
+            "mae_c": 0.6586,
+            "rmse_c": 1.0419,
+            "r2": 0.9072,
+            "smape_pct": 0.2383
+          },
+          "recent_mean": {
+            "mae_c": 1.7779,
+            "rmse_c": 2.3028,
+            "r2": 0.5465,
+            "smape_pct": 0.6431
+          },
+          "improvement_over_persistence_mae_pct": -116.09,
+          "improvement_over_mean_mae_pct": 19.95
+        },
+        "6h": {
+          "lstm": {
+            "mae_c": 1.8426,
+            "rmse_c": 2.2494,
+            "r2": 0.5693,
+            "smape_pct": 0.666
+          },
+          "persistence": {
+            "mae_c": 1.8146,
+            "rmse_c": 2.3778,
+            "r2": 0.5187,
+            "smape_pct": 0.6565
+          },
+          "recent_mean": {
+            "mae_c": 2.1457,
+            "rmse_c": 2.7391,
+            "r2": 0.3613,
+            "smape_pct": 0.7761
+          },
+          "improvement_over_persistence_mae_pct": -1.54,
+          "improvement_over_mean_mae_pct": 14.13
+        },
+        "24h": {
+          "lstm": {
+            "mae_c": 2.2808,
+            "rmse_c": 2.7461,
+            "r2": 0.3661,
+            "smape_pct": 0.8245
+          },
+          "persistence": {
+            "mae_c": 2.6793,
+            "rmse_c": 3.4797,
+            "r2": -0.0179,
+            "smape_pct": 0.9694
+          },
+          "recent_mean": {
+            "mae_c": 2.8134,
+            "rmse_c": 3.5565,
+            "r2": -0.0633,
+            "smape_pct": 1.0172
+          },
+          "improvement_over_persistence_mae_pct": 14.87,
+          "improvement_over_mean_mae_pct": 18.93
+        }
+      },
+      "extreme_cold_scenario": {
+        "scenario_type": "SYNTHETIC_EXTREME_COLD_PERIOD",
+        "threshold_temp_c": -0.18,
+        "sample_count": 192,
+        "horizons": {
+          "1h": {
+            "mae_c": 2.3987,
+            "rmse_c": 2.6905,
+            "r2": -1.7698,
+            "smape_pct": 0.8797
+          },
+          "6h": {
+            "mae_c": 1.8171,
+            "rmse_c": 2.4085,
+            "r2": -0.2437,
+            "smape_pct": 0.6658
+          },
+          "24h": {
+            "mae_c": 2.3936,
+            "rmse_c": 3.0275,
+            "r2": -0.1004,
+            "smape_pct": 0.8724
+          }
+        }
+      }
+    },
+    "BRT": {
+      "station": "BRT",
+      "sample_count": 1267,
+      "horizons": {
+        "1h": {
+          "lstm": {
+            "mae_c": 1.4333,
+            "rmse_c": 1.7736,
+            "r2": 0.742,
+            "smape_pct": 0.5187
+          },
+          "persistence": {
+            "mae_c": 0.702,
+            "rmse_c": 1.0451,
+            "r2": 0.9104,
+            "smape_pct": 0.2542
+          },
+          "recent_mean": {
+            "mae_c": 1.878,
+            "rmse_c": 2.4123,
+            "r2": 0.5227,
+            "smape_pct": 0.679
+          },
+          "improvement_over_persistence_mae_pct": -104.17,
+          "improvement_over_mean_mae_pct": 23.68
+        },
+        "6h": {
+          "lstm": {
+            "mae_c": 1.918,
+            "rmse_c": 2.401,
+            "r2": 0.5285,
+            "smape_pct": 0.6934
+          },
+          "persistence": {
+            "mae_c": 1.8959,
+            "rmse_c": 2.52,
+            "r2": 0.4807,
+            "smape_pct": 0.6859
+          },
+          "recent_mean": {
+            "mae_c": 2.2146,
+            "rmse_c": 2.8533,
+            "r2": 0.3342,
+            "smape_pct": 0.8005
+          },
+          "improvement_over_persistence_mae_pct": -1.17,
+          "improvement_over_mean_mae_pct": 13.39
+        },
+        "24h": {
+          "lstm": {
+            "mae_c": 2.3465,
+            "rmse_c": 2.8948,
+            "r2": 0.3144,
+            "smape_pct": 0.848
+          },
+          "persistence": {
+            "mae_c": 2.7492,
+            "rmse_c": 3.6161,
+            "r2": -0.0698,
+            "smape_pct": 0.9931
+          },
+          "recent_mean": {
+            "mae_c": 2.7264,
+            "rmse_c": 3.5392,
+            "r2": -0.0248,
+            "smape_pct": 0.9849
+          },
+          "improvement_over_persistence_mae_pct": 14.65,
+          "improvement_over_mean_mae_pct": 13.93
+        }
+      },
+      "extreme_cold_scenario": {
+        "scenario_type": "SYNTHETIC_EXTREME_COLD_PERIOD",
+        "threshold_temp_c": -0.62,
+        "sample_count": 192,
+        "horizons": {
+          "1h": {
+            "mae_c": 2.1071,
+            "rmse_c": 2.3856,
+            "r2": -1.9946,
+            "smape_pct": 0.7731
+          },
+          "6h": {
+            "mae_c": 1.8012,
+            "rmse_c": 2.4049,
+            "r2": 0.085,
+            "smape_pct": 0.6582
+          },
+          "24h": {
+            "mae_c": 2.5036,
+            "rmse_c": 3.2172,
+            "r2": 0.0274,
+            "smape_pct": 0.9106
+          }
+        }
+      }
+    },
+    "COMBINED": {
+      "station": "COMBINED",
+      "sample_count": 2534,
+      "horizons": {
+        "1h": {
+          "lstm": {
+            "mae_c": 1.4283,
+            "rmse_c": 1.7656,
+            "r2": 0.7412,
+            "smape_pct": 0.5168
+          },
+          "persistence": {
+            "mae_c": 0.6803,
+            "rmse_c": 1.0435,
+            "r2": 0.9096,
+            "smape_pct": 0.2462
+          },
+          "recent_mean": {
+            "mae_c": 1.828,
+            "rmse_c": 2.3582,
+            "r2": 0.5383,
+            "smape_pct": 0.661
+          },
+          "improvement_over_persistence_mae_pct": -109.95,
+          "improvement_over_mean_mae_pct": 21.87
+        },
+        "6h": {
+          "lstm": {
+            "mae_c": 1.8803,
+            "rmse_c": 2.3264,
+            "r2": 0.5518,
+            "smape_pct": 0.6797
+          },
+          "persistence": {
+            "mae_c": 1.8553,
+            "rmse_c": 2.45,
+            "r2": 0.503,
+            "smape_pct": 0.6712
+          },
+          "recent_mean": {
+            "mae_c": 2.1802,
+            "rmse_c": 2.7968,
+            "r2": 0.3523,
+            "smape_pct": 0.7883
+          },
+          "improvement_over_persistence_mae_pct": -1.35,
+          "improvement_over_mean_mae_pct": 13.76
+        },
+        "24h": {
+          "lstm": {
+            "mae_c": 2.3137,
+            "rmse_c": 2.8215,
+            "r2": 0.3434,
+            "smape_pct": 0.8363
+          },
+          "persistence": {
+            "mae_c": 2.7143,
+            "rmse_c": 3.5485,
+            "r2": -0.0386,
+            "smape_pct": 0.9813
+          },
+          "recent_mean": {
+            "mae_c": 2.7699,
+            "rmse_c": 3.5479,
+            "r2": -0.0382,
+            "smape_pct": 1.0011
+          },
+          "improvement_over_persistence_mae_pct": 14.76,
+          "improvement_over_mean_mae_pct": 16.47
+        }
+      }
+    }
+  },
+  "artifact_hashes": {
+    "model_weights": "57d8f639cf122e6ceb38225dedd2f777b35fc60878319badf4035a78560c7d13",
+    "model_config": "a66041db1cf1039eaacbcd3d1db1671b078ba5575e914788f0abff6d9e2418d0",
+    "model_scaler": "870e49f3858b9d0ac034259483c3dec1b2d299ac7b9f0a947099ab9e9c8f0d03"
+  }
+}

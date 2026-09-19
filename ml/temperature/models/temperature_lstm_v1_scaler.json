@@ -1,0 +1,43 @@
+{
+  "is_fitted": true,
+  "feature_cols": [
+    "temperature_c",
+    "humidity_percent",
+    "pressure_hpa",
+    "wind_speed_mps",
+    "sin_hour",
+    "cos_hour",
+    "sin_day",
+    "cos_day",
+    "is_bharati"
+  ],
+  "target_cols": [
+    "target_temperature_1h_c",
+    "target_temperature_6h_c",
+    "target_temperature_24h_c"
+  ],
+  "means": {
+    "temperature_c": -10.39330768585205,
+    "humidity_percent": 69.82946014404297,
+    "pressure_hpa": 988.8866577148438,
+    "wind_speed_mps": 12.640886306762695,
+    "sin_hour": 0.0,
+    "cos_hour": 0.0,
+    "sin_day": 0.0,
+    "cos_day": 0.0,
+    "is_bharati": 0.0
+  },
+  "stds": {
+    "temperature_c": 11.839052200317383,
+    "humidity_percent": 13.860129356384277,
+    "pressure_hpa": 11.860005378723145,
+    "wind_speed_mps": 6.464253902435303,
+    "sin_hour": 1.0,
+    "cos_hour": 1.0,
+    "sin_day": 1.0,
+    "cos_day": 1.0,
+    "is_bharati": 1.0
+  },
+  "temp_mean": -10.39330768585205,
+  "temp_std": 11.839052200317383
+}

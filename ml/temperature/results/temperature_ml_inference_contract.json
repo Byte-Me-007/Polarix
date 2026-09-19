@@ -1,0 +1,48 @@
+{
+  "contract_name": "polarix-temperature-ml-contract-v1",
+  "subsystem": "ml/temperature",
+  "model_version": "temperature-lstm-v1",
+  "provenance": "SYNTHETIC_POLARIX_DATA",
+  "status_codes": [
+    "PREDICTION_AVAILABLE",
+    "INSUFFICIENT_HISTORY",
+    "INVALID_INPUT"
+  ],
+  "required_lookback_hours": 24,
+  "input_schema": {
+    "station_id": {
+      "type": "string",
+      "enum": [
+        "MTR",
+        "BRT"
+      ]
+    },
+    "telemetry": {
+      "type": "array",
+      "min_items": 24,
+      "item_fields": [
+        "timestamp",
+        "temperature_c",
+        "humidity_percent",
+        "pressure_hpa",
+        "wind_speed_mps"
+      ]
+    }
+  },
+  "output_schema": {
+    "station_id": "string",
+    "timestamp": "string (ISO-8601 UTC)",
+    "status": "string",
+    "model_version": "string",
+    "forecasts": {
+      "temperature_1h_c": "float (\u00b0C)",
+      "temperature_6h_c": "float (\u00b0C)",
+      "temperature_24h_c": "float (\u00b0C)"
+    },
+    "provenance": {
+      "source": "string",
+      "model_status": "string",
+      "disclaimer": "string"
+    }
+  }
+}

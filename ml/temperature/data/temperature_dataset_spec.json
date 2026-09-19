@@ -1,0 +1,132 @@
+{
+  "spec_version": "1.0.0",
+  "module": "ml.temperature.data",
+  "project": "Polarix (SIH 2026 - Problem Statement SIH26060, Team Byte Me_26 / 143760)",
+  "subsystem": "Temperature Forecasting ML Subsystem",
+  "author": "Person C — Machine Learning Specialist",
+  "date_created": "2026-09-19",
+  "station_scopes": [
+    "MTR",
+    "BRT"
+  ],
+  "station_metadata": {
+    "MTR": {
+      "station_name": "Maitri",
+      "location": "Schirmacher Oasis, Queen Maud Land, East Antarctica",
+      "coordinates": {
+        "latitude": "-70.7667 S",
+        "longitude": "11.7333 E"
+      },
+      "elevation_m": 117,
+      "climate_regime": "Inland Antarctic Oasis (Continental rock oasis, severe winter drops to -40C, moderate katabatic winds, high summer solar diurnal swings)",
+      "temperature_range_c": {
+        "min": -45.0,
+        "max": 8.0,
+        "mean": -10.5
+      }
+    },
+    "BRT": {
+      "station_name": "Bharati",
+      "location": "Larsemann Hills, Prydz Bay, East Antarctica",
+      "coordinates": {
+        "latitude": "-69.4000 S",
+        "longitude": "76.1833 E"
+      },
+      "elevation_m": 35,
+      "climate_regime": "Coastal Promontory (Maritime buffered, frequent coastal blizzards, extreme maritime katabatic winds, winter lows to -35C, summer highs to +8C)",
+      "temperature_range_c": {
+        "min": -38.0,
+        "max": 10.0,
+        "mean": -8.5
+      }
+    }
+  },
+  "public_datasets_investigated": [
+    {
+      "source_authority": "National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences, Govt of India",
+      "dataset_title": "Meteorological Observations from Indian Antarctic Stations (Maitri & Bharati)",
+      "provenance_category": "REAL_PUBLIC_INDIAN_ANTARCTIC_WEATHER_DATA",
+      "usage": "Calibrates empirical distributions for temperature, diurnal solar cycle, pressure variability, and wind distributions"
+    },
+    {
+      "source_authority": "Australian Antarctic Data Centre (AADC CC BY 4.0)",
+      "dataset_title": "East Antarctic Automatic Weather Station (AWS) Meteorological Archives",
+      "provenance_category": "REAL_PUBLIC_ANTARCTIC_DATA",
+      "usage": "Provides empirical macroscopic benchmark bounds for Antarctic thermal transitions"
+    }
+  ],
+  "provenance_disclaimer": "SYNTHETIC_POLARIX_DATA. Generated deterministically from physically grounded Antarctic meteorological transfer equations and seasonal solar geometry conditioned on NCPOR empirical bounds. Never represented as classified real-time station SCADA telemetry.",
+  "canonical_features": [
+    {
+      "name": "timestamp",
+      "type": "string",
+      "format": "ISO-8601 UTC (YYYY-MM-DDTHH:MM:SSZ)",
+      "description": "Chronological observation timestamp at hourly resolution"
+    },
+    {
+      "name": "station_id",
+      "type": "string",
+      "enum": ["MTR", "BRT"],
+      "description": "Canonical station identifier"
+    },
+    {
+      "name": "temperature_c",
+      "type": "float",
+      "unit": "deg C",
+      "bounds": [-50.0, 15.0],
+      "description": "Ambient air temperature at 2-meter meteorological mast"
+    },
+    {
+      "name": "humidity_percent",
+      "type": "float",
+      "unit": "%",
+      "bounds": [10.0, 100.0],
+      "description": "Relative humidity"
+    },
+    {
+      "name": "pressure_hpa",
+      "type": "float",
+      "unit": "hPa",
+      "bounds": [910.0, 1045.0],
+      "description": "Atmospheric barometric pressure"
+    },
+    {
+      "name": "wind_speed_mps",
+      "type": "float",
+      "unit": "m/s",
+      "bounds": [0.0, 65.0],
+      "description": "Sustained wind speed at 10-meter mast"
+    }
+  ],
+  "forecasting_targets": [
+    {
+      "name": "target_temperature_1h_c",
+      "horizon": "t + 1h",
+      "definition": "temperature_c(t + 1 hour)",
+      "description": "Immediate 1-hour ahead temperature forecast for HVAC fine adjustment"
+    },
+    {
+      "name": "target_temperature_6h_c",
+      "horizon": "t + 6h",
+      "definition": "temperature_c(t + 6 hours)",
+      "description": "Medium-term 6-hour ahead temperature forecast for thermal mass pre-heating and generator dispatch"
+    },
+    {
+      "name": "target_temperature_24h_c",
+      "horizon": "t + 24h",
+      "definition": "temperature_c(t + 24 hours)",
+      "description": "Day-ahead 24-hour diurnal temperature forecast for daily habitat energy budgeting"
+    }
+  ],
+  "temporal_split_strategy": {
+    "total_records_per_station": 8760,
+    "total_records_combined": 17520,
+    "coverage": "2026-01-01T00:00:00Z to 2026-12-31T23:00:00Z (365 days / 8,760 hours)",
+    "train_ratio": 0.70,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "train_period": "2026-01-01T00:00:00Z to 2026-09-13T17:00:00Z (6,132 hours/station)",
+    "val_period": "2026-09-13T18:00:00Z to 2026-11-07T05:00:00Z (1,314 hours/station)",
+    "test_period": "2026-11-07T06:00:00Z to 2026-12-31T23:00:00Z (1,314 hours/station)"
+  }
+}

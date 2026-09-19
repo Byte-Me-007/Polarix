@@ -1,0 +1,41 @@
+{
+  "manifest_version": "1.0.0",
+  "subsystem": "Temperature Forecasting ML Subsystem",
+  "data_provenance": "SYNTHETIC_POLARIX_DATA",
+  "provenance_disclaimer": "Generated deterministically from physically grounded Antarctic meteorological transfer equations and seasonal solar geometry conditioned on NCPOR empirical bounds.",
+  "random_seed": 42,
+  "stations": {
+    "MTR": {
+      "records": 8760,
+      "filename": "maitri_temperature_telemetry.csv",
+      "sha256": "d64eab3aa053d63a39c7b7aa1f0d7b4bec721e31fd0a296510f50849df83a8bf",
+      "temp_stats": {
+        "mean": -8.79802625570776,
+        "min": -32.58,
+        "max": 8.0,
+        "std": 12.115274511532025
+      }
+    },
+    "BRT": {
+      "records": 8760,
+      "filename": "bharati_temperature_telemetry.csv",
+      "sha256": "36debf04fe7ec8e8b8e2d7898cf1bbacfa76c69df4948baaeb7f16d70de0629a",
+      "temp_stats": {
+        "mean": -7.4934600456621,
+        "min": -27.43,
+        "max": 10.0,
+        "std": 10.467742478041695
+      }
+    },
+    "COMBINED": {
+      "records": 17520,
+      "filename": "polarix_temperature_telemetry.csv",
+      "sha256": "e36b5ccf0a028e5663060a6353721583305bc82029508c58599e745137ad0867"
+    }
+  },
+  "chronological_splits": {
+    "train_period": "2026-01-01T00:00:00Z to 2026-09-13T17:00:00Z (6,132 records / station)",
+    "val_period": "2026-09-13T18:00:00Z to 2026-11-07T05:00:00Z (1,314 records / station)",
+    "test_period": "2026-11-07T06:00:00Z to 2026-12-31T23:00:00Z (1,314 records / station)"
+  }
+}
